@@ -39,9 +39,9 @@
                   data-action="song-row#play">
             Play
           </button>
-          <%= render "playlist_tracks/add_menu", track: @track, playlists: current_user_playlists, menu_class: "left-0" %>
           <%= link_to "Edit", edit_track_path(@track), class: "px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600" %>
           <%= button_to "Delete", track_path(@track), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700" %>
+          <%= render "playlist_tracks/add_menu", track: @track, playlists: current_user_playlists, menu_class: "left-0" %>
         </div>
       </div>
     </div>

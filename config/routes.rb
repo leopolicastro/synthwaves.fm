@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  resource :profile, only: [:show, :edit, :update]
+  resource :registration, only: [:new, :create]
+  resource :session
+  resources :passwords, param: :token
   get '/home', to: 'home#show', as: :home
 root "static/landing#show"
 

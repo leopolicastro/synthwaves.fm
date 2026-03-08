@@ -1,8 +1,14 @@
 class PlaylistsController < ApplicationController
+  include Orderable
+
   before_action :set_playlist, only: [:show, :edit, :update, :destroy]
 
   def index
-    @playlists = Current.user.playlists.order(:name)
+    @query = params[:q]
+    @sort = sort_column(Playlist, default: "name")
+    @direction = sort_direction
+    scope = Current.user.playlists.search(@query).order(@sort => @direction)
+    @pagy, @playlists = pagy(:offset, scope)
   end
 
   def show

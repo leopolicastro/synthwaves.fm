@@ -51,6 +51,13 @@ namespace :library do
         request.body = body
 
         response = http.request(request)
+
+        unless response.content_type&.include?("json")
+          puts "#{label} #{file_name} — FAILED (#{response.code}: #{response.body[0..200]})"
+          failed += 1
+          next
+        end
+
         json = JSON.parse(response.body)
 
         if response.code.to_i == 201

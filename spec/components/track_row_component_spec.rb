@@ -11,6 +11,16 @@ RSpec.describe TrackRowComponent, type: :component do
     render_inline(described_class.new(track: track, **options), &block)
   end
 
+  describe "hover styling" do
+    it "uses valid Tailwind dark mode hover class" do
+      html = render_component
+      row = html.at_css("[data-controller='song-row']")
+      classes = row["class"]
+      expect(classes).to include("dark:hover:bg-gray-700")
+      expect(classes).not_to include("gray-750")
+    end
+  end
+
   describe "stimulus wiring" do
     it "sets data-controller on the outer div" do
       expect(render_component.css("[data-controller='song-row']")).to be_present
@@ -37,9 +47,17 @@ RSpec.describe TrackRowComponent, type: :component do
 
     it "shows the number when number is provided" do
       html = render_component(number: 7)
-      button = html.at_css("button")
-      expect(button.text.strip).to eq("7")
-      expect(html.css("button svg")).to be_empty
+      number_span = html.at_css("button span")
+      expect(number_span.text.strip).to eq("7")
+    end
+
+    it "shows number by default and play icon on hover when number is provided" do
+      html = render_component(number: 7)
+      number_span = html.at_css("button span")
+      play_svg = html.at_css("button svg")
+      expect(number_span["class"]).to include("group-hover/play:hidden")
+      expect(play_svg["class"]).to include("hidden")
+      expect(play_svg["class"]).to include("group-hover/play:block")
     end
   end
 

@@ -1,18 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Manages the YouTube IFrame Player API and PiP video window.
-// Listens for "youtube:play" events and controls embedded YouTube playback.
+// Manages the YouTube IFrame Player API and a floating PiP video window.
+//
+// This controller lives on the permanent player bar (#player-bar).
+// The PiP container is created dynamically via JS and appended to
+// document.body — Turbo never touches it, so the iframe survives
+// page navigations without reloading.
 export default class extends Controller {
-  static targets = ["container", "iframe", "closeButton"]
-
   connect() {
-    this.player = null
-    this.apiReady = false
-    this.pendingVideoId = null
-    this.pendingIsLive = false
-    this.currentIsLive = false
-    this.timeUpdateInterval = null
-
     this.playHandler = (e) => this.play(e.detail)
     this.stopHandler = () => this.stop()
     this.toggleHandler = () => this.toggle()
@@ -26,19 +21,34 @@ export default class extends Controller {
     document.removeEventListener("youtube:play", this.playHandler)
     document.removeEventListener("youtube:stop", this.stopHandler)
     document.removeEventListener("youtube:toggle", this.toggleHandler)
-    this.stopTimeUpdates()
-    if (this.player) {
-      this.player.destroy()
-      this.player = null
-    }
+  }
+
+  get pip() {
+    return this._ensurePip()
+  }
+
+  get player() {
+    return this.pip._ytPlayer || null
+  }
+
+  set player(value) {
+    this.pip._ytPlayer = value
+  }
+
+  get apiReady() {
+    return window._ytApiReady || false
+  }
+
+  set apiReady(value) {
+    window._ytApiReady = value
   }
 
   play({ videoId, isLive }) {
-    this.currentIsLive = isLive || false
+    this.pip._ytIsLive = isLive || false
 
     if (!this.apiReady) {
-      this.pendingVideoId = videoId
-      this.pendingIsLive = isLive || false
+      this.pip._ytPendingVideoId = videoId
+      this.pip._ytPendingIsLive = isLive || false
       this.loadApi()
       return
     }
@@ -49,7 +59,7 @@ export default class extends Controller {
       this.createPlayer(videoId)
     }
 
-    this.show()
+    this.showPip()
   }
 
   toggle() {
@@ -68,15 +78,39 @@ export default class extends Controller {
       this.player.stopVideo()
     }
     this.stopTimeUpdates()
-    this.hide()
+    this.hidePip()
     document.dispatchEvent(new CustomEvent("youtube:stopped"))
   }
 
-  close() {
-    this.stop()
+  // Private
+
+  _ensurePip() {
+    let pip = document.getElementById("youtube-pip")
+    if (!pip) {
+      pip = document.createElement("div")
+      pip.id = "youtube-pip"
+      pip.className = "hidden fixed bottom-28 right-4 z-50 rounded-lg shadow-2xl overflow-hidden"
+      pip.innerHTML = `
+        <div class="relative">
+          <div id="youtube-pip-iframe"></div>
+          <button type="button"
+                  class="absolute top-1 right-1 w-6 h-6 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center"
+                  id="youtube-pip-close">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      `
+      // Append to <html> instead of <body> so Turbo's body
+      // replacement never detaches the iframe (which would reload it).
+      document.documentElement.appendChild(pip)
+      pip.querySelector("#youtube-pip-close").addEventListener("click", () => this.stop())
+    }
+    return pip
   }
 
-  // Private
+  get iframeTarget() {
+    return document.getElementById("youtube-pip-iframe")
+  }
 
   loadApi() {
     if (window.YT && window.YT.Player) {
@@ -86,7 +120,6 @@ export default class extends Controller {
     }
 
     if (document.querySelector('script[src*="youtube.com/iframe_api"]')) {
-      // Script already loading, wait for callback
       const originalCallback = window.onYouTubeIframeAPIReady
       window.onYouTubeIframeAPIReady = () => {
         if (originalCallback) originalCallback()
@@ -107,14 +140,15 @@ export default class extends Controller {
   }
 
   onApiReady() {
-    if (this.pendingVideoId) {
-      const videoId = this.pendingVideoId
-      const isLive = this.pendingIsLive
-      this.pendingVideoId = null
-      this.pendingIsLive = false
-      this.currentIsLive = isLive
+    const pip = this.pip
+    if (pip._ytPendingVideoId) {
+      const videoId = pip._ytPendingVideoId
+      const isLive = pip._ytPendingIsLive || false
+      pip._ytPendingVideoId = null
+      pip._ytPendingIsLive = false
+      pip._ytIsLive = isLive
       this.createPlayer(videoId)
-      this.show()
+      this.showPip()
     }
   }
 
@@ -124,7 +158,19 @@ export default class extends Controller {
       this.player = null
     }
 
-    this.player = new YT.Player(this.iframeTarget, {
+    // YT.Player replaces the target div with an iframe, so recreate it if needed
+    let target = this.iframeTarget
+    if (!target || target.tagName === "IFRAME") {
+      const parent = this.pip.querySelector(".relative")
+      const old = target || parent.querySelector("iframe")
+      if (old) old.remove()
+      const div = document.createElement("div")
+      div.id = "youtube-pip-iframe"
+      parent.insertBefore(div, parent.firstChild)
+      target = div
+    }
+
+    this.player = new YT.Player(target, {
       height: "144",
       width: "256",
       videoId: videoId,
@@ -147,12 +193,14 @@ export default class extends Controller {
   }
 
   onStateChange(event) {
+    const isLive = this.pip._ytIsLive || false
+
     switch (event.data) {
       case YT.PlayerState.PLAYING:
         document.dispatchEvent(new CustomEvent("youtube:stateChange", {
           detail: { state: "playing" }
         }))
-        if (!this.currentIsLive) {
+        if (!isLive) {
           this.startTimeUpdates()
         }
         break
@@ -173,30 +221,33 @@ export default class extends Controller {
 
   startTimeUpdates() {
     this.stopTimeUpdates()
-    this.timeUpdateInterval = setInterval(() => {
-      if (this.player && this.player.getCurrentTime) {
+    const interval = setInterval(() => {
+      const p = this.player
+      if (p && p.getCurrentTime) {
         document.dispatchEvent(new CustomEvent("youtube:timeUpdate", {
           detail: {
-            currentTime: this.player.getCurrentTime(),
-            duration: this.player.getDuration()
+            currentTime: p.getCurrentTime(),
+            duration: p.getDuration()
           }
         }))
       }
     }, 500)
+    this.pip._ytInterval = interval
   }
 
   stopTimeUpdates() {
-    if (this.timeUpdateInterval) {
-      clearInterval(this.timeUpdateInterval)
-      this.timeUpdateInterval = null
+    const pip = document.getElementById("youtube-pip")
+    if (pip && pip._ytInterval) {
+      clearInterval(pip._ytInterval)
+      pip._ytInterval = null
     }
   }
 
-  show() {
-    this.containerTarget.classList.remove("hidden")
+  showPip() {
+    this.pip.classList.remove("hidden")
   }
 
-  hide() {
-    this.containerTarget.classList.add("hidden")
+  hidePip() {
+    this.pip.classList.add("hidden")
   }
 }

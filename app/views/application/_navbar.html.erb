@@ -8,7 +8,6 @@
         <% end %>
         <% if authenticated? %>
           <nav class="hidden md:flex items-center space-x-3 text-sm">
-            <%= link_to "Library", library_path, class: "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" %>
             <%= link_to "Artists", artists_path, class: "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" %>
             <%= link_to "Albums", albums_path, class: "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" %>
             <%= link_to "Tracks", tracks_path, class: "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" %>

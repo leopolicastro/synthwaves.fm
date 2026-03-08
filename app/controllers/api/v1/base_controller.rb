@@ -4,7 +4,7 @@ class API::V1::BaseController < ActionController::API
   private
 
   def authenticate_with_jwt!
-    token = request.bearer_token
+    token = request.headers["Authorization"]&.remove("Bearer ")
     return render_unauthorized unless token
 
     payload = JWTService.decode(token)

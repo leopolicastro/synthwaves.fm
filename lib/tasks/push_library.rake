@@ -3,11 +3,14 @@ namespace :library do
   task :push do
     require "net/http"
     require "uri"
+    require "json"
 
     remote_url = ENV.fetch("GROOVY_REMOTE_URL") { abort "GROOVY_REMOTE_URL is required" }
-    remote_user = ENV.fetch("GROOVY_REMOTE_USER") { abort "GROOVY_REMOTE_USER is required" }
-    remote_pass = ENV.fetch("GROOVY_REMOTE_PASSWORD") { abort "GROOVY_REMOTE_PASSWORD is required" }
+    client_id = ENV.fetch("GROOVY_CLIENT_ID") { abort "GROOVY_CLIENT_ID is required" }
+    secret_key = ENV.fetch("GROOVY_SECRET_KEY") { abort "GROOVY_SECRET_KEY is required" }
     music_path = ENV.fetch("MUSIC_PATH", "/Volumes/music")
+
+    token = authenticate(remote_url, client_id, secret_key)
 
     extensions = %w[mp3 flac ogg m4a aac wav wma opus webm]
     pattern = File.join(music_path, "**", "*.{#{extensions.join(",")}}")
@@ -20,7 +23,7 @@ namespace :library do
 
     puts "Found #{files.size} audio files in #{music_path}"
 
-    uri = URI.parse("#{remote_url}/api/import/tracks?u=#{CGI.escape(remote_user)}&p=#{CGI.escape(remote_pass)}")
+    uri = URI.parse("#{remote_url}/api/import/tracks")
 
     created = 0
     existing = 0
@@ -44,6 +47,7 @@ namespace :library do
 
         request = Net::HTTP::Post.new(uri.request_uri)
         request["Content-Type"] = "multipart/form-data; boundary=#{boundary}"
+        request["Authorization"] = "Bearer #{token}"
         request.body = body
 
         response = http.request(request)
@@ -68,6 +72,28 @@ namespace :library do
     puts
     puts "Done: #{created} created, #{existing} already existed, #{failed} failed"
   end
+end
+
+def authenticate(remote_url, client_id, secret_key)
+  uri = URI.parse("#{remote_url}/api/v1/auth/token")
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = uri.scheme == "https"
+  http.open_timeout = 15
+  http.read_timeout = 15
+
+  request = Net::HTTP::Post.new(uri.request_uri)
+  request["Content-Type"] = "application/json"
+  request.body = JSON.generate(client_id: client_id, secret_key: secret_key)
+
+  response = http.request(request)
+  json = JSON.parse(response.body)
+
+  unless response.code.to_i == 200 && json["token"]
+    abort "Authentication failed: #{json["error"] || response.body}"
+  end
+
+  puts "Authenticated successfully"
+  json["token"]
 end
 
 def build_multipart_body(boundary, file_name, file_data)

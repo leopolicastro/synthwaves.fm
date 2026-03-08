@@ -1,15 +1,17 @@
 require "rails_helper"
 
 RSpec.describe "API Import Tracks", type: :request do
-  let(:user) { create(:user, subsonic_password: "testpass") }
-  let(:auth_params) { { u: user.email_address, p: "testpass" } }
+  let(:user) { create(:user) }
+  let(:api_key) { create(:api_key, user: user) }
+  let(:token) { JWTService.encode({ user_id: user.id, api_key_id: api_key.id }) }
+  let(:auth_headers) { { "Authorization" => "Bearer #{token}" } }
 
   describe "POST /api/import/tracks" do
     it "creates a track from an uploaded audio file" do
       file = fixture_file_upload("test.mp3", "audio/mpeg")
 
       expect {
-        post api_import_tracks_path, params: auth_params.merge(audio_file: file)
+        post api_import_tracks_path, params: { audio_file: file }, headers: auth_headers
       }.to change(Track, :count).by(1)
 
       expect(response).to have_http_status(:created)
@@ -22,12 +24,12 @@ RSpec.describe "API Import Tracks", type: :request do
 
     it "returns existing track without creating a duplicate" do
       file = fixture_file_upload("test.mp3", "audio/mpeg")
-      post api_import_tracks_path, params: auth_params.merge(audio_file: file)
+      post api_import_tracks_path, params: { audio_file: file }, headers: auth_headers
       expect(response).to have_http_status(:created)
 
       expect {
         file = fixture_file_upload("test.mp3", "audio/mpeg")
-        post api_import_tracks_path, params: auth_params.merge(audio_file: file)
+        post api_import_tracks_path, params: { audio_file: file }, headers: auth_headers
       }.not_to change(Track, :count)
 
       expect(response).to have_http_status(:ok)
@@ -36,7 +38,7 @@ RSpec.describe "API Import Tracks", type: :request do
     end
 
     it "returns unprocessable_entity without a file" do
-      post api_import_tracks_path, params: auth_params
+      post api_import_tracks_path, headers: auth_headers
 
       expect(response).to have_http_status(:unprocessable_entity)
       json = JSON.parse(response.body)
@@ -46,7 +48,8 @@ RSpec.describe "API Import Tracks", type: :request do
     it "returns unauthorized without valid credentials" do
       file = fixture_file_upload("test.mp3", "audio/mpeg")
 
-      post api_import_tracks_path, params: { u: user.email_address, p: "wrong", audio_file: file }
+      post api_import_tracks_path, params: { audio_file: file },
+        headers: { "Authorization" => "Bearer invalid_token" }
 
       expect(response).to have_http_status(:unauthorized)
     end
@@ -64,7 +67,7 @@ RSpec.describe "API Import Tracks", type: :request do
       album = create(:album, title: "Test Album", artist: artist)
 
       file = fixture_file_upload("test.mp3", "audio/mpeg")
-      post api_import_tracks_path, params: auth_params.merge(audio_file: file)
+      post api_import_tracks_path, params: { audio_file: file }, headers: auth_headers
 
       expect(response).to have_http_status(:created)
       track = Track.last
@@ -81,7 +84,7 @@ RSpec.describe "API Import Tracks", type: :request do
       })
 
       file = fixture_file_upload("test.mp3", "audio/mpeg")
-      post api_import_tracks_path, params: auth_params.merge(audio_file: file)
+      post api_import_tracks_path, params: { audio_file: file }, headers: auth_headers
 
       expect(response).to have_http_status(:created)
       expect(Track.last.album.cover_image.attached?).to be true

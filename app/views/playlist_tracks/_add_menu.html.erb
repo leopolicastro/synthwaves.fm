@@ -2,16 +2,28 @@
   <button data-action="click->playlist-menu#toggle" class="text-gray-400 hover:text-neon-cyan" title="Add to playlist">
     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
   </button>
-  <div data-playlist-menu-target="menu" class="hidden absolute z-10 mt-1 w-max bg-gray-800 border border-gray-700 rounded-lg shadow-lg <%= local_assigns[:menu_class] || 'right-0' %>">
+  <div data-playlist-menu-target="menu" class="hidden absolute z-10 mt-1 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-lg <%= local_assigns[:menu_class] || 'right-0' %>">
     <% if playlists.any? %>
-      <% playlists.each do |playlist| %>
-        <%= button_to playlist_tracks_path(playlist),
-              params: { track_id: track.id },
-              method: :post,
-              class: "block w-full text-left px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 hover:text-neon-cyan first:rounded-t-lg last:rounded-b-lg" do %>
-          <span class="truncate"><%= playlist.name %></span>
+      <div class="p-2 border-b border-gray-700">
+        <input type="text"
+               data-playlist-menu-target="input"
+               data-action="input->playlist-menu#filter keydown->playlist-menu#filterKeydown"
+               placeholder="Search playlists…"
+               class="w-full px-2 py-1 text-sm text-gray-200 bg-gray-900 border border-gray-600 rounded focus:outline-none focus:border-neon-cyan">
+      </div>
+      <div class="max-h-64 overflow-y-auto">
+        <% playlists.each do |playlist| %>
+          <div data-playlist-menu-target="item" data-playlist-name="<%= playlist.name %>">
+            <%= button_to playlist_tracks_path(playlist),
+                  params: { track_id: track.id },
+                  method: :post,
+                  class: "block w-full text-left px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 hover:text-neon-cyan" do %>
+              <span class="truncate block"><%= playlist.name %></span>
+            <% end %>
+          </div>
         <% end %>
-      <% end %>
+      </div>
+      <div data-playlist-menu-target="emptyMessage" style="display: none" class="px-4 py-2 text-sm text-gray-500">No matching playlists</div>
     <% else %>
       <div class="px-4 py-2 text-sm text-gray-500">No playlists yet</div>
     <% end %>

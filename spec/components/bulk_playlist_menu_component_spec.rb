@@ -63,4 +63,26 @@ RSpec.describe BulkPlaylistMenuComponent, type: :component do
     expect(html.at_css("form[action='#{playlists_path}']")).to be_present
     expect(html.css("form").size).to eq(1)
   end
+
+  it "renders search input when playlists exist" do
+    html = render_component
+    input = html.at_css("input[data-playlist-menu-target='input']")
+    expect(input).to be_present
+    expect(input["placeholder"]).to include("Search")
+  end
+
+  it "does not render search input when no playlists" do
+    html = render_component(playlists: [])
+    expect(html.at_css("input[data-playlist-menu-target='input']")).not_to be_present
+  end
+
+  it "renders data-playlist-name attribute on each item wrapper" do
+    html = render_component
+    items = html.css("[data-playlist-menu-target='item']")
+    expect(items.size).to eq(playlists.size)
+    playlists.each do |playlist|
+      item = html.at_css("[data-playlist-name='#{playlist.name}']")
+      expect(item).to be_present
+    end
+  end
 end

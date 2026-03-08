@@ -3,6 +3,6 @@ class Static::LandingController < ApplicationController
   layout "landing"
 
   def show
-    redirect_to home_path if resume_session
+    redirect_to library_path if resume_session
   end
 end

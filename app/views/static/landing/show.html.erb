@@ -1,95 +1,240 @@
-<% content_for :title, "Groovy Tunes - Welcome" %>
+<% content_for :title, "Groovy Tunes — Your Music, Your Server, Your Rules" %>
 
 <!-- Hero Section -->
-<section class="min-h-screen flex flex-col relative overflow-hidden retro-grid">
+<section class="min-h-screen flex flex-col relative overflow-hidden">
+  <!-- Retro grid background on hero only -->
+  <div class="absolute inset-0 retro-grid opacity-40"></div>
+  <!-- Extra radial glow for hero -->
+  <div class="absolute inset-0" style="background: radial-gradient(ellipse at 50% 30%, rgba(255, 45, 149, 0.12) 0%, transparent 60%);"></div>
+
   <!-- Auth Bar -->
-  <nav class="w-full py-4 px-6">
-    <div class="max-w-7xl mx-auto flex justify-end items-center gap-4">
-      <%= link_to "Log In", new_session_path, class: "text-gray-400 hover:text-neon-cyan font-medium transition-colors" %>
-      <%= link_to "Sign Up", new_registration_path, class: "bg-sunset-gradient hover:shadow-neon-pink text-white px-4 py-2 rounded-lg font-medium transition-shadow" %>
+  <nav class="relative z-10 w-full py-5 px-6">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 bg-sunset-gradient rounded-lg flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/>
+          </svg>
+        </div>
+        <span class="font-display text-lg text-neon-cyan">Groovy Tunes</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <%= link_to "Log In", new_session_path, class: "text-gray-400 hover:text-neon-cyan font-medium transition-colors" %>
+        <%= link_to "Sign Up", new_registration_path, class: "bg-sunset-gradient hover:shadow-neon-pink text-white px-5 py-2 rounded-lg font-medium transition-shadow" %>
+      </div>
     </div>
   </nav>
 
   <!-- Hero Content -->
-  <div class="flex-1 flex flex-col items-center justify-center px-6 pb-16">
-    <!-- Logo -->
-    <div class="mb-6">
-      <div class="w-20 h-20 bg-sunset-gradient rounded-2xl flex items-center justify-center shadow-neon-pink">
-        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+  <div class="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pb-20">
+    <!-- Glowing music icon -->
+    <div class="mb-8">
+      <div class="w-24 h-24 bg-sunset-gradient rounded-3xl flex items-center justify-center shadow-neon-pink animate-pulse" style="animation-duration: 3s;">
+        <svg class="w-14 h-14 text-white" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/>
         </svg>
       </div>
     </div>
 
     <!-- Title -->
-    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4">
+    <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-center mb-6 leading-tight">
       <span class="font-display text-sunset">Groovy Tunes</span>
     </h1>
 
     <!-- Tagline -->
-    <p class="text-xl md:text-2xl text-gray-500 text-center mb-8 max-w-2xl">
-      Build something amazing with Rails
+    <p class="text-xl md:text-2xl text-center mb-4 max-w-3xl leading-relaxed">
+      <span class="text-neon-pink">Self-hosted music streaming</span>
+      <span class="text-white"> that puts you in control.</span>
+    </p>
+    <p class="text-lg text-center mb-10 max-w-2xl">
+      <span class="text-neon-cyan">Your library.</span>
+      <span class="text-neon-pink">Your playlists.</span>
+      <span class="text-neon-purple">Your server.</span>
+      <span class="text-white/80">No subscriptions, no algorithms, no compromises.</span>
     </p>
 
     <!-- CTA Buttons -->
     <div class="flex flex-col sm:flex-row gap-4">
-      <%= link_to new_registration_path, class: "bg-sunset-gradient hover:shadow-neon-pink text-white px-8 py-3 rounded-lg font-semibold text-lg transition-shadow shadow-lg" do %>
-        Get Started Free
+      <%= link_to new_registration_path, class: "bg-sunset-gradient hover:shadow-neon-pink text-white px-10 py-4 rounded-xl font-semibold text-lg transition-shadow shadow-lg text-center" do %>
+        Start Listening
       <% end %>
-      <a href="#features" class="bg-gray-800 border border-neon-cyan/30 hover:border-neon-cyan/60 text-white px-8 py-3 rounded-lg font-semibold text-lg transition-colors">
-        Learn More
+      <a href="#features" class="bg-gray-800/60 backdrop-blur border border-neon-cyan/30 hover:border-neon-cyan/60 hover:shadow-neon-cyan text-neon-cyan px-10 py-4 rounded-xl font-semibold text-lg transition-all text-center">
+        See Features
       </a>
     </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="relative z-10 pb-8 flex justify-center">
+    <a href="#features" class="text-gray-500 hover:text-neon-cyan transition-colors animate-bounce">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+      </svg>
+    </a>
   </div>
 </section>
 
 <!-- Features Section -->
-<section id="features" class="py-20 px-6 bg-gray-800">
+<section id="features" class="py-24 px-6 bg-gray-800/50 border-t border-neon-purple/10">
   <div class="max-w-7xl mx-auto">
-    <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 font-display text-white">Features</h2>
+    <h2 class="text-3xl md:text-4xl font-bold text-center mb-4 font-display">
+      <span class="text-neon-pink">Everything</span> <span class="text-neon-cyan">you need</span>
+    </h2>
+    <p class="text-gray-500 text-center mb-16 text-lg max-w-2xl mx-auto">
+      A complete music platform running on your own hardware.
+    </p>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <!-- Feature 1 -->
-      <div class="text-center">
-        <div class="w-16 h-16 bg-neon-cyan/10 border border-neon-cyan/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <svg class="w-8 h-8 text-neon-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Feature: Music Library -->
+      <div class="bg-gray-800/80 border border-neon-purple/15 rounded-2xl p-8 hover:border-neon-pink/30 transition-colors group">
+        <div class="w-14 h-14 bg-neon-pink/10 border border-neon-pink/20 rounded-xl flex items-center justify-center mb-5 group-hover:shadow-neon-pink transition-shadow">
+          <svg class="w-7 h-7 text-neon-pink" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
           </svg>
         </div>
-        <h3 class="text-xl font-bold mb-2 text-white">Fast</h3>
-        <p class="text-gray-500">Lightning-fast performance with modern Rails.</p>
+        <h3 class="text-xl font-bold mb-2 text-neon-pink">Music Library</h3>
+        <p class="text-gray-400 leading-relaxed">Upload your collection and browse by artist, album, or track. Cover art and metadata extracted automatically.</p>
       </div>
 
-      <!-- Feature 2 -->
-      <div class="text-center">
-        <div class="w-16 h-16 bg-laser-green/10 border border-laser-green/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <svg class="w-8 h-8 text-laser-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+      <!-- Feature: Playlists -->
+      <div class="bg-gray-800/80 border border-neon-purple/15 rounded-2xl p-8 hover:border-neon-cyan/30 transition-colors group">
+        <div class="w-14 h-14 bg-neon-cyan/10 border border-neon-cyan/20 rounded-xl flex items-center justify-center mb-5 group-hover:shadow-neon-cyan transition-shadow">
+          <svg class="w-7 h-7 text-neon-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h10"/>
           </svg>
         </div>
-        <h3 class="text-xl font-bold mb-2 text-white">Secure</h3>
-        <p class="text-gray-500">Built-in authentication and security best practices.</p>
+        <h3 class="text-xl font-bold mb-2 text-neon-cyan">Playlists</h3>
+        <p class="text-gray-400 leading-relaxed">Create, reorder, and share playlists. Build them manually or generate from albums with one click.</p>
       </div>
 
-      <!-- Feature 3 -->
-      <div class="text-center">
-        <div class="w-16 h-16 bg-neon-purple/10 border border-neon-purple/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <svg class="w-8 h-8 text-neon-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+      <!-- Feature: Streaming -->
+      <div class="bg-gray-800/80 border border-neon-purple/15 rounded-2xl p-8 hover:border-neon-purple/30 transition-colors group">
+        <div class="w-14 h-14 bg-neon-purple/10 border border-neon-purple/20 rounded-xl flex items-center justify-center mb-5 group-hover:shadow-neon-pink transition-shadow">
+          <svg class="w-7 h-7 text-neon-purple" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
         </div>
-        <h3 class="text-xl font-bold mb-2 text-white">Responsive</h3>
-        <p class="text-gray-500">Fully responsive design that works on any device.</p>
+        <h3 class="text-xl font-bold mb-2 text-neon-purple">Stream Anywhere</h3>
+        <p class="text-gray-400 leading-relaxed">Full player with queue, shuffle, and repeat. Native media controls on desktop and mobile via MediaSession API.</p>
+      </div>
+
+      <!-- Feature: Podcasts -->
+      <div class="bg-gray-800/80 border border-neon-purple/15 rounded-2xl p-8 hover:border-laser-green/30 transition-colors group">
+        <div class="w-14 h-14 bg-laser-green/10 border border-laser-green/20 rounded-xl flex items-center justify-center mb-5 group-hover:shadow-[0_0_10px_rgba(57,255,20,0.3)] transition-shadow">
+          <svg class="w-7 h-7 text-laser-green" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold mb-2 text-laser-green">Podcasts</h3>
+        <p class="text-gray-400 leading-relaxed">Subscribe to podcast feeds and stream episodes alongside your music. Episodes auto-refresh on schedule.</p>
+      </div>
+
+      <!-- Feature: Radio -->
+      <div class="bg-gray-800/80 border border-neon-purple/15 rounded-2xl p-8 hover:border-sunset-orange/30 transition-colors group">
+        <div class="w-14 h-14 bg-sunset-orange/10 border border-sunset-orange/20 rounded-xl flex items-center justify-center mb-5 group-hover:shadow-[0_0_10px_rgba(255,107,53,0.3)] transition-shadow">
+          <svg class="w-7 h-7 text-sunset-orange" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728m-9.9-2.829a5 5 0 010-7.07m7.072 0a5 5 0 010 7.07M13 12a1 1 0 11-2 0 1 1 0 012 0z"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold mb-2 text-sunset-orange">Internet Radio</h3>
+        <p class="text-gray-400 leading-relaxed">Add any internet radio stream URL. Live indicator shows what's playing in real time.</p>
+      </div>
+
+      <!-- Feature: AI Chat -->
+      <div class="bg-gray-800/80 border border-neon-purple/15 rounded-2xl p-8 hover:border-neon-cyan/30 transition-colors group">
+        <div class="w-14 h-14 bg-neon-cyan/10 border border-neon-cyan/20 rounded-xl flex items-center justify-center mb-5 group-hover:shadow-neon-cyan transition-shadow">
+          <svg class="w-7 h-7 text-neon-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold mb-2 text-neon-cyan">AI Assistant</h3>
+        <p class="text-gray-400 leading-relaxed">Chat with an AI that knows your library. Get recommendations, discover connections, and explore your music.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Footer -->
-<footer class="py-8 px-6 bg-gray-900 border-t border-neon-purple/20">
-  <div class="max-w-7xl mx-auto text-center">
-    <p class="text-gray-500">
-      &copy; <%= Date.current.year %> Groovy Tunes. Built with Ruby on Rails.
+<!-- Subsonic Compatibility Section -->
+<section class="py-24 px-6 border-t border-neon-purple/10">
+  <div class="max-w-5xl mx-auto text-center">
+    <h2 class="text-3xl md:text-4xl font-bold mb-4 font-display">
+      <span class="text-neon-cyan">Subsonic</span> compatible
+    </h2>
+    <p class="text-gray-400 text-lg mb-12 max-w-2xl mx-auto">
+      Use your favourite Subsonic-compatible app to stream your library on the go.
+      <span class="text-neon-pink">DSub</span>,
+      <span class="text-neon-cyan">play:Sub</span>,
+      <span class="text-neon-purple">Ultrasonic</span>
+      &mdash; they all work.
     </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+      <div class="bg-gray-800/60 border border-neon-purple/15 rounded-xl p-6">
+        <div class="text-3xl font-display text-neon-pink mb-2">22</div>
+        <div class="text-gray-500 text-sm">API endpoints</div>
+      </div>
+      <div class="bg-gray-800/60 border border-neon-purple/15 rounded-xl p-6">
+        <div class="text-3xl font-display text-neon-cyan mb-2">REST</div>
+        <div class="text-gray-500 text-sm">JSON &amp; XML API</div>
+      </div>
+      <div class="bg-gray-800/60 border border-neon-purple/15 rounded-xl p-6">
+        <div class="text-3xl font-display text-neon-purple mb-2">JWT</div>
+        <div class="text-gray-500 text-sm">Token auth</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tech Stack Section -->
+<section class="py-24 px-6 bg-gray-800/30 border-t border-neon-purple/10">
+  <div class="max-w-5xl mx-auto text-center">
+    <h2 class="text-3xl md:text-4xl font-bold mb-4 font-display">
+      <span class="text-neon-cyan">Built with</span> <span class="text-neon-pink">Rails 8</span>
+    </h2>
+    <p class="text-gray-400 text-lg mb-12 max-w-2xl mx-auto">
+      Modern stack, zero complexity. SQLite for everything, Hotwire for interactivity, Solid Queue for background jobs.
+    </p>
+
+    <div class="flex flex-wrap justify-center gap-3">
+      <% %w[Ruby\ on\ Rails Hotwire SQLite Tailwind\ CSS Stimulus Turbo Solid\ Queue Solid\ Cache Importmap ViewComponent].each do |tech| %>
+        <span class="bg-gray-800/80 border border-neon-purple/20 text-gray-400 px-4 py-2 rounded-full text-sm font-medium hover:text-neon-cyan hover:border-neon-cyan/30 transition-colors cursor-default">
+          <%= tech %>
+        </span>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<!-- Final CTA Section -->
+<section class="py-24 px-6 border-t border-neon-purple/10 relative overflow-hidden">
+  <div class="absolute inset-0 retro-grid opacity-20"></div>
+  <div class="absolute inset-0" style="background: radial-gradient(ellipse at 50% 50%, rgba(255, 45, 149, 0.08) 0%, transparent 60%);"></div>
+
+  <div class="relative z-10 max-w-3xl mx-auto text-center">
+    <h2 class="text-3xl md:text-4xl font-bold mb-4 font-display text-sunset">
+      Ready to groove?
+    </h2>
+    <p class="text-gray-400 text-lg mb-10">
+      Set up your server, upload your music, and start streaming in minutes.
+    </p>
+    <%= link_to new_registration_path, class: "inline-block bg-sunset-gradient hover:shadow-neon-pink text-white px-12 py-4 rounded-xl font-semibold text-lg transition-shadow shadow-lg" do %>
+      Get Started Free
+    <% end %>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-10 px-6 bg-gray-800/50 border-t border-neon-purple/20">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+    <div class="flex items-center gap-2">
+      <div class="w-7 h-7 bg-sunset-gradient rounded-md flex items-center justify-center">
+        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/>
+        </svg>
+      </div>
+      <span class="text-gray-500 text-sm">&copy; <%= Date.current.year %> Groovy Tunes</span>
+    </div>
+    <p class="text-gray-600 text-sm">Built with Ruby on Rails</p>
   </div>
 </footer>

@@ -55,7 +55,7 @@ Rails.application.routes.draw do
   resource :session
   resources :passwords, param: :token
   get "/home", to: "home#show", as: :home
-  root "library#show"
+  root "static/landing#show"
 
   namespace :static do
     resource :landing, only: [:show], controller: "landing"

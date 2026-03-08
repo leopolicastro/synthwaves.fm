@@ -8,13 +8,13 @@
         <% end %>
         <% if authenticated? %>
           <nav class="hidden md:flex items-center space-x-3 text-sm">
-            <%= link_to "Artists", artists_path, class: "text-gray-400 hover:text-neon-cyan transition-colors" %>
-            <%= link_to "Albums", albums_path, class: "text-gray-400 hover:text-neon-cyan transition-colors" %>
-            <%= link_to "Tracks", tracks_path, class: "text-gray-400 hover:text-neon-cyan transition-colors" %>
-            <%= link_to "Playlists", playlists_path, class: "text-gray-400 hover:text-neon-cyan transition-colors" %>
-            <%= link_to "Podcasts", podcasts_path, class: "text-gray-400 hover:text-neon-cyan transition-colors" %>
+            <%= link_to "Artists", artists_path, class: "text-white hover:text-neon-cyan transition-colors" %>
+            <%= link_to "Albums", albums_path, class: "text-white hover:text-neon-cyan transition-colors" %>
+            <%= link_to "Tracks", tracks_path, class: "text-white hover:text-neon-cyan transition-colors" %>
+            <%= link_to "Playlists", playlists_path, class: "text-white hover:text-neon-cyan transition-colors" %>
+            <%= link_to "Podcasts", podcasts_path, class: "text-white hover:text-neon-cyan transition-colors" %>
             <% if Flipper.enabled?(:youtube_radio, Current.user) %>
-              <%= link_to "Radio", radio_stations_path, class: "text-gray-400 hover:text-neon-cyan transition-colors" %>
+              <%= link_to "Radio", radio_stations_path, class: "text-white hover:text-neon-cyan transition-colors" %>
             <% end %>
           </nav>
         <% end %>
@@ -37,7 +37,7 @@
           </div>
         </div>
         <!-- Mobile search icon -->
-        <%= link_to search_path, class: "md:hidden text-gray-400 hover:text-neon-cyan" do %>
+        <%= link_to search_path, class: "md:hidden text-gray-300 hover:text-neon-cyan" do %>
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
           </svg>
@@ -46,20 +46,20 @@
       <!-- Right side: User Dropdown or Auth links -->
       <% if authenticated? %>
         <details class="relative">
-          <summary class="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-neon-cyan cursor-pointer list-none">
+          <summary class="flex items-center gap-2 text-sm font-medium text-gray-300 hover:text-neon-cyan cursor-pointer list-none">
             <%= Current.user.email_address %>
             <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
             </svg>
           </summary>
           <div class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg border border-gray-700 py-1 z-50">
-            <%= link_to "Profile", profile_path, class: "block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 hover:text-neon-cyan" %>
+            <%= link_to "Profile", profile_path, class: "block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-neon-cyan" %>
             <% if Current.user.admin? %>
               <div class="border-t border-gray-700 my-1"></div>
-              <%= link_to "Admin", "/admin", class: "block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 hover:text-neon-cyan" %>
-              <%= link_to "Jobs", "/admin/jobs", class: "block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 hover:text-neon-cyan" %>
-              <%= link_to "Feature Flags", "/admin/flipper", class: "block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 hover:text-neon-cyan" %>
-              <%= link_to "Maintenance", "/admin/maintenance_tasks", class: "block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 hover:text-neon-cyan" %>
+              <%= link_to "Admin", "/admin", class: "block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-neon-cyan" %>
+              <%= link_to "Jobs", "/admin/jobs", class: "block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-neon-cyan" %>
+              <%= link_to "Feature Flags", "/admin/flipper", class: "block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-neon-cyan" %>
+              <%= link_to "Maintenance", "/admin/maintenance_tasks", class: "block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-neon-cyan" %>
             <% end %>
             <div class="border-t border-gray-700 my-1"></div>
             <%= button_to "Sign Out", session_path, method: :delete, data: { turbo_method: :delete }, class: "w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700" %>

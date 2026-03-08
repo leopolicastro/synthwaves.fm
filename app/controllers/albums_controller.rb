@@ -54,6 +54,18 @@ class AlbumsController < ApplicationController
     end
   end
 
+  def fetch_cover
+    album = Album.find(params[:id])
+
+    result = CoverArtSearchService.call(album)
+
+    if result == :not_found
+      redirect_to album, alert: "No cover art found."
+    else
+      redirect_to album, notice: "Cover art updated from #{result} source."
+    end
+  end
+
   def create_playlist
     album = Album.find(params[:id])
     tracks = album.tracks.order(:disc_number, :track_number)

@@ -148,6 +148,38 @@ RSpec.describe "Albums", type: :request do
     end
   end
 
+  describe "POST /albums/:id/fetch_cover" do
+    it "calls the service and redirects with success notice" do
+      album = create(:album)
+      allow(CoverArtSearchService).to receive(:call).with(album).and_return(:itunes)
+
+      post fetch_cover_album_path(album)
+
+      expect(CoverArtSearchService).to have_received(:call).with(album)
+      expect(response).to redirect_to(album_path(album))
+      follow_redirect!
+      expect(response.body).to include("Cover art updated from itunes source")
+    end
+
+    it "redirects with alert when no cover found" do
+      album = create(:album)
+      allow(CoverArtSearchService).to receive(:call).with(album).and_return(:not_found)
+
+      post fetch_cover_album_path(album)
+
+      expect(response).to redirect_to(album_path(album))
+      follow_redirect!
+      expect(response.body).to include("No cover art found")
+    end
+
+    it "requires authentication" do
+      album = create(:album)
+      reset!
+      post fetch_cover_album_path(album)
+      expect(response).to redirect_to(new_session_path)
+    end
+  end
+
   describe "PATCH /albums/:id" do
     it "saves the youtube_playlist_url" do
       album = create(:album, youtube_playlist_url: nil)

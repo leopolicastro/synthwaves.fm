@@ -1,0 +1,19 @@
+<div class="w-full">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-bold">Downloads</h1>
+  </div>
+
+  <%= render "form" %>
+
+  <div class="mt-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+    <% if @song_downloads.any? %>
+      <% @song_downloads.each do |download| %>
+        <%= render "song_download", song_download: download %>
+      <% end %>
+    <% else %>
+      <div class="p-6 text-center text-gray-500 dark:text-gray-400">
+        No downloads yet. Enter a URL or search query above.
+      </div>
+    <% end %>
+  </div>
+</div>

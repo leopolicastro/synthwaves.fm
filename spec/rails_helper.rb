@@ -12,6 +12,7 @@ require "rspec/rails"
 require "factory_bot_rails"
 
 require "shoulda-matchers"
+require "webmock/rspec"
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|

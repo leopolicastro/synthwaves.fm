@@ -1,0 +1,6 @@
+<div class="flex gap-3">
+  <%= form_with url: song_downloads_path, method: :post, class: "flex-1 flex gap-2" do |f| %>
+    <%= f.text_field :url, placeholder: "YouTube URL or search query...", class: "flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+    <%= f.submit "Download", class: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer" %>
+  <% end %>
+</div>

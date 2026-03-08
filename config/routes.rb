@@ -25,6 +25,12 @@ Rails.application.routes.draw do
   get :search, to: "search#index"
   get :library, to: "library#show"
 
+  # Song downloads
+  resources :song_downloads, only: [:index, :create]
+
+  # Webhook (unauthenticated, token in URL)
+  post "webhooks/song_download/:token", to: "webhooks/song_downloads#create", as: :webhooks_song_download
+
   draw :subsonic
 
   draw :madmin
@@ -32,6 +38,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       post "auth/token", to: "auth#create"
+      resources :downloads, only: [:create]
     end
     namespace :import do
       resources :tracks, only: [:create]

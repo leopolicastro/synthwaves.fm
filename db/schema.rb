@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_08_023843) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_08_141330) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -249,6 +249,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_023843) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "song_downloads", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "job_id", null: false
+    t.string "source_type", null: false
+    t.string "status", default: "queued", null: false
+    t.integer "total_tracks"
+    t.integer "tracks_failed", default: 0, null: false
+    t.integer "tracks_received", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.string "url", null: false
+    t.integer "user_id", null: false
+    t.string "webhook_token", null: false
+    t.index ["job_id"], name: "index_song_downloads_on_job_id", unique: true
+    t.index ["user_id"], name: "index_song_downloads_on_user_id"
+    t.index ["webhook_token"], name: "index_song_downloads_on_webhook_token", unique: true
+  end
+
   create_table "tool_calls", force: :cascade do |t|
     t.json "arguments", default: {}
     t.datetime "created_at", null: false
@@ -305,6 +322,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_023843) do
   add_foreign_key "playlist_tracks", "tracks"
   add_foreign_key "playlists", "users"
   add_foreign_key "sessions", "users"
+  add_foreign_key "song_downloads", "users"
   add_foreign_key "tool_calls", "messages"
   add_foreign_key "tracks", "albums"
   add_foreign_key "tracks", "artists"

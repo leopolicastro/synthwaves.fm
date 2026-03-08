@@ -71,3 +71,9 @@ gem "madmin"
 gem "mission_control-jobs"
 
 gem "maintenance_tasks"
+
+gem "flipper"
+
+gem "flipper-active_record"
+
+gem "flipper-ui"

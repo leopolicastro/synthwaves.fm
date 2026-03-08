@@ -9,4 +9,5 @@ constraints AdminConstraint.new do
     root to: "dashboard#show"
   end
   mount MaintenanceTasks::Engine, at: "/admin/maintenance_tasks"
+  mount Flipper::UI.app(Flipper), at: "/admin/flipper"
 end

@@ -88,6 +88,30 @@ RSpec.describe "Playlists", type: :request do
       expect(play_button).to be_present
       expect(play_button.ancestors("form")).to be_empty
     end
+
+    it "renders a copy track list button" do
+      expect(response.body).to include("Copy track list")
+    end
+
+    it "includes track info in clipboard data attribute" do
+      doc = Nokogiri::HTML(response.body)
+      clipboard_div = doc.at_css('[data-controller="clipboard"]')
+      content = clipboard_div["data-clipboard-content-value"]
+
+      expect(content).to include("#{track.artist.name} - #{track.title}")
+    end
+
+    it "includes YouTube URL for YouTube tracks" do
+      youtube_track = create(:track, youtube_video_id: "abc123")
+      create(:playlist_track, playlist: playlist, track: youtube_track, position: 2)
+      get playlist_path(playlist)
+
+      doc = Nokogiri::HTML(response.body)
+      clipboard_div = doc.at_css('[data-controller="clipboard"]')
+      content = clipboard_div["data-clipboard-content-value"]
+
+      expect(content).to include("https://youtube.com/watch?v=abc123")
+    end
   end
 
   describe "DELETE /playlists/:id" do

@@ -5,7 +5,8 @@
 
   <div class="flex items-center justify-between mb-6">
     <h1 class="text-3xl font-bold"><%= @playlist.name %></h1>
-    <div class="flex gap-2">
+    <div class="flex gap-2" data-controller="clipboard" data-clipboard-content-value="<%= playlist_tracks_as_text(@playlist_tracks) %>">
+      <button data-clipboard-target="button" data-action="clipboard#copy" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">Copy track list</button>
       <%= link_to "Edit", edit_playlist_path(@playlist), class: "px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600" %>
       <%= button_to "Delete", playlist_path(@playlist), method: :delete, data: { turbo_confirm: "Delete this playlist?" }, class: "px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700" %>
     </div>

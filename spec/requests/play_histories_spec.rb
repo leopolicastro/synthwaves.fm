@@ -10,6 +10,32 @@ RSpec.describe "PlayHistories", type: :request do
       get play_histories_path
       expect(response).to have_http_status(:ok)
     end
+
+    it "groups tracks under album headers" do
+      album = create(:album)
+      track1 = create(:track, album: album, artist: album.artist)
+      track2 = create(:track, album: album, artist: album.artist)
+      create(:play_history, user: user, track: track1, played_at: 2.hours.ago)
+      create(:play_history, user: user, track: track2, played_at: 1.hour.ago)
+
+      get play_histories_path
+      expect(response.body).to include(album.title)
+      expect(response.body).to include(track1.title)
+      expect(response.body).to include(track2.title)
+    end
+
+    it "shows tracks from different albums under separate headers" do
+      album1 = create(:album)
+      album2 = create(:album)
+      track1 = create(:track, album: album1, artist: album1.artist)
+      track2 = create(:track, album: album2, artist: album2.artist)
+      create(:play_history, user: user, track: track1, played_at: 2.hours.ago)
+      create(:play_history, user: user, track: track2, played_at: 1.hour.ago)
+
+      get play_histories_path
+      expect(response.body).to include(album1.title)
+      expect(response.body).to include(album2.title)
+    end
   end
 
   describe "POST /play_histories" do

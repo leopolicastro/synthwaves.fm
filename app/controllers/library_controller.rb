@@ -3,7 +3,7 @@ class LibraryController < ApplicationController
     @greeting = time_of_day_greeting
     @user_display_name = Current.user.name.presence || Current.user.email_address.split("@").first
 
-    @recently_played = recently_played_tracks
+    @recently_played_albums = recently_played_albums
     @playlists = Current.user.playlists
       .left_joins(:playlist_tracks)
       .select("playlists.*, COUNT(playlist_tracks.id) AS tracks_count")
@@ -50,17 +50,13 @@ class LibraryController < ApplicationController
     end
   end
 
-  def recently_played_tracks
-    Track.where(
-      id: Current.user.play_histories
-        .select("track_id")
-        .group(:track_id)
-        .order(Arel.sql("MAX(played_at) DESC"))
-        .limit(10)
-    ).includes(:artist, :album)
-      .joins(:play_histories)
+  def recently_played_albums
+    Album.joins(tracks: :play_histories)
       .where(play_histories: { user_id: Current.user.id })
-      .group("tracks.id")
-      .order(Arel.sql("MAX(play_histories.played_at) DESC"))
+      .select("albums.*, MAX(play_histories.played_at) AS last_played_at")
+      .group("albums.id")
+      .order("last_played_at DESC")
+      .includes(:artist)
+      .limit(10)
   end
 end

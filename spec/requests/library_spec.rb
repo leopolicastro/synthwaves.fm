@@ -23,13 +23,13 @@ RSpec.describe "Library", type: :request do
     end
 
     context "Recently Played section" do
-      it "appears when play histories exist" do
+      it "appears when play histories exist and shows the album" do
         track = create(:track)
         create(:play_history, user: user, track: track)
 
         get library_path
         expect(response.body).to include("Recently Played")
-        expect(response.body).to include(track.title)
+        expect(response.body).to include(track.album.title)
       end
 
       it "is hidden when no play histories exist" do
@@ -37,13 +37,29 @@ RSpec.describe "Library", type: :request do
         expect(response.body).not_to include("Recently Played")
       end
 
-      it "deduplicates tracks showing most recent play" do
-        track = create(:track)
-        create(:play_history, user: user, track: track, played_at: 2.hours.ago)
-        create(:play_history, user: user, track: track, played_at: 1.hour.ago)
+      it "deduplicates to one album card when multiple tracks from same album are played" do
+        album = create(:album)
+        track1 = create(:track, album: album, artist: album.artist)
+        track2 = create(:track, album: album, artist: album.artist)
+        create(:play_history, user: user, track: track1, played_at: 2.hours.ago)
+        create(:play_history, user: user, track: track2, played_at: 1.hour.ago)
 
         get library_path
-        expect(response.body.scan(track.title).count).to eq(1)
+        # Album title appears in "Recently Played" and also "Recently Added" — exactly 2
+        expect(response.body.scan(album.title).count).to eq(2)
+      end
+
+      it "shows different albums separately" do
+        album1 = create(:album)
+        album2 = create(:album)
+        track1 = create(:track, album: album1, artist: album1.artist)
+        track2 = create(:track, album: album2, artist: album2.artist)
+        create(:play_history, user: user, track: track1, played_at: 2.hours.ago)
+        create(:play_history, user: user, track: track2, played_at: 1.hour.ago)
+
+        get library_path
+        expect(response.body).to include(album1.title)
+        expect(response.body).to include(album2.title)
       end
     end
 

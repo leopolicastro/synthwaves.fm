@@ -1,14 +1,36 @@
 <div class="w-full">
   <h1 class="text-3xl font-bold mb-6">Recently Played</h1>
 
-  <% if @recent.any? %>
-    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-      <% @recent.each do |ph| %>
-        <%= render TrackRowComponent.new(track: ph.track, link_title: true, show_duration: false) do |c| %>
-          <% c.with_trailing do %>
-            <span class="text-sm text-gray-500"><%= time_ago_in_words(ph.played_at) %> ago</span>
+  <% if @grouped_histories.any? %>
+    <div class="space-y-6">
+      <% @grouped_histories.each do |album, play_histories| %>
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <%# Album header %>
+          <%= link_to album_path(album), class: "flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors" do %>
+            <% if album.cover_image.attached? %>
+              <%= image_tag album.cover_image, class: "w-12 h-12 rounded object-cover", loading: "lazy" %>
+            <% else %>
+              <div class="w-12 h-12 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
+              </div>
+            <% end %>
+            <div>
+              <div class="font-semibold text-gray-900 dark:text-white"><%= album.title %></div>
+              <div class="text-sm text-gray-500"><%= album.artist.name %></div>
+            </div>
           <% end %>
-        <% end %>
+
+          <%# Tracks under this album %>
+          <div class="border-t border-gray-200 dark:border-gray-700">
+            <% play_histories.each do |ph| %>
+              <%= render TrackRowComponent.new(track: ph.track, link_title: true, show_duration: false) do |c| %>
+                <% c.with_trailing do %>
+                  <span class="text-sm text-gray-500"><%= time_ago_in_words(ph.played_at) %> ago</span>
+                <% end %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
       <% end %>
     </div>
   <% else %>

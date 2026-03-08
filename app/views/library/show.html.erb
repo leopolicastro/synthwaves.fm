@@ -27,10 +27,10 @@
   </div>
 
   <%# Recently Played %>
-  <% if @recently_played.any? %>
+  <% if @recently_played_albums.any? %>
     <%= render "library/section", title: "Recently Played", see_all_path: play_histories_path do %>
-      <% @recently_played.each do |track| %>
-        <%= render "library/track_card", track: track %>
+      <% @recently_played_albums.each do |album| %>
+        <%= render "library/album_card", album: album %>
       <% end %>
     <% end %>
   <% end %>

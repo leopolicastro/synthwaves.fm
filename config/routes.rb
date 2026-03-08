@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+constraints AdminConstraint.new do
+  mount Quarterdeck::Engine => "/quarterdeck"
+end
+
   resources :chats do
     resources :messages, only: [:create]
   end

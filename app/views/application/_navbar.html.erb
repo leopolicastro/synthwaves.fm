@@ -1,10 +1,20 @@
 <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
   <div class="container mx-auto py-3">
     <div class="flex items-center justify-between">
-      <!-- Left side: App name -->
-      <div class="flex items-center space-x-1">
+      <!-- Left side: App name + nav -->
+      <div class="flex items-center space-x-4">
         <%= link_to root_path, class: "text-xl font-semibold text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-300" do %>
           Groovy Tunes
+        <% end %>
+        <% if authenticated? %>
+          <nav class="hidden md:flex items-center space-x-3 text-sm">
+            <%= link_to "Library", library_path, class: "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" %>
+            <%= link_to "Artists", artists_path, class: "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" %>
+            <%= link_to "Albums", albums_path, class: "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" %>
+            <%= link_to "Tracks", tracks_path, class: "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" %>
+            <%= link_to "Playlists", playlists_path, class: "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" %>
+            <%= link_to "Search", search_path, class: "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" %>
+          </nav>
         <% end %>
       </div>
       <!-- Right side: User Dropdown or Auth links -->

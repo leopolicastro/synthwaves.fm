@@ -31,5 +31,3 @@ learn from the friction, and let them shape your code.
 - **Don't mock what you don't own.** Wrap third-party dependencies behind your
   own interface, then mock that. Tests shouldn't break when a library ships a
   patch.
-
-<!-- TODO: Customize these rules for your project -->

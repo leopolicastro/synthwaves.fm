@@ -26,14 +26,66 @@
 </head>
 
 
-  <body class="dark:bg-gray-900 dark:text-white">
+  <body class="dark:bg-gray-900 dark:text-white pb-24">
 
 <%= render 'navbar' %>
     <%= render 'alerts' %>
 
-
     <main class="container mx-auto my-28 px-5 flex">
       <%= yield %>
     </main>
+
+    <!-- Persistent player bar -->
+    <div id="player-bar" class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50"
+         data-turbo-permanent
+         data-controller="player queue"
+         data-player-play-history-url-value="<%= play_histories_path %>">
+      <audio data-player-target="audio" preload="auto"></audio>
+
+      <!-- Progress bar -->
+      <div class="h-1 bg-gray-200 dark:bg-gray-700 cursor-pointer" data-action="click->player#seek">
+        <div class="h-full bg-blue-600 transition-all duration-200" data-player-target="progress" style="width: 0%"></div>
+      </div>
+
+      <div class="container mx-auto px-4 py-2">
+        <div class="flex items-center justify-between gap-4">
+          <!-- Track info -->
+          <div class="flex items-center gap-3 min-w-0 flex-1">
+            <div class="w-10 h-10 rounded bg-gray-200 dark:bg-gray-700 flex-shrink-0 flex items-center justify-center" data-player-target="artwork">
+              <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
+            </div>
+            <div class="min-w-0">
+              <div class="text-sm font-medium text-gray-900 dark:text-white truncate" data-player-target="title">Not playing</div>
+              <div class="text-xs text-gray-500 truncate" data-player-target="artist"></div>
+            </div>
+          </div>
+
+          <!-- Controls -->
+          <div class="flex items-center gap-3">
+            <button data-action="player#previous" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z"/></svg>
+            </button>
+            <button data-action="player#toggle" class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700">
+              <svg data-player-target="playIcon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+              <svg data-player-target="pauseIcon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M5.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75A.75.75 0 007.25 3h-1.5zM12.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75a.75.75 0 00-.75-.75h-1.5z"/></svg>
+            </button>
+            <button data-action="player#next" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M11.555 5.168A1 1 0 0010 6v2.798l-5.445-3.63A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4z"/></svg>
+            </button>
+          </div>
+
+          <!-- Time & volume -->
+          <div class="flex items-center gap-3 flex-1 justify-end">
+            <span class="text-xs text-gray-500 tabular-nums" data-player-target="currentTime">0:00</span>
+            <span class="text-xs text-gray-500">/</span>
+            <span class="text-xs text-gray-500 tabular-nums" data-player-target="duration">0:00</span>
+            <input type="range" min="0" max="1" step="0.01" value="1"
+                   class="w-20 h-1 accent-blue-600"
+                   data-player-target="volume"
+                   data-action="input->player#setVolume">
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

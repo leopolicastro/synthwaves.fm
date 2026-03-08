@@ -3,15 +3,9 @@ require "rails_helper"
 RSpec.describe "Static::Landing", type: :request do
   describe "GET /" do
     context "when not authenticated" do
-      it "returns http success" do
+      it "redirects to login" do
         get root_path
-        expect(response).to have_http_status(:success)
-      end
-
-      it "displays the landing page content" do
-        get root_path
-        expect(response.body).to include("Groovy Tunes")
-        expect(response.body).to include("Get Started Free")
+        expect(response).to have_http_status(:redirect)
       end
     end
 
@@ -22,9 +16,9 @@ RSpec.describe "Static::Landing", type: :request do
         post session_path, params: {email_address: user.email_address, password: "password123"}
       end
 
-      it "redirects to home page" do
+      it "returns http success" do
         get root_path
-        expect(response).to redirect_to(home_path)
+        expect(response).to have_http_status(:success)
       end
     end
   end

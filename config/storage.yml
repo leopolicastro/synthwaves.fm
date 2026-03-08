@@ -25,3 +25,14 @@ local:
 #   service: Mirror
 #   primary: local
 #   mirrors: [ amazon, google, microsoft ]
+
+# Linode Object Storage (S3-compatible) for production
+# Configure credentials via: bin/rails credentials:edit
+linode:
+  service: S3
+  access_key_id: <%= Rails.application.credentials.dig(:linode, :access_key_id) %>
+  secret_access_key: <%= Rails.application.credentials.dig(:linode, :secret_access_key) %>
+  region: <%= Rails.application.credentials.dig(:linode, :region) %>
+  bucket: <%= Rails.application.credentials.dig(:linode, :bucket) %>
+  endpoint: <%= Rails.application.credentials.dig(:linode, :endpoint) %>
+  force_path_style: true

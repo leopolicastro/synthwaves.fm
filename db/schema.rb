@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_08_005410) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_08_023843) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -81,6 +81,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_005410) do
     t.index ["visitor_token", "started_at"], name: "index_ahoy_visits_on_visitor_token_and_started_at"
   end
 
+  create_table "albums", force: :cascade do |t|
+    t.integer "artist_id", null: false
+    t.datetime "created_at", null: false
+    t.string "genre"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.integer "year"
+    t.index ["artist_id", "title"], name: "index_albums_on_artist_id_and_title", unique: true
+    t.index ["artist_id"], name: "index_albums_on_artist_id"
+  end
+
   create_table "api_keys", force: :cascade do |t|
     t.string "client_id", null: false
     t.datetime "created_at", null: false
@@ -95,11 +106,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_005410) do
     t.index ["user_id"], name: "index_api_keys_on_user_id"
   end
 
+  create_table "artists", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "image_url"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_artists_on_name", unique: true
+  end
+
   create_table "chats", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "model_id"
     t.datetime "updated_at", null: false
     t.index ["model_id"], name: "index_chats_on_model_id"
+  end
+
+  create_table "favorites", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "favorable_id", null: false
+    t.string "favorable_type", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id", "favorable_type", "favorable_id"], name: "index_favorites_on_user_id_and_favorable_type_and_favorable_id", unique: true
+    t.index ["user_id"], name: "index_favorites_on_user_id"
   end
 
   create_table "flipper_features", force: :cascade do |t|
@@ -181,6 +210,36 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_005410) do
     t.index ["provider"], name: "index_models_on_provider"
   end
 
+  create_table "play_histories", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "played_at", null: false
+    t.integer "track_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["track_id"], name: "index_play_histories_on_track_id"
+    t.index ["user_id", "played_at"], name: "index_play_histories_on_user_id_and_played_at"
+    t.index ["user_id"], name: "index_play_histories_on_user_id"
+  end
+
+  create_table "playlist_tracks", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "playlist_id", null: false
+    t.integer "position", null: false
+    t.integer "track_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["playlist_id", "position"], name: "index_playlist_tracks_on_playlist_id_and_position", unique: true
+    t.index ["playlist_id"], name: "index_playlist_tracks_on_playlist_id"
+    t.index ["track_id"], name: "index_playlist_tracks_on_track_id"
+  end
+
+  create_table "playlists", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id"], name: "index_playlists_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
@@ -203,23 +262,50 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_005410) do
     t.index ["tool_call_id"], name: "index_tool_calls_on_tool_call_id", unique: true
   end
 
+  create_table "tracks", force: :cascade do |t|
+    t.integer "album_id", null: false
+    t.integer "artist_id", null: false
+    t.integer "bitrate"
+    t.datetime "created_at", null: false
+    t.integer "disc_number", default: 1
+    t.float "duration"
+    t.string "file_format"
+    t.integer "file_size"
+    t.string "title", null: false
+    t.integer "track_number"
+    t.datetime "updated_at", null: false
+    t.index ["album_id", "disc_number", "track_number"], name: "index_tracks_on_album_id_and_disc_number_and_track_number"
+    t.index ["album_id"], name: "index_tracks_on_album_id"
+    t.index ["artist_id"], name: "index_tracks_on_artist_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.boolean "admin", default: false, null: false
     t.datetime "created_at", null: false
     t.string "email_address", null: false
     t.string "name"
     t.string "password_digest", null: false
+    t.string "subsonic_password"
     t.datetime "updated_at", null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "albums", "artists"
   add_foreign_key "api_keys", "users"
   add_foreign_key "chats", "models"
+  add_foreign_key "favorites", "users"
   add_foreign_key "messages", "chats"
   add_foreign_key "messages", "models"
   add_foreign_key "messages", "tool_calls"
+  add_foreign_key "play_histories", "tracks"
+  add_foreign_key "play_histories", "users"
+  add_foreign_key "playlist_tracks", "playlists"
+  add_foreign_key "playlist_tracks", "tracks"
+  add_foreign_key "playlists", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "tool_calls", "messages"
+  add_foreign_key "tracks", "albums"
+  add_foreign_key "tracks", "artists"
 end

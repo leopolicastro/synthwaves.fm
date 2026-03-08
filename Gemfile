@@ -85,3 +85,5 @@ gem "ruby_llm"
 gem "ahoy_matey"
 
 gem "quarterdeck"
+
+gem "wahwah"

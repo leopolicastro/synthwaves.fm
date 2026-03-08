@@ -13,7 +13,7 @@ class RegistrationsController < ApplicationController
 
     if @user.save
       start_new_session_for @user
-      redirect_to after_authentication_url
+      redirect_to after_authentication_url, status: :see_other
     else
       render :new, status: :unprocessable_content
     end

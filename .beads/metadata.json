@@ -1,7 +1,0 @@
-{
-  "database": "dolt",
-  "backend": "dolt",
-  "dolt_mode": "server",
-  "dolt_database": "groovy_tunes",
-  "project_id": "a73b2455-004d-45f7-82cc-70ea89adb92a"
-}

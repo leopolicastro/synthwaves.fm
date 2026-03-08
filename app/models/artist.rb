@@ -7,5 +7,14 @@ class Artist < ApplicationRecord
 
   CATEGORIES = categories.keys
 
+  SORT_OPTIONS = {
+    "name" => "Name",
+    "created_at" => "Recently Added"
+  }.freeze
+
   validates :name, presence: true, uniqueness: true
+
+  scope :search, ->(query) {
+    where("artists.name LIKE :q", q: "%#{query}%") if query.present?
+  }
 end

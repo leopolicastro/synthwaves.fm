@@ -45,6 +45,60 @@ RSpec.describe "Artists", type: :request do
       expect(response.body).to include("Music Band")
       expect(response.body).not_to include("Podcast Show")
     end
+
+    it "filters artists by search query" do
+      create(:artist, name: "The Beatles")
+      create(:artist, name: "Led Zeppelin")
+
+      get artists_path, params: { q: "Beatles" }
+
+      expect(response.body).to include("The Beatles")
+      expect(response.body).not_to include("Led Zeppelin")
+    end
+
+    it "shows no artists found message when search has no results" do
+      create(:artist, name: "The Beatles")
+
+      get artists_path, params: { q: "Nonexistent" }
+
+      expect(response.body).to include("No artists found")
+      expect(response.body).to include("Nonexistent")
+    end
+
+    it "sorts artists by name ascending by default" do
+      create(:artist, name: "Zebra")
+      create(:artist, name: "Alpha")
+
+      get artists_path
+
+      expect(response.body.index("Alpha")).to be < response.body.index("Zebra")
+    end
+
+    it "sorts artists by name descending" do
+      create(:artist, name: "Zebra")
+      create(:artist, name: "Alpha")
+
+      get artists_path, params: { sort: "name", direction: "desc" }
+
+      expect(response.body.index("Zebra")).to be < response.body.index("Alpha")
+    end
+
+    it "sorts artists by recently added" do
+      older = create(:artist, name: "Older Artist", created_at: 2.days.ago)
+      newer = create(:artist, name: "Newer Artist", created_at: 1.hour.ago)
+
+      get artists_path, params: { sort: "created_at", direction: "desc" }
+
+      expect(response.body.index("Newer Artist")).to be < response.body.index("Older Artist")
+    end
+
+    it "paginates results" do
+      26.times { |i| create(:artist, name: "Artist #{i.to_s.rjust(2, '0')}") }
+
+      get artists_path
+
+      expect(response).to have_http_status(:ok)
+    end
   end
 
   describe "GET /artists/:id" do

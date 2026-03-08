@@ -46,5 +46,36 @@ RSpec.describe Artist, type: :model do
       expect(Artist.podcast).to include(podcast_artist)
       expect(Artist.podcast).not_to include(music_artist)
     end
+
+    describe ".search" do
+      let!(:artist1) { create(:artist, name: "Pink Floyd") }
+      let!(:artist2) { create(:artist, name: "Led Zeppelin") }
+
+      it "returns artists matching the query" do
+        results = Artist.search("Pink")
+        expect(results).to include(artist1)
+        expect(results).not_to include(artist2)
+      end
+
+      it "is case-insensitive" do
+        results = Artist.search("pink")
+        expect(results).to include(artist1)
+      end
+
+      it "returns no results when nothing matches" do
+        results = Artist.search("Nonexistent")
+        expect(results).to be_empty
+      end
+
+      it "returns all artists when query is blank" do
+        results = Artist.search("")
+        expect(results).to include(artist1, artist2)
+      end
+
+      it "returns all artists when query is nil" do
+        results = Artist.search(nil)
+        expect(results).to include(artist1, artist2)
+      end
+    end
   end
 end

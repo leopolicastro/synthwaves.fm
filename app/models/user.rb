@@ -6,7 +6,6 @@ class User < ApplicationRecord
   has_many :playlists, dependent: :destroy
   has_many :favorites, dependent: :destroy
   has_many :play_histories, dependent: :destroy
-  has_many :song_downloads, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 

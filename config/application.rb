@@ -21,7 +21,7 @@ RubyLLM.configure do |config|
   config.use_new_acts_as = true
 end
 
-module GroovyTunes
+module SynthwavesFm
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1

@@ -1,5 +1,5 @@
 namespace :playlists do
-  desc "Push cliamp playlists to a remote Groovy Tunes instance"
+  desc "Push cliamp playlists to a remote Synthwaves.fm instance"
   task :push do
     require "net/http"
     require "uri"

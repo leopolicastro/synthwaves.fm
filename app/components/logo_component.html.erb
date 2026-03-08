@@ -1,0 +1,10 @@
+<span class="inline-flex items-center gap-2">
+  <% if icon? %>
+    <span class="<%= icon_wrapper_classes %> bg-sunset-gradient flex items-center justify-center">
+      <svg class="<%= icon_size_classes %> text-white" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/>
+      </svg>
+    </span>
+  <% end %>
+  <span class="font-display <%= size_classes %> bg-gradient-to-r from-blue-400 to-pink-500 bg-clip-text text-transparent glow-gradient">Synthwaves.fm</span>
+</span>

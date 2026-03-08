@@ -3,8 +3,8 @@
     <div class="flex items-center justify-between">
       <!-- Left side: App name + nav -->
       <div class="flex items-center space-x-4">
-        <%= link_to root_path, class: "text-xl font-display font-semibold text-neon-cyan glow-cyan hover:text-neon-cyan/80" do %>
-          Groovy Tunes
+        <%= link_to root_path do %>
+          <%= render(LogoComponent.new(size: :md)) %>
         <% end %>
         <% if authenticated? %>
           <nav class="hidden md:flex items-center space-x-3 text-sm">

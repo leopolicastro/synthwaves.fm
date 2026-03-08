@@ -4,7 +4,7 @@ module SubsonicResponseFormatting
   extend ActiveSupport::Concern
 
   SUBSONIC_API_VERSION = "1.16.1"
-  SERVER_NAME = "GroovyTunes"
+  SERVER_NAME = "Synthwaves.fm"
 
   private
 

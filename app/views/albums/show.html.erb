@@ -22,25 +22,11 @@
 
   <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
     <% @tracks.each do |track| %>
-      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-750"
-           data-controller="song-row"
-           data-song-row-track-id-value="<%= track.id %>"
-           data-song-row-title-value="<%= track.title %>"
-           data-song-row-artist-value="<%= track.artist.name %>"
-           data-song-row-stream-url-value="<%= stream_track_path(track) %>">
-        <div class="flex items-center gap-3">
-          <button data-action="song-row#play" class="w-8 text-center text-gray-400 hover:text-blue-600">
-            <span data-song-row-target="trackNumber"><%= track.track_number %></span>
-          </button>
-          <div>
-            <div class="font-medium text-gray-900 dark:text-white"><%= track.title %></div>
-            <% if track.artist != @album.artist %>
-              <div class="text-sm text-gray-500"><%= track.artist.name %></div>
-            <% end %>
-          </div>
-        </div>
-        <div class="text-sm text-gray-500"><%= format_duration(track.duration || 0) %></div>
-      </div>
+      <%= render TrackRowComponent.new(track: track, number: track.track_number, show_album: false, hide_artist_if: @album.artist) do |c| %>
+        <% c.with_trailing do %>
+          <%= render "playlist_tracks/add_menu", track: track, playlists: current_user_playlists %>
+        <% end %>
+      <% end %>
     <% end %>
   </div>
 </div>

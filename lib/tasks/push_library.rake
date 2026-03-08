@@ -112,13 +112,13 @@ def authenticate(remote_url, client_id, secret_key)
 end
 
 def build_multipart_body(boundary, file_name, file_data)
-  body = +""
-  body << "--#{boundary}\r\n"
-  body << "Content-Disposition: form-data; name=\"audio_file\"; filename=\"#{file_name}\"\r\n"
-  body << "Content-Type: application/octet-stream\r\n"
-  body << "\r\n"
+  body = +"".b
+  body << "--#{boundary}\r\n".b
+  body << "Content-Disposition: form-data; name=\"audio_file\"; filename=\"#{file_name}\"\r\n".b
+  body << "Content-Type: application/octet-stream\r\n".b
+  body << "\r\n".b
   body << file_data
-  body << "\r\n"
-  body << "--#{boundary}--\r\n"
+  body << "\r\n".b
+  body << "--#{boundary}--\r\n".b
   body
 end

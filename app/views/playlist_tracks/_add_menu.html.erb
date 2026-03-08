@@ -1,0 +1,19 @@
+<div class="relative" data-controller="playlist-menu" data-action="click@window->playlist-menu#close">
+  <button data-action="click->playlist-menu#toggle" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" title="Add to playlist">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+  </button>
+  <div data-playlist-menu-target="menu" class="hidden absolute right-0 z-10 mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+    <% if playlists.any? %>
+      <% playlists.each do |playlist| %>
+        <%= button_to playlist_tracks_path(playlist),
+              params: { track_id: track.id },
+              method: :post,
+              class: "block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg" do %>
+          <%= playlist.name %>
+        <% end %>
+      <% end %>
+    <% else %>
+      <div class="px-4 py-2 text-sm text-gray-500">No playlists yet</div>
+    <% end %>
+  </div>
+</div>

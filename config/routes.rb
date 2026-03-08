@@ -17,7 +17,9 @@ Rails.application.routes.draw do
   resources :tracks, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
     member { get :stream }
   end
-  resources :playlists
+  resources :playlists do
+    resources :tracks, controller: "playlist_tracks", only: [:create, :destroy], as: :tracks
+  end
   resources :favorites, only: [:index, :create, :destroy]
   resources :play_histories, only: [:index, :create]
   get :search, to: "search#index"

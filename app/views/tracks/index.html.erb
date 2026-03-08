@@ -6,28 +6,14 @@
 
   <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
     <% @tracks.each do |track| %>
-      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-750"
-           data-controller="song-row"
-           data-song-row-track-id-value="<%= track.id %>"
-           data-song-row-title-value="<%= track.title %>"
-           data-song-row-artist-value="<%= track.artist.name %>"
-           data-song-row-stream-url-value="<%= stream_track_path(track) %>">
-        <div class="flex items-center gap-3">
-          <button data-action="song-row#play" class="text-gray-400 hover:text-blue-600">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
-          </button>
-          <div>
-            <div class="font-medium text-gray-900 dark:text-white"><%= link_to track.title, track_path(track), class: "hover:underline" %></div>
-            <div class="text-sm text-gray-500"><%= link_to track.artist.name, artist_path(track.artist), class: "hover:underline" %> &middot; <%= link_to track.album.title, album_path(track.album), class: "hover:underline" %></div>
-          </div>
-        </div>
-        <div class="flex items-center gap-4">
-          <span class="text-sm text-gray-500"><%= format_duration(track.duration || 0) %></span>
+      <%= render TrackRowComponent.new(track: track, link_title: true, link_subtitle: true) do |c| %>
+        <% c.with_trailing do %>
+          <%= render "playlist_tracks/add_menu", track: track, playlists: current_user_playlists %>
           <%= link_to edit_track_path(track), class: "text-gray-400 hover:text-gray-600" do %>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
           <% end %>
-        </div>
-      </div>
+        <% end %>
+      <% end %>
     <% end %>
   </div>
 </div>

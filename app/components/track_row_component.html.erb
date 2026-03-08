@@ -1,0 +1,51 @@
+<div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-750"
+     data-controller="song-row"
+     data-song-row-track-id-value="<%= track.id %>"
+     data-song-row-title-value="<%= track.title %>"
+     data-song-row-artist-value="<%= track.artist.name %>"
+     data-song-row-stream-url-value="<%= stream_track_path(track) %>">
+  <div class="flex items-center gap-3">
+    <button data-action="song-row#play" class="<%= number ? 'w-8 text-center' : '' %> text-gray-400 hover:text-blue-600">
+      <% if number %>
+        <span data-song-row-target="trackNumber"><%= number %></span>
+      <% else %>
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+      <% end %>
+    </button>
+    <div>
+      <div class="font-medium text-gray-900 dark:text-white">
+        <% if link_title? %>
+          <%= link_to track.title, track_path(track), class: "hover:underline" %>
+        <% else %>
+          <%= track.title %>
+        <% end %>
+      </div>
+      <% if show_subtitle? %>
+        <div class="text-sm text-gray-500">
+          <% parts = [] %>
+          <% if show_artist? %>
+            <% if link_subtitle? %>
+              <% parts << link_to(track.artist.name, artist_path(track.artist), class: "hover:underline") %>
+            <% else %>
+              <% parts << track.artist.name %>
+            <% end %>
+          <% end %>
+          <% if show_album? %>
+            <% if link_subtitle? %>
+              <% parts << link_to(track.album.title, album_path(track.album), class: "hover:underline") %>
+            <% else %>
+              <% parts << track.album.title %>
+            <% end %>
+          <% end %>
+          <%= safe_join(parts, " &middot; ".html_safe) %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <div class="flex items-center gap-4">
+    <% if show_duration? %>
+      <span class="text-sm text-gray-500"><%= format_duration(track.duration || 0) %></span>
+    <% end %>
+    <%= trailing if trailing? %>
+  </div>
+</div>

@@ -1,30 +1,37 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["audio", "progress", "title", "artist", "artwork", "playIcon", "pauseIcon", "currentTime", "duration", "volume", "progressBar", "liveIndicator", "prevButton", "nextButton", "repeatOff", "repeatAll", "repeatOne", "shuffleIcon"]
+  static targets = ["progress", "title", "artist", "artwork", "playIcon", "pauseIcon", "currentTime", "duration", "volume", "progressBar", "liveIndicator", "prevButton", "nextButton", "repeatOff", "repeatAll", "repeatOne", "shuffleIcon"]
   static values = { playHistoryUrl: String }
 
   connect() {
-    this.audio = this.audioTarget
-    this.youtubeActive = false
-    this.youtubePlaying = false
-    this.currentIsLive = false
-    this.repeatMode = "off"
-    this.shuffleEnabled = false
-    this.youtubeCurrentTime = 0
-    this.youtubeDuration = 0
+    // Append <audio> to <html> (outside <body>) so Turbo's body
+    // replacement never detaches it — same pattern as youtube_player_controller.
+    this.audio = this._ensureAudio()
 
-    this.audio.addEventListener("timeupdate", () => this.onTimeUpdate())
-    this.audio.addEventListener("ended", () => this.onEnded())
-    this.audio.addEventListener("loadedmetadata", () => this.onLoadedMetadata())
-    this.audio.addEventListener("play", () => {
-      this.updatePlayPauseIcon()
-      this.startPositionSave()
-    })
-    this.audio.addEventListener("pause", () => {
-      this.updatePlayPauseIcon()
-      this.stopPositionSave()
-    })
+    // Only initialize state and audio element listeners once
+    if (!this.audio._playerInitialized) {
+      this.audio._playerInitialized = true
+      this.youtubeActive = false
+      this.youtubePlaying = false
+      this.currentIsLive = false
+      this.repeatMode = "off"
+      this.shuffleEnabled = false
+      this.youtubeCurrentTime = 0
+      this.youtubeDuration = 0
+
+      this.audio.addEventListener("timeupdate", () => this.onTimeUpdate())
+      this.audio.addEventListener("ended", () => this.onEnded())
+      this.audio.addEventListener("loadedmetadata", () => this.onLoadedMetadata())
+      this.audio.addEventListener("play", () => {
+        this.updatePlayPauseIcon()
+        this.startPositionSave()
+      })
+      this.audio.addEventListener("pause", () => {
+        this.updatePlayPauseIcon()
+        this.stopPositionSave()
+      })
+    }
 
     this.playTrackHandler = (e) => this.playTrack(e.detail)
     this.playYouTubeHandler = (e) => this.playYouTube(e.detail)
@@ -63,6 +70,19 @@ export default class extends Controller {
     document.removeEventListener("queue:shuffleChanged", this.shuffleChangedHandler)
   }
 
+  // Persistent audio element — lives on <html> so Turbo never detaches it
+
+  _ensureAudio() {
+    let audio = document.getElementById("persistent-audio")
+    if (!audio) {
+      audio = document.createElement("audio")
+      audio.id = "persistent-audio"
+      audio.preload = "auto"
+      document.documentElement.appendChild(audio)
+    }
+    return audio
+  }
+
   // Session restore
 
   restoreSession() {
@@ -77,6 +97,9 @@ export default class extends Controller {
 
     this.shuffleEnabled = localStorage.getItem("playerShuffle") === "true"
     this.updateShuffleIcon()
+
+    // Don't interrupt active playback on reconnect
+    if (!this.audio.paused || this.youtubeActive) return
 
     const savedTrack = localStorage.getItem("playerCurrentTrack")
     if (!savedTrack) return

@@ -209,6 +209,18 @@ RSpec.describe "Tracks", type: :request do
     end
   end
 
+  describe "player bar layout" do
+    it "does not render an <audio> element inside the player bar" do
+      get tracks_path
+
+      doc = Nokogiri::HTML(response.body)
+      audio_in_player = doc.at_css("#player-bar audio")
+      expect(audio_in_player).to be_nil,
+        "Expected no <audio> inside #player-bar — it must be created by JS on " \
+        "<html> (outside <body>) so Turbo navigation never detaches it"
+    end
+  end
+
   describe "GET /tracks/:id/stream" do
     let(:track) { create(:track) }
 

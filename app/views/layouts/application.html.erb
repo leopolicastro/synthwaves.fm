@@ -57,7 +57,7 @@
          data-turbo-permanent
          data-controller="player queue"
          data-player-play-history-url-value="<%= play_histories_path %>">
-      <audio data-player-target="audio" preload="auto"></audio>
+      <%# <audio> element is created by player_controller.js on <html> so Turbo never detaches it %>
 
       <!-- Progress bar -->
       <div data-player-target="progressBar" class="h-1 bg-gray-700 cursor-pointer" data-action="click->player#seek">

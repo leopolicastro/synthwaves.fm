@@ -51,7 +51,7 @@ Synthwaves.fm is a self-hosted music streaming app built with Rails. Upload your
 
 ## Use Your Favorite Apps
 
-Synthwaves.fm implements the Subsonic API, so you can connect dedicated music apps and stream your library from any platform. Popular compatible apps include DSub, play:Sub, Submariner, Clementine, Symfonium, CLIamp, and many more.
+Synthwaves.fm implements the Subsonic API, so you can connect dedicated music apps and stream your library from any platform. Popular compatible apps include DSub, play:Sub, Submariner, Clementine, Symfonium, cliamp, and many more.
 
 There's also a REST API with JWT authentication for building your own integrations. API keys are manageable from the web UI under your account settings.
 
@@ -93,9 +93,9 @@ bundle exec rake library:push
 
 `MUSIC_PATH` defaults to `/Volumes/music` if not set. Metadata and cover art are extracted automatically. Duplicate tracks are skipped.
 
-### Push CLIamp Playlists
+### Push cliamp Playlists
 
-Upload playlists from CLIamp's TOML playlist files:
+Upload playlists from cliamp's TOML playlist files:
 
 ```
 GROOVY_REMOTE_URL=https://groovy.example.com \

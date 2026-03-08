@@ -7,10 +7,12 @@ image: groovy_tunes
 # Deploy to these servers.
 servers:
   web:
-    - 100.98.15.106
+    # - 100.98.15.106
+    - 192.168.1.67
   job:
     hosts:
-      - 100.98.15.106
+      # - 100.98.15.106
+      - 192.168.1.67
     cmd: bin/jobs
 
 # Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
@@ -20,9 +22,10 @@ servers:
 #
 # Don't use this when deploying to multiple web servers (then you have to terminate SSL at your load balancer).
 #
-# proxy:
-#   ssl: true
-#   host: app.example.com
+proxy:
+  ssl: false
+  hosts:
+    - synthwaves.fm
 
 # Where you keep your container images.
 registry:

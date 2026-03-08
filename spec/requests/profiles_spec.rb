@@ -68,6 +68,18 @@ RSpec.describe "Profiles", type: :request do
       end
     end
 
+    context "with subsonic_password" do
+      it "updates the subsonic password" do
+        user = create(:user, subsonic_password: "oldpass")
+        login_user(user)
+
+        patch profile_path, params: {user: {subsonic_password: "newpass"}}
+
+        expect(response).to redirect_to(profile_path)
+        expect(user.reload.subsonic_password).to eq("newpass")
+      end
+    end
+
     context "with invalid data" do
       it "re-renders form with blank email" do
         user = create(:user)

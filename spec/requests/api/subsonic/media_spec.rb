@@ -31,6 +31,33 @@ RSpec.describe "Subsonic Media API", type: :request do
     end
   end
 
+  describe "GET /api/rest/download.view" do
+    it "redirects when audio file is attached" do
+      track = create(:track)
+      track.audio_file.attach(
+        io: File.open(Rails.root.join("spec/fixtures/files/test.mp3")),
+        filename: "test.mp3",
+        content_type: "audio/mpeg"
+      )
+
+      get "/api/rest/download.view", params: auth_params.merge(id: track.id)
+      expect(response).to have_http_status(:redirect)
+    end
+
+    it "returns error when no audio file attached" do
+      track = create(:track)
+      get "/api/rest/download.view", params: auth_params.merge(id: track.id)
+      json = JSON.parse(response.body)
+      expect(json["subsonic-response"]["error"]["code"]).to eq(70)
+    end
+
+    it "returns error for nonexistent track" do
+      get "/api/rest/download.view", params: auth_params.merge(id: 99999)
+      json = JSON.parse(response.body)
+      expect(json["subsonic-response"]["status"]).to eq("failed")
+    end
+  end
+
   describe "GET /api/rest/getCoverArt.view" do
     it "redirects when cover image is attached" do
       album = create(:album)

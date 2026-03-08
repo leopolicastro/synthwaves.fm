@@ -10,6 +10,8 @@ class API::Subsonic::MediaController < API::Subsonic::BaseController
     render_subsonic_error(70, "Song not found")
   end
 
+  alias_method :download, :stream
+
   def get_cover_art
     album = Album.find(params[:id])
     if album.cover_image.attached?

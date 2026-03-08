@@ -20,6 +20,6 @@ class ProfilesController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:name, :email_address)
+    params.require(:user).permit(:name, :email_address, :subsonic_password)
   end
 end

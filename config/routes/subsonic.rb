@@ -1,51 +1,42 @@
-# Subsonic API
-namespace :api do
-  namespace :subsonic, path: "/rest" do
-    get "ping.view", to: "system#ping"
-    post "ping.view", to: "system#ping"
-    get "getLicense.view", to: "system#get_license"
-    post "getLicense.view", to: "system#get_license"
+# Subsonic API endpoint definitions shared by both route scopes.
+# Registers each endpoint with and without the .view suffix for client compatibility.
+SUBSONIC_ENDPOINTS = {
+  "ping" => "system#ping",
+  "getLicense" => "system#get_license",
+  "getMusicFolders" => "browsing#get_music_folders",
+  "getIndexes" => "browsing#get_indexes",
+  "getArtists" => "browsing#get_artists",
+  "getArtist" => "browsing#get_artist",
+  "getAlbum" => "browsing#get_album",
+  "getSong" => "browsing#get_song",
+  "stream" => "media#stream",
+  "download" => "media#download",
+  "getCoverArt" => "media#get_cover_art",
+  "search3" => "search#search3",
+  "getAlbumList2" => "lists#get_album_list2",
+  "getRandomSongs" => "lists#get_random_songs",
+  "getPlaylists" => "playlists#get_playlists",
+  "getPlaylist" => "playlists#get_playlist",
+  "createPlaylist" => "playlists#create_playlist",
+  "deletePlaylist" => "playlists#delete_playlist",
+  "star" => "interaction#star",
+  "unstar" => "interaction#unstar",
+  "scrobble" => "interaction#scrobble"
+}.freeze
 
-    get "getMusicFolders.view", to: "browsing#get_music_folders"
-    post "getMusicFolders.view", to: "browsing#get_music_folders"
-    get "getIndexes.view", to: "browsing#get_indexes"
-    post "getIndexes.view", to: "browsing#get_indexes"
-    get "getArtists.view", to: "browsing#get_artists"
-    post "getArtists.view", to: "browsing#get_artists"
-    get "getArtist.view", to: "browsing#get_artist"
-    post "getArtist.view", to: "browsing#get_artist"
-    get "getAlbum.view", to: "browsing#get_album"
-    post "getAlbum.view", to: "browsing#get_album"
-    get "getSong.view", to: "browsing#get_song"
-    post "getSong.view", to: "browsing#get_song"
-
-    get "stream.view", to: "media#stream"
-    post "stream.view", to: "media#stream"
-    get "getCoverArt.view", to: "media#get_cover_art"
-    post "getCoverArt.view", to: "media#get_cover_art"
-
-    get "search3.view", to: "search#search3"
-    post "search3.view", to: "search#search3"
-
-    get "getAlbumList2.view", to: "lists#get_album_list2"
-    post "getAlbumList2.view", to: "lists#get_album_list2"
-    get "getRandomSongs.view", to: "lists#get_random_songs"
-    post "getRandomSongs.view", to: "lists#get_random_songs"
-
-    get "getPlaylists.view", to: "playlists#get_playlists"
-    post "getPlaylists.view", to: "playlists#get_playlists"
-    get "getPlaylist.view", to: "playlists#get_playlist"
-    post "getPlaylist.view", to: "playlists#get_playlist"
-    get "createPlaylist.view", to: "playlists#create_playlist"
-    post "createPlaylist.view", to: "playlists#create_playlist"
-    get "deletePlaylist.view", to: "playlists#delete_playlist"
-    post "deletePlaylist.view", to: "playlists#delete_playlist"
-
-    get "star.view", to: "interaction#star"
-    post "star.view", to: "interaction#star"
-    get "unstar.view", to: "interaction#unstar"
-    post "unstar.view", to: "interaction#unstar"
-    get "scrobble.view", to: "interaction#scrobble"
-    post "scrobble.view", to: "interaction#scrobble"
+SUBSONIC_ROUTES = lambda do
+  SUBSONIC_ENDPOINTS.each do |endpoint, action|
+    get "#{endpoint}.view", to: action
+    post "#{endpoint}.view", to: action
+    get endpoint, to: action
+    post endpoint, to: action
   end
 end
+
+# Original /api/rest/ routes
+namespace :api do
+  namespace :subsonic, path: "/rest", &SUBSONIC_ROUTES
+end
+
+# Alias at /rest/ for standard Subsonic client compatibility (e.g. cliamp)
+scope "/rest", module: "api/subsonic", &SUBSONIC_ROUTES

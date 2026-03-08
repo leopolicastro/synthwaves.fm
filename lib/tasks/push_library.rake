@@ -32,6 +32,7 @@ namespace :library do
     files.each_with_index do |file_path, index|
       label = "[#{index + 1}/#{files.size}]"
 
+      retries = 0
       begin
         boundary = "----RubyMultipart#{SecureRandom.hex(16)}"
 
@@ -51,6 +52,13 @@ namespace :library do
         request.body = body
 
         response = http.request(request)
+
+        if response.code.to_i == 503 && retries < 2
+          retries += 1
+          puts "#{label} #{file_name} — S3 error, retrying (#{retries}/2)..."
+          sleep 2
+          redo
+        end
 
         unless response.content_type&.include?("json")
           puts "#{label} #{file_name} — FAILED (#{response.code}: #{response.body[0..200]})"

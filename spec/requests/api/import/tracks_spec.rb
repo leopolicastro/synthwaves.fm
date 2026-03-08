@@ -75,7 +75,7 @@ RSpec.describe "API Import Tracks", type: :request do
       expect(track.album).to eq(album)
     end
 
-    it "attaches cover art to album" do
+    it "enqueues cover art attachment job" do
       allow(MetadataExtractor).to receive(:call).and_return({
         title: "Art Song", artist: "Art Artist", album: "Art Album",
         year: 2024, genre: "Rock", track_number: 1, disc_number: 1,
@@ -84,10 +84,12 @@ RSpec.describe "API Import Tracks", type: :request do
       })
 
       file = fixture_file_upload("test.mp3", "audio/mpeg")
-      post api_import_tracks_path, params: { audio_file: file }, headers: auth_headers
+
+      expect {
+        post api_import_tracks_path, params: { audio_file: file }, headers: auth_headers
+      }.to have_enqueued_job(CoverArtAttachJob)
 
       expect(response).to have_http_status(:created)
-      expect(Track.last.album.cover_image.attached?).to be true
     end
   end
 end

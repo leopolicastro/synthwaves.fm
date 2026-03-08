@@ -1,44 +1,116 @@
 <div class="w-full">
-  <h1 class="text-3xl font-bold mb-8">Library</h1>
-
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-      <div class="text-3xl font-bold text-blue-600"><%= @artist_count %></div>
-      <div class="text-gray-500 dark:text-gray-400">Artists</div>
-    </div>
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-      <div class="text-3xl font-bold text-green-600"><%= @album_count %></div>
-      <div class="text-gray-500 dark:text-gray-400">Albums</div>
-    </div>
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-      <div class="text-3xl font-bold text-purple-600"><%= @track_count %></div>
-      <div class="text-gray-500 dark:text-gray-400">Tracks</div>
-    </div>
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-      <div class="text-3xl font-bold text-orange-600"><%= format_duration(@total_duration || 0) %></div>
-      <div class="text-gray-500 dark:text-gray-400">Total Duration</div>
-    </div>
-  </div>
-
-  <div class="flex gap-4 mb-8">
-    <%= link_to "Upload Track", new_track_path, class: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" %>
-    <% if Flipper.enabled?(:youtube_import, Current.user) %>
-      <%= link_to "Import from YouTube", new_youtube_import_path, class: "px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700" %>
-    <% end %>
-    <%= link_to "Browse Artists", artists_path, class: "px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600" %>
-    <%= link_to "Browse Albums", albums_path, class: "px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600" %>
-  </div>
-
-  <% if @recent_tracks.any? %>
-    <h2 class="text-xl font-semibold mb-4">Recently Added</h2>
-    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-      <% @recent_tracks.each do |track| %>
-        <%= render TrackRowComponent.new(track: track, link_subtitle: true) do |c| %>
-          <% c.with_trailing do %>
-            <%= render "playlist_tracks/add_menu", track: track, playlists: current_user_playlists %>
-          <% end %>
+  <%# Greeting + Quick Actions %>
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4"><%= @greeting %>, <%= @user_display_name %></h1>
+    <div class="flex flex-wrap gap-2">
+      <%= link_to new_track_path, class: "inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+        Upload
+      <% end %>
+      <% if Flipper.enabled?(:youtube_import, Current.user) %>
+        <%= link_to new_youtube_import_path, class: "inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" do %>
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          Import from YouTube
+        <% end %>
+      <% end %>
+      <%= link_to new_playlist_path, class: "inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        New Playlist
+      <% end %>
+      <% if Flipper.enabled?(:youtube_radio, Current.user) %>
+        <%= link_to new_radio_station_path, class: "inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 14.828a4 4 0 010-5.656m5.656 0a4 4 0 010 5.656M12 12h.01"/></svg>
+          Add Radio Station
         <% end %>
       <% end %>
     </div>
+  </div>
+
+  <%# Recently Played %>
+  <% if @recently_played.any? %>
+    <%= render "library/section", title: "Recently Played", see_all_path: play_histories_path do %>
+      <% @recently_played.each do |track| %>
+        <%= render "library/track_card", track: track %>
+      <% end %>
+    <% end %>
   <% end %>
+
+  <%# Your Playlists (always shown — includes New Playlist CTA) %>
+  <%= render "library/section", title: "Your Playlists", see_all_path: playlists_path do %>
+    <% @playlists.each_with_index do |playlist, index| %>
+      <%= render "library/playlist_card", playlist: playlist, playlist_counter: index %>
+    <% end %>
+    <%= render "library/new_playlist_card" %>
+  <% end %>
+
+  <%# Favorites %>
+  <% if @favorite_tracks.any? %>
+    <%= render "library/section", title: "Favorites", see_all_path: favorites_path do %>
+      <% @favorite_tracks.each do |favorite| %>
+        <%= render "library/track_card", track: favorite.favorable %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <%# Radio Stations %>
+  <% if @radio_stations&.any? %>
+    <%= render "library/section", title: "Radio Stations", see_all_path: radio_stations_path do %>
+      <% @radio_stations.each do |station| %>
+        <%= render "library/radio_card", station: station %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <%# Recently Added Albums %>
+  <% if @recently_added_albums.any? %>
+    <%= render "library/section", title: "Recently Added", see_all_path: albums_path do %>
+      <% @recently_added_albums.each do |album| %>
+        <%= render "library/album_card", album: album %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <%# Podcasts %>
+  <% if @podcasts.any? %>
+    <%= render "library/section", title: "Podcasts", see_all_path: podcasts_path do %>
+      <% @podcasts.each do |podcast| %>
+        <%= render "library/podcast_card", podcast: podcast %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <%# Browse %>
+  <div class="mb-8">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Browse</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <%= render "library/browse_card",
+        path: artists_path,
+        label: "Artists",
+        count: @artist_count,
+        item_name: "artist",
+        color: "blue",
+        icon: tag.svg(tag.path(d: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z", stroke_linecap: "round", stroke_linejoin: "round", stroke_width: "2"), class: "w-5 h-5 text-blue-600 dark:text-blue-400", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24") %>
+      <%= render "library/browse_card",
+        path: albums_path,
+        label: "Albums",
+        count: @album_count,
+        item_name: "album",
+        color: "green",
+        icon: tag.svg(tag.path(d: "M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"), class: "w-5 h-5 text-green-600 dark:text-green-400", fill: "currentColor", viewBox: "0 0 20 20") %>
+      <%= render "library/browse_card",
+        path: tracks_path,
+        label: "Tracks",
+        count: @track_count,
+        item_name: "track",
+        color: "purple",
+        icon: tag.svg(tag.path(d: "M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3", stroke_linecap: "round", stroke_linejoin: "round", stroke_width: "2"), class: "w-5 h-5 text-purple-600 dark:text-purple-400", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24") %>
+      <%= render "library/browse_card",
+        path: podcasts_path,
+        label: "Podcasts",
+        count: @podcast_count,
+        item_name: "podcast",
+        color: "orange",
+        icon: tag.svg(tag.path(d: "M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z", stroke_linecap: "round", stroke_linejoin: "round", stroke_width: "2"), class: "w-5 h-5 text-orange-600 dark:text-orange-400", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24") %>
+    </div>
+  </div>
 </div>

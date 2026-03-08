@@ -1,0 +1,35 @@
+<div class="w-56 flex-shrink-0 group">
+  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow">
+    <div class="relative aspect-video bg-gray-200 dark:bg-gray-700">
+      <% if station.thumbnail_url.present? %>
+        <img src="<%= station.thumbnail_url %>" alt="<%= station.name %>" class="w-full h-full object-cover" loading="lazy">
+      <% else %>
+        <div class="w-full h-full flex items-center justify-center">
+          <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 14.828a4 4 0 010-5.656m5.656 0a4 4 0 010 5.656M12 12h.01"/>
+          </svg>
+        </div>
+      <% end %>
+      <button type="button"
+              class="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition-colors"
+              data-controller="song-row"
+              data-song-row-track-id-value="0"
+              data-song-row-title-value="<%= station.name %>"
+              data-song-row-artist-value="Live"
+              data-song-row-youtube-video-id-value="<%= station.youtube_video_id %>"
+              data-song-row-is-live-value="true"
+              data-action="song-row#play">
+        <div class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+          <svg class="w-6 h-6 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+        </div>
+      </button>
+    </div>
+    <div class="p-2">
+      <div class="font-medium text-sm text-gray-900 dark:text-white truncate"><%= station.name %></div>
+      <span class="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300">
+        <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+        LIVE
+      </span>
+    </div>
+  </div>
+</div>

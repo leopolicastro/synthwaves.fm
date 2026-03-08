@@ -1,0 +1,9 @@
+<%= link_to path, class: "bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-lg transition-shadow flex items-center gap-3" do %>
+  <div class="w-10 h-10 rounded-lg bg-<%= color %>-100 dark:bg-<%= color %>-900 flex items-center justify-center">
+    <%= icon %>
+  </div>
+  <div>
+    <div class="font-medium text-gray-900 dark:text-white"><%= label %></div>
+    <div class="text-sm text-gray-500"><%= pluralize(count, item_name) %></div>
+  </div>
+<% end %>

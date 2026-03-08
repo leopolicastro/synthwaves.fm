@@ -1,0 +1,13 @@
+<%= link_to podcast_path(podcast), class: "group w-40 flex-shrink-0" do %>
+  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow">
+    <div class="w-full aspect-square bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+      <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+      </svg>
+    </div>
+    <div class="p-2">
+      <div class="font-medium text-sm text-gray-900 dark:text-white group-hover:text-blue-600 truncate"><%= podcast.name %></div>
+      <div class="text-xs text-gray-500"><%= pluralize(podcast.tracks.count, "episode") %></div>
+    </div>
+  </div>
+<% end %>

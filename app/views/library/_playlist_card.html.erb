@@ -1,0 +1,21 @@
+<%
+  gradient_colors = [
+    "from-purple-500 to-blue-500",
+    "from-green-500 to-teal-500",
+    "from-orange-500 to-red-500",
+    "from-pink-500 to-purple-500",
+    "from-blue-500 to-indigo-500"
+  ]
+  gradient = gradient_colors[playlist_counter % gradient_colors.size]
+%>
+<%= link_to playlist_path(playlist), class: "group w-40 flex-shrink-0" do %>
+  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow">
+    <div class="w-full aspect-square bg-gradient-to-br <%= gradient %> flex items-center justify-center">
+      <svg class="w-10 h-10 text-white/80" fill="currentColor" viewBox="0 0 20 20"><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0zm-3-9a1 1 0 00-1 1v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 10.586V5a1 1 0 00-1-1z"/></svg>
+    </div>
+    <div class="p-2">
+      <div class="font-medium text-sm text-gray-900 dark:text-white group-hover:text-blue-600 truncate"><%= playlist.name %></div>
+      <div class="text-xs text-gray-500"><%= pluralize(playlist.tracks_count, "track") %></div>
+    </div>
+  </div>
+<% end %>

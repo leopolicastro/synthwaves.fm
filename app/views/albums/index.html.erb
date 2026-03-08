@@ -1,0 +1,24 @@
+<div class="w-full">
+  <h1 class="text-3xl font-bold mb-6">Albums</h1>
+
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+    <% @albums.each do |album| %>
+      <%= link_to album_path(album), class: "group" do %>
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow">
+          <% if album.cover_image.attached? %>
+            <%= image_tag album.cover_image, class: "w-full aspect-square object-cover", loading: "lazy" %>
+          <% else %>
+            <div class="w-full aspect-square bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+              <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
+            </div>
+          <% end %>
+          <div class="p-3">
+            <div class="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 truncate"><%= album.title %></div>
+            <div class="text-sm text-gray-500"><%= album.artist.name %></div>
+            <div class="text-xs text-gray-400"><%= album.year %></div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

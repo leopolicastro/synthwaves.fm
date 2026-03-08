@@ -1,0 +1,11 @@
+class PlayHistoriesController < ApplicationController
+  def index
+    @recent = Current.user.play_histories.includes(track: [:artist, :album]).order(played_at: :desc).limit(50)
+  end
+
+  def create
+    track = Track.find(params[:track_id])
+    Current.user.play_histories.create!(track: track, played_at: Time.current)
+    head :ok
+  end
+end

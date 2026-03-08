@@ -1,0 +1,24 @@
+<div class="w-full">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-bold">Playlists</h1>
+    <%= link_to "New Playlist", new_playlist_path, class: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" %>
+  </div>
+
+  <% if @playlists.any? %>
+    <div class="space-y-2">
+      <% @playlists.each do |playlist| %>
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between hover:shadow transition-shadow">
+          <%= link_to playlist_path(playlist), class: "flex-1" do %>
+            <div class="font-medium text-gray-900 dark:text-white hover:text-blue-600"><%= playlist.name %></div>
+            <div class="text-sm text-gray-500"><%= pluralize(playlist.tracks.size, "track") %></div>
+          <% end %>
+          <div class="flex gap-2">
+            <%= link_to "Edit", edit_playlist_path(playlist), class: "text-sm text-gray-500 hover:text-gray-700" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-gray-500">No playlists yet. Create one to get started.</p>
+  <% end %>
+</div>

@@ -1,0 +1,36 @@
+<div class="w-full">
+  <div class="mb-6">
+    <%= link_to "&larr; Playlists".html_safe, playlists_path, class: "text-blue-600 hover:underline" %>
+  </div>
+
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-bold"><%= @playlist.name %></h1>
+    <div class="flex gap-2">
+      <%= link_to "Edit", edit_playlist_path(@playlist), class: "px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600" %>
+      <%= button_to "Delete", playlist_path(@playlist), method: :delete, data: { turbo_confirm: "Delete this playlist?" }, class: "px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700" %>
+    </div>
+  </div>
+
+  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+    <% @playlist_tracks.each do |pt| %>
+      <% track = pt.track %>
+      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-750"
+           data-controller="song-row"
+           data-song-row-track-id-value="<%= track.id %>"
+           data-song-row-title-value="<%= track.title %>"
+           data-song-row-artist-value="<%= track.artist.name %>"
+           data-song-row-stream-url-value="<%= stream_track_path(track) %>">
+        <div class="flex items-center gap-3">
+          <button data-action="song-row#play" class="w-8 text-center text-gray-400 hover:text-blue-600">
+            <span><%= pt.position %></span>
+          </button>
+          <div>
+            <div class="font-medium text-gray-900 dark:text-white"><%= track.title %></div>
+            <div class="text-sm text-gray-500"><%= track.artist.name %> &middot; <%= track.album.title %></div>
+          </div>
+        </div>
+        <div class="text-sm text-gray-500"><%= format_duration(track.duration || 0) %></div>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,53 @@
+<div class="w-full">
+  <h1 class="text-3xl font-bold mb-8">Library</h1>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+      <div class="text-3xl font-bold text-blue-600"><%= @artist_count %></div>
+      <div class="text-gray-500 dark:text-gray-400">Artists</div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+      <div class="text-3xl font-bold text-green-600"><%= @album_count %></div>
+      <div class="text-gray-500 dark:text-gray-400">Albums</div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+      <div class="text-3xl font-bold text-purple-600"><%= @track_count %></div>
+      <div class="text-gray-500 dark:text-gray-400">Tracks</div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+      <div class="text-3xl font-bold text-orange-600"><%= format_duration(@total_duration || 0) %></div>
+      <div class="text-gray-500 dark:text-gray-400">Total Duration</div>
+    </div>
+  </div>
+
+  <div class="flex gap-4 mb-8">
+    <%= link_to "Upload Track", new_track_path, class: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" %>
+    <%= link_to "Browse Artists", artists_path, class: "px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600" %>
+    <%= link_to "Browse Albums", albums_path, class: "px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600" %>
+  </div>
+
+  <% if @recent_tracks.any? %>
+    <h2 class="text-xl font-semibold mb-4">Recently Added</h2>
+    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+      <% @recent_tracks.each do |track| %>
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-750"
+             data-controller="song-row"
+             data-song-row-track-id-value="<%= track.id %>"
+             data-song-row-title-value="<%= track.title %>"
+             data-song-row-artist-value="<%= track.artist.name %>"
+             data-song-row-stream-url-value="<%= stream_track_path(track) %>">
+          <div class="flex items-center gap-3">
+            <button data-action="song-row#play" class="text-gray-400 hover:text-blue-600">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+            </button>
+            <div>
+              <div class="font-medium text-gray-900 dark:text-white"><%= track.title %></div>
+              <div class="text-sm text-gray-500"><%= link_to track.artist.name, artist_path(track.artist), class: "hover:underline" %> &middot; <%= link_to track.album.title, album_path(track.album), class: "hover:underline" %></div>
+            </div>
+          </div>
+          <div class="text-sm text-gray-500"><%= format_duration(track.duration || 0) %></div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,28 @@
+<div class="w-full">
+  <h1 class="text-3xl font-bold mb-6">Favorites</h1>
+
+  <% if @favorites.any? %>
+    <div class="space-y-2">
+      <% @favorites.each do |favorite| %>
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between">
+          <div>
+            <span class="text-xs text-gray-400 uppercase"><%= favorite.favorable_type %></span>
+            <div class="font-medium text-gray-900 dark:text-white">
+              <% case favorite.favorable %>
+              <% when Track %>
+                <%= link_to favorite.favorable.title, track_path(favorite.favorable), class: "hover:underline" %>
+              <% when Album %>
+                <%= link_to favorite.favorable.title, album_path(favorite.favorable), class: "hover:underline" %>
+              <% when Artist %>
+                <%= link_to favorite.favorable.name, artist_path(favorite.favorable), class: "hover:underline" %>
+              <% end %>
+            </div>
+          </div>
+          <%= button_to "Remove", favorite_path(favorite), method: :delete, class: "text-sm text-red-500 hover:text-red-700" %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-gray-500">No favorites yet.</p>
+  <% end %>
+</div>

@@ -1,0 +1,21 @@
+<%= form_with model: playlist, class: "space-y-4" do |f| %>
+  <% if playlist.errors.any? %>
+    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+      <ul class="text-sm text-red-600 dark:text-red-400">
+        <% playlist.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name, class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+    <%= f.text_field :name, class: "w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white" %>
+  </div>
+
+  <div>
+    <%= f.submit class: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer" %>
+    <%= link_to "Cancel", playlists_path, class: "px-4 py-2 text-gray-600 hover:text-gray-900" %>
+  </div>
+<% end %>

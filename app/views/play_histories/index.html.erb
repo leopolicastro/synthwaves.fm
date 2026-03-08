@@ -1,0 +1,21 @@
+<div class="w-full">
+  <h1 class="text-3xl font-bold mb-6">Recently Played</h1>
+
+  <% if @recent.any? %>
+    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+      <% @recent.each do |ph| %>
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0">
+          <div class="flex items-center gap-3">
+            <div>
+              <div class="font-medium text-gray-900 dark:text-white"><%= link_to ph.track.title, track_path(ph.track), class: "hover:underline" %></div>
+              <div class="text-sm text-gray-500"><%= ph.track.artist.name %> &middot; <%= ph.track.album.title %></div>
+            </div>
+          </div>
+          <div class="text-sm text-gray-500"><%= time_ago_in_words(ph.played_at) %> ago</div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-gray-500">No play history yet.</p>
+  <% end %>
+</div>

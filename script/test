@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
-# prove_it: full test suite—runs before every git commit
-# Replace the test command below, or change the 'full-tests' command
-# in .claude/prove_it/config.json to point at your existing test runner.
-set -e
-trap 'prove_it record --name full-tests --result $?' EXIT
-echo "No tests configured. Edit script/test to run your test suite."
-bundle exec rspec
+set -euo pipefail
+
+LOCKDIR="tmp/test.lock"
+
+cleanup() { rmdir "$LOCKDIR" 2>/dev/null || true; }
+trap cleanup EXIT
+
+# Wait for any concurrent test run to finish
+while ! mkdir "$LOCKDIR" 2>/dev/null; do
+  sleep 0.5
+done
+
+bundle exec rspec "$@"

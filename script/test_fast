@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
-# prove_it: fast tests—runs every time Claude finishes a response
-# Replace the test command below, or change the 'fast-tests' command
-# in .claude/prove_it/config.json to point at your existing test runner.
-set -e
-trap 'prove_it record --name fast-tests --result $?' EXIT
-echo "No tests configured. Edit script/test_fast to run your fast (unit) tests."
-bundle exec rspec --tag fast
+set -euo pipefail
+
+LOCKDIR="tmp/test.lock"
+
+cleanup() { rmdir "$LOCKDIR" 2>/dev/null || true; }
+trap cleanup EXIT
+
+# Wait for any concurrent test run to finish
+while ! mkdir "$LOCKDIR" 2>/dev/null; do
+  sleep 0.5
+done
+
+bundle exec rspec --fail-fast "$@"

@@ -1,0 +1,26 @@
+<div class="w-full max-w-lg">
+  <h1 class="text-3xl font-bold mb-6">Upload Track</h1>
+
+  <%= form_with url: tracks_path, method: :post, multipart: true, class: "space-y-4" do |f| %>
+    <% if @track.errors.any? %>
+      <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+        <ul class="text-sm text-red-600 dark:text-red-400">
+          <% @track.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Audio File</label>
+      <input type="file" name="audio_file" accept="audio/*,video/webm,.webm" required
+             class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300">
+      <p class="mt-1 text-sm text-gray-500">MP3, FLAC, OGG, M4A, or WebM. Non-MP3 formats will be converted automatically.</p>
+    </div>
+
+    <div>
+      <%= f.submit "Upload", class: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer" %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,67 @@
+<div class="w-full">
+  <h1 class="text-3xl font-bold mb-6">Search</h1>
+
+  <div data-controller="search" class="mb-8">
+    <%= form_with url: search_path, method: :get, data: { turbo_frame: "search-results", search_target: "form", action: "input->search#submit" } do |f| %>
+      <input type="text" name="q" value="<%= @query %>" placeholder="Search artists, albums, tracks..."
+             class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg px-4 py-3"
+             data-search-target="input" autofocus>
+    <% end %>
+  </div>
+
+  <turbo-frame id="search-results">
+    <% if @query.present? %>
+      <% if @results[:artists].any? %>
+        <h2 class="text-xl font-semibold mb-3">Artists</h2>
+        <div class="space-y-2 mb-6">
+          <% @results[:artists].each do |artist| %>
+            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+              <%= link_to artist.name, artist_path(artist), class: "font-medium text-gray-900 dark:text-white hover:text-blue-600" %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if @results[:albums].any? %>
+        <h2 class="text-xl font-semibold mb-3">Albums</h2>
+        <div class="space-y-2 mb-6">
+          <% @results[:albums].each do |album| %>
+            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+              <%= link_to album.title, album_path(album), class: "font-medium text-gray-900 dark:text-white hover:text-blue-600" %>
+              <span class="text-sm text-gray-500">by <%= album.artist.name %></span>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if @results[:tracks].any? %>
+        <h2 class="text-xl font-semibold mb-3">Tracks</h2>
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+          <% @results[:tracks].each do |track| %>
+            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                 data-controller="song-row"
+                 data-song-row-track-id-value="<%= track.id %>"
+                 data-song-row-title-value="<%= track.title %>"
+                 data-song-row-artist-value="<%= track.artist.name %>"
+                 data-song-row-stream-url-value="<%= stream_track_path(track) %>">
+              <div class="flex items-center gap-3">
+                <button data-action="song-row#play" class="text-gray-400 hover:text-blue-600">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+                </button>
+                <div>
+                  <div class="font-medium text-gray-900 dark:text-white"><%= track.title %></div>
+                  <div class="text-sm text-gray-500"><%= track.artist.name %> &middot; <%= track.album.title %></div>
+                </div>
+              </div>
+              <div class="text-sm text-gray-500"><%= format_duration(track.duration || 0) %></div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if @results[:artists].empty? && @results[:albums].empty? && @results[:tracks].empty? %>
+        <p class="text-gray-500">No results found for "<%= @query %>".</p>
+      <% end %>
+    <% end %>
+  </turbo-frame>
+</div>

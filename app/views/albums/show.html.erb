@@ -1,0 +1,46 @@
+<div class="w-full">
+  <div class="mb-6">
+    <%= link_to "&larr; Albums".html_safe, albums_path, class: "text-blue-600 hover:underline" %>
+  </div>
+
+  <div class="flex items-start gap-6 mb-8">
+    <% if @album.cover_image.attached? %>
+      <%= image_tag @album.cover_image, class: "w-48 h-48 rounded-lg object-cover shadow-lg" %>
+    <% else %>
+      <div class="w-48 h-48 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center shadow-lg">
+        <svg class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
+      </div>
+    <% end %>
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white"><%= @album.title %></h1>
+      <p class="text-lg text-gray-600 dark:text-gray-400"><%= link_to @album.artist.name, artist_path(@album.artist), class: "hover:underline" %></p>
+      <% if @album.year %><p class="text-gray-500"><%= @album.year %></p><% end %>
+      <% if @album.genre %><p class="text-gray-500"><%= @album.genre %></p><% end %>
+      <p class="text-sm text-gray-400 mt-2"><%= pluralize(@tracks.size, "track") %></p>
+    </div>
+  </div>
+
+  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+    <% @tracks.each do |track| %>
+      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-750"
+           data-controller="song-row"
+           data-song-row-track-id-value="<%= track.id %>"
+           data-song-row-title-value="<%= track.title %>"
+           data-song-row-artist-value="<%= track.artist.name %>"
+           data-song-row-stream-url-value="<%= stream_track_path(track) %>">
+        <div class="flex items-center gap-3">
+          <button data-action="song-row#play" class="w-8 text-center text-gray-400 hover:text-blue-600">
+            <span data-song-row-target="trackNumber"><%= track.track_number %></span>
+          </button>
+          <div>
+            <div class="font-medium text-gray-900 dark:text-white"><%= track.title %></div>
+            <% if track.artist != @album.artist %>
+              <div class="text-sm text-gray-500"><%= track.artist.name %></div>
+            <% end %>
+          </div>
+        </div>
+        <div class="text-sm text-gray-500"><%= format_duration(track.duration || 0) %></div>
+      </div>
+    <% end %>
+  </div>
+</div>

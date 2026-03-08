@@ -1,0 +1,35 @@
+<div class="w-full max-w-lg">
+  <h1 class="text-3xl font-bold mb-6">Edit Track</h1>
+
+  <%= form_with model: @track, class: "space-y-4" do |f| %>
+    <% if @track.errors.any? %>
+      <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+        <ul class="text-sm text-red-600 dark:text-red-400">
+          <% @track.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.label :title, class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+      <%= f.text_field :title, class: "w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white" %>
+    </div>
+
+    <div>
+      <%= f.label :track_number, class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+      <%= f.number_field :track_number, class: "w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white" %>
+    </div>
+
+    <div>
+      <%= f.label :disc_number, class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+      <%= f.number_field :disc_number, class: "w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white" %>
+    </div>
+
+    <div>
+      <%= f.submit "Save", class: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer" %>
+      <%= link_to "Cancel", track_path(@track), class: "px-4 py-2 text-gray-600 hover:text-gray-900" %>
+    </div>
+  <% end %>
+</div>

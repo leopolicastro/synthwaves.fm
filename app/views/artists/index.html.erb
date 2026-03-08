@@ -1,0 +1,19 @@
+<div class="w-full">
+  <h1 class="text-3xl font-bold mb-6">Artists</h1>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+    <% @artists.each do |artist| %>
+      <%= link_to artist_path(artist), class: "group" do %>
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-lg transition-shadow">
+          <div class="w-full aspect-square rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mb-3">
+            <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+          </div>
+          <div class="text-center">
+            <div class="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 truncate"><%= artist.name %></div>
+            <div class="text-sm text-gray-500"><%= pluralize(artist.albums.size, "album") %></div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

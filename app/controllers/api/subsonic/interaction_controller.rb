@@ -13,6 +13,32 @@ class API::Subsonic::InteractionController < API::Subsonic::BaseController
     render_subsonic
   end
 
+  def get_starred2
+    artist_favs = current_user.favorites.where(favorable_type: "Artist").includes(favorable: :albums)
+    album_favs = current_user.favorites.where(favorable_type: "Album").includes(favorable: [:artist, :tracks])
+    song_favs = current_user.favorites.where(favorable_type: "Track").includes(favorable: [:album, :artist])
+
+    render_subsonic(starred2: {
+      artist: artist_favs.filter_map { |f|
+        next unless f.favorable
+        {
+          id: f.favorable.id.to_s,
+          name: f.favorable.name,
+          albumCount: f.favorable.albums.size,
+          starred: f.created_at.iso8601
+        }
+      },
+      album: album_favs.filter_map { |f|
+        next unless f.favorable
+        album_to_entry(f.favorable).merge(starred: f.created_at.iso8601)
+      },
+      song: song_favs.filter_map { |f|
+        next unless f.favorable
+        track_to_child(f.favorable).merge(starred: f.created_at.iso8601)
+      }
+    })
+  end
+
   def scrobble
     track = Track.find(params[:id])
     current_user.play_histories.create!(track: track, played_at: Time.current)

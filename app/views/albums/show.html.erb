@@ -2,7 +2,6 @@
   <div class="mb-6">
     <%= link_to "&larr; Albums".html_safe, albums_path, class: "text-neon-cyan hover:underline" %>
   </div>
-
   <div class="flex items-start gap-6 mb-8">
     <% if @album.cover_image.attached? %>
       <%= image_tag @album.cover_image, class: "w-48 h-48 rounded-lg object-cover shadow-lg" %>
@@ -14,24 +13,25 @@
     <div>
       <h1 class="text-3xl font-bold font-display text-white"><%= @album.title %></h1>
       <p class="text-lg text-gray-400"><%= link_to @album.artist.name, artist_path(@album.artist), class: "hover:underline" %></p>
-      <% if @album.year %><p class="text-gray-500"><%= @album.year %></p><% end %>
-      <% if @album.genre %><p class="text-gray-500"><%= @album.genre %></p><% end %>
+      <% if @album.year %>
+        <p class="text-gray-500"><%= @album.year %></p>
+      <% end %>
+      <% if @album.genre %>
+        <p class="text-gray-500"><%= @album.genre %></p>
+      <% end %>
       <p class="text-sm text-gray-400 mt-2"><%= pluralize(@total_tracks, "track") %></p>
-
       <div class="mt-3 flex items-center gap-2">
+        <%= render "favorites/button", favorable: @album, favorited: Current.user.favorites.exists?(favorable: @album) %>
         <%= render BulkPlaylistMenuComponent.new(
               tracks: @all_tracks,
               playlists: current_user_playlists,
               new_playlist_name: @album.title
             ) %>
-        <% unless @album.cover_image.attached? %>
-          <%= button_to "Fetch cover", fetch_cover_album_path(@album), class: "inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-neon-cyan bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors" %>
-        <% end %>
+        <%= button_to "Fetch cover", fetch_cover_album_path(@album), class: "inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-neon-cyan bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors" %>
         <% if @album.youtube_playlist_url.present? %>
           <%= button_to "Refresh Episodes", refresh_album_path(@album), class: "inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-neon-cyan bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors" %>
         <% end %>
       </div>
-
       <% if Flipper.enabled?(:youtube_import, Current.user) %>
         <%= form_with model: @album, class: "mt-3 flex items-center gap-2" do |f| %>
           <%= f.text_field :youtube_playlist_url,
@@ -43,18 +43,16 @@
       <% end %>
     </div>
   </div>
-
   <turbo-frame id="album-tracks" data-turbo-action="advance">
     <form action="<%= album_path(@album) %>" method="get" data-controller="search" data-search-target="form" class="mb-4 flex items-center gap-3">
       <label for="sort" class="text-sm text-gray-500">Sort by</label>
       <select name="sort" id="sort" data-action="change->search#submit" class="text-sm rounded-md border-gray-600 bg-gray-700 text-white">
         <% Track::ALBUM_SORT_OPTIONS.each do |value, label| %>
           <option value="<%= value %>" <%= "selected" if value == @sort %>><%= label %></option>
-        <% end %>
-      </select>
-
-      <select name="direction" id="direction" data-action="change->search#submit" class="text-sm rounded-md border-gray-600 bg-gray-700 text-white">
-        <option value="asc" <%= "selected" if @direction == "asc" %>>Ascending</option>
+          <% end %>
+        </select>
+        <select name="direction" id="direction" data-action="change->search#submit" class="text-sm rounded-md border-gray-600 bg-gray-700 text-white">
+          <option value="asc" <%= "selected" if @direction == "asc" %>>Ascending</option>
         <option value="desc" <%= "selected" if @direction == "desc" %>>Descending</option>
       </select>
     </form>
@@ -63,16 +61,16 @@
       <% @tracks.each do |track| %>
         <%= render TrackRowComponent.new(track: track, number: (@sort == "disc_number" ? track.track_number : nil), show_album: false, hide_artist_if: @album.artist) do |c| %>
           <% c.with_trailing do %>
+            <%= render "favorites/button", favorable: track, favorited: @favorited_track_ids.include?(track.id) %>
             <%= render "playlist_tracks/add_menu", track: track, playlists: current_user_playlists %>
           <% end %>
         <% end %>
       <% end %>
     </div>
-
-    <% if @pagy.pages > 1 %>
-      <div class="mt-6 flex justify-center">
-        <%== @pagy.series_nav %>
-      </div>
-    <% end %>
-  </turbo-frame>
-</div>
+            <% if @pagy.pages > 1 %>
+              <div class="mt-6 flex justify-center">
+                <%== @pagy.series_nav %>
+              </div>
+            <% end %>
+          </turbo-frame>
+        </div>

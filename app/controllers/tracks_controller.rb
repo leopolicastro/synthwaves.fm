@@ -6,6 +6,7 @@ class TracksController < ApplicationController
     scope = Track.music.includes(:artist, :album).search(params[:q]).order(:title)
     @pagy, @tracks = pagy(:offset, scope)
     @query = params[:q]
+    @favorited_track_ids = Current.user.favorites.where(favorable_type: "Track").pluck(:favorable_id).to_set
   end
 
   def show

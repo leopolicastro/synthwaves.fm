@@ -29,7 +29,7 @@
     <% if @artists.any? %>
       <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         <% @artists.each do |artist| %>
-          <%= link_to artist_path(artist), class: "group" do %>
+          <%= link_to artist_path(artist), class: "group", data: { turbo_frame: "_top" } do %>
             <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 hover:shadow-lg transition-shadow">
               <% last_album = artist.albums.max_by(&:created_at) %>
               <% if last_album&.cover_image&.attached? %>

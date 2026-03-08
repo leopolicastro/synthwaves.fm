@@ -15,6 +15,8 @@ class SearchController < ApplicationController
     else
       {artists: [], albums: [], tracks: []}
     end
+
+    @favorited_track_ids = Current.user.favorites.where(favorable_type: "Track").pluck(:favorable_id).to_set
   end
 
   def dropdown

@@ -77,6 +77,54 @@ RSpec.describe "Subsonic Interaction API", type: :request do
     end
   end
 
+  describe "GET /api/rest/getStarred2.view" do
+    it "returns empty arrays when nothing is starred" do
+      get "/api/rest/getStarred2.view", params: auth_params
+      json = JSON.parse(response.body)
+      starred = json["subsonic-response"]["starred2"]
+      expect(starred["artist"]).to eq([])
+      expect(starred["album"]).to eq([])
+      expect(starred["song"]).to eq([])
+    end
+
+    it "returns starred artists, albums, and songs" do
+      artist = create(:artist)
+      album = create(:album, artist: artist)
+      track = create(:track, album: album, artist: artist)
+
+      create(:favorite, user: user, favorable: artist)
+      create(:favorite, user: user, favorable: album)
+      create(:favorite, user: user, favorable: track)
+
+      get "/api/rest/getStarred2.view", params: auth_params
+      json = JSON.parse(response.body)
+      starred = json["subsonic-response"]["starred2"]
+
+      expect(starred["artist"].size).to eq(1)
+      expect(starred["artist"].first["name"]).to eq(artist.name)
+      expect(starred["artist"].first["starred"]).to be_present
+
+      expect(starred["album"].size).to eq(1)
+      expect(starred["album"].first["name"]).to eq(album.title)
+      expect(starred["album"].first["starred"]).to be_present
+
+      expect(starred["song"].size).to eq(1)
+      expect(starred["song"].first["title"]).to eq(track.title)
+      expect(starred["song"].first["starred"]).to be_present
+    end
+
+    it "does not return other users' starred items" do
+      other = create(:user)
+      track = create(:track)
+      create(:favorite, user: other, favorable: track)
+
+      get "/api/rest/getStarred2.view", params: auth_params
+      json = JSON.parse(response.body)
+      starred = json["subsonic-response"]["starred2"]
+      expect(starred["song"]).to eq([])
+    end
+  end
+
   describe "GET /api/rest/scrobble.view" do
     it "records play history" do
       track = create(:track)

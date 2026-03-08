@@ -85,6 +85,7 @@
           <% @results[:tracks].each do |track| %>
             <%= render TrackRowComponent.new(track: track) do |c| %>
               <% c.with_trailing do %>
+                <%= render "favorites/button", favorable: track, favorited: @favorited_track_ids.include?(track.id) %>
                 <%= render "playlist_tracks/add_menu", track: track, playlists: current_user_playlists %>
               <% end %>
             <% end %>

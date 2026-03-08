@@ -17,6 +17,7 @@ class AlbumsController < ApplicationController
     @total_tracks = scope.count
     @all_tracks = @album.tracks
     @pagy, @tracks = pagy(:offset, scope)
+    @favorited_track_ids = Current.user.favorites.where(favorable_type: "Track").pluck(:favorable_id).to_set
   end
 
   def refresh

@@ -27,6 +27,7 @@
         <% @tracks.each do |track| %>
           <%= render TrackRowComponent.new(track: track, link_title: true, link_subtitle: true) do |c| %>
             <% c.with_trailing do %>
+              <%= render "favorites/button", favorable: track, favorited: @favorited_track_ids.include?(track.id) %>
               <%= render "playlist_tracks/add_menu", track: track, playlists: current_user_playlists %>
               <%= link_to edit_track_path(track), data: { turbo_frame: "_top" }, class: "text-gray-400 hover:text-neon-cyan" do %>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>

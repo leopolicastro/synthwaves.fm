@@ -21,6 +21,7 @@ SUBSONIC_ENDPOINTS = {
   "deletePlaylist" => "playlists#delete_playlist",
   "star" => "interaction#star",
   "unstar" => "interaction#unstar",
+  "getStarred2" => "interaction#get_starred2",
   "scrobble" => "interaction#scrobble"
 }.freeze
 

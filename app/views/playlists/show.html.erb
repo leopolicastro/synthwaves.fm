@@ -16,6 +16,7 @@
     <% @playlist_tracks.each do |pt| %>
       <%= render TrackRowComponent.new(track: pt.track, number: pt.position) do |c| %>
         <% c.with_trailing do %>
+          <%= render "favorites/button", favorable: pt.track, favorited: @favorited_track_ids.include?(pt.track.id) %>
           <%= button_to playlist_track_path(@playlist, pt),
                 method: :delete,
                 class: "text-gray-400 hover:text-red-600",

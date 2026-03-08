@@ -10,7 +10,18 @@ RSpec.describe "Subsonic Playlists API", type: :request do
       get "/api/rest/getPlaylists.view", params: auth_params
       json = JSON.parse(response.body)
       playlists = json["subsonic-response"]["playlists"]["playlist"]
-      expect(playlists.first["name"]).to eq("My Playlist")
+      expect(playlists.last["name"]).to eq("My Playlist")
+    end
+
+    it "includes All Tracks virtual playlist first" do
+      create_list(:track, 3)
+      get "/api/rest/getPlaylists.view", params: auth_params
+      json = JSON.parse(response.body)
+      playlists = json["subsonic-response"]["playlists"]["playlist"]
+      all_tracks = playlists.first
+      expect(all_tracks["id"]).to eq("all")
+      expect(all_tracks["name"]).to eq("All Tracks")
+      expect(all_tracks["songCount"]).to eq(3)
     end
 
     it "does not return other users playlists" do
@@ -19,7 +30,9 @@ RSpec.describe "Subsonic Playlists API", type: :request do
       get "/api/rest/getPlaylists.view", params: auth_params
       json = JSON.parse(response.body)
       playlists = json["subsonic-response"]["playlists"]["playlist"]
-      expect(playlists).to be_empty
+      # Only the virtual "All Tracks" playlist should be present
+      expect(playlists.size).to eq(1)
+      expect(playlists.first["id"]).to eq("all")
     end
   end
 
@@ -32,6 +45,16 @@ RSpec.describe "Subsonic Playlists API", type: :request do
       get "/api/rest/getPlaylist.view", params: auth_params.merge(id: playlist.id)
       json = JSON.parse(response.body)
       expect(json["subsonic-response"]["playlist"]["entry"]).to be_present
+    end
+
+    it "returns all tracks when id is 'all'" do
+      tracks = create_list(:track, 3)
+      get "/api/rest/getPlaylist.view", params: auth_params.merge(id: "all")
+      json = JSON.parse(response.body)
+      playlist = json["subsonic-response"]["playlist"]
+      expect(playlist["id"]).to eq("all")
+      expect(playlist["name"]).to eq("All Tracks")
+      expect(playlist["entry"].size).to eq(3)
     end
 
     it "returns error for nonexistent playlist" do
@@ -73,12 +96,30 @@ RSpec.describe "Subsonic Playlists API", type: :request do
     end
   end
 
+  describe "GET /api/rest/createPlaylist.view" do
+    # ... existing tests above ...
+
+    it "returns error when trying to modify the All Tracks playlist" do
+      get "/api/rest/createPlaylist.view", params: auth_params.merge(playlistId: "all", name: "Renamed")
+      json = JSON.parse(response.body)
+      expect(json["subsonic-response"]["status"]).to eq("failed")
+      expect(json["subsonic-response"]["error"]["code"]).to eq(70)
+    end
+  end
+
   describe "GET /api/rest/deletePlaylist.view" do
     it "deletes user's playlist" do
       playlist = create(:playlist, user: user)
       expect {
         get "/api/rest/deletePlaylist.view", params: auth_params.merge(id: playlist.id)
       }.to change(Playlist, :count).by(-1)
+    end
+
+    it "returns error when trying to delete the All Tracks playlist" do
+      get "/api/rest/deletePlaylist.view", params: auth_params.merge(id: "all")
+      json = JSON.parse(response.body)
+      expect(json["subsonic-response"]["status"]).to eq("failed")
+      expect(json["subsonic-response"]["error"]["code"]).to eq(70)
     end
 
     it "returns error for nonexistent playlist" do

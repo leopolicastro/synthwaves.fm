@@ -25,7 +25,8 @@
           <% if @track.youtube? %><p>Source: YouTube</p><% end %>
         </div>
 
-        <div class="mt-4 flex gap-2">
+        <div class="mt-4 flex items-center gap-2">
+          <%= render "favorites/button", favorable: @track, favorited: Current.user.favorites.exists?(favorable: @track) %>
           <button class="px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink"
                   data-controller="song-row"
                   data-song-row-track-id-value="<%= @track.id %>"

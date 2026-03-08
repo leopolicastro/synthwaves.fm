@@ -99,6 +99,14 @@ RSpec.describe "Artists", type: :request do
 
       expect(response).to have_http_status(:ok)
     end
+
+    it "renders artist links that break out of the turbo frame" do
+      create(:artist, name: "Turbo Artist")
+
+      get artists_path
+
+      expect(response.body).to include('data-turbo-frame="_top"')
+    end
   end
 
   describe "GET /artists/:id" do

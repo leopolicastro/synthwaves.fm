@@ -2,11 +2,19 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
   def get_playlists
     playlists = current_user.playlists
     render_subsonic(playlists: {
-      playlist: playlists.map { |p| playlist_to_entry(p) }
+      playlist: [all_tracks_virtual_entry] + playlists.map { |p| playlist_to_entry(p) }
     })
   end
 
   def get_playlist
+    if params[:id] == "all"
+      tracks = Track.includes(:album, :artist).order(:title)
+      render_subsonic(playlist: all_tracks_virtual_entry.merge(
+        entry: tracks.map { |t| track_to_child(t) }
+      ))
+      return
+    end
+
     playlist = current_user.playlists.includes(playlist_tracks: {track: [:album, :artist]}).find(params[:id])
     render_subsonic(playlist: playlist_to_entry(playlist).merge(
       entry: playlist.playlist_tracks.order(:position).map { |pt| track_to_child(pt.track) }
@@ -16,6 +24,11 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
   end
 
   def create_playlist
+    if params[:playlistId] == "all"
+      render_subsonic_error(70, "Cannot modify the All Tracks playlist")
+      return
+    end
+
     if params[:playlistId].present?
       playlist = current_user.playlists.find(params[:playlistId])
       playlist.update!(name: params[:name]) if params[:name].present?
@@ -37,6 +50,11 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
   end
 
   def delete_playlist
+    if params[:id] == "all"
+      render_subsonic_error(70, "Cannot delete the All Tracks playlist")
+      return
+    end
+
     playlist = current_user.playlists.find(params[:id])
     playlist.destroy!
     render_subsonic
@@ -45,6 +63,17 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
   end
 
   private
+
+  def all_tracks_virtual_entry
+    {
+      id: "all",
+      name: "All Tracks",
+      songCount: Track.count,
+      duration: Track.sum(:duration).to_i,
+      owner: current_user.email_address,
+      public: false
+    }
+  end
 
   def playlist_to_entry(playlist)
     {

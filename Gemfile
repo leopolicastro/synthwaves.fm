@@ -67,3 +67,5 @@ gem "view_component"
 gem "jwt", "~> 2.7"
 
 gem "madmin"
+
+gem "mission_control-jobs"

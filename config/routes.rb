@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get '/home', to: 'home#show', as: :home
 root "static/landing#show"
 
 namespace :static do

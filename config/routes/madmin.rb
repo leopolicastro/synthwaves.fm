@@ -8,4 +8,5 @@ constraints AdminConstraint.new do
     resources :api_keys
     root to: "dashboard#show"
   end
+  mount MaintenanceTasks::Engine, at: "/admin/maintenance_tasks"
 end

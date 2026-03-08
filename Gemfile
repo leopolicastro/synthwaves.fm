@@ -69,3 +69,5 @@ gem "jwt", "~> 2.7"
 gem "madmin"
 
 gem "mission_control-jobs"
+
+gem "maintenance_tasks"

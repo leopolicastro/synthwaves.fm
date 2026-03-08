@@ -61,3 +61,5 @@ group :development do
 end
 
 gem "pagy"
+
+gem "view_component"

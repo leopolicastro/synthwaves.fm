@@ -4,7 +4,7 @@
   <% if @favorites.any? %>
     <div class="space-y-2">
       <% @favorites.each do |favorite| %>
-        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between">
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700">
           <div>
             <span class="text-xs text-gray-400 uppercase"><%= favorite.favorable_type %></span>
             <div class="font-medium text-gray-900 dark:text-white">

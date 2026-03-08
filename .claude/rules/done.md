@@ -24,3 +24,5 @@ means for this project.
   commented-out blocks left behind.
 - **Documentation matches reality.** If behavior changed, any docs, comments,
   or README sections that reference it are updated.
+- ** PR Review process** - When ready for review, create a pull request and request reviews from the team. Address any feedback and ensure all checks pass before merging.
+- **Merge to main** - Once approved, merge the pull request to the main branch.

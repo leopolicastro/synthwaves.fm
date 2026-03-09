@@ -20,5 +20,11 @@ FactoryBot.define do
       status { "failed" }
       error_message { "Conversion failed" }
     end
+
+    trait :in_folder do
+      folder
+      season_number { 1 }
+      episode_number { 1 }
+    end
   end
 end

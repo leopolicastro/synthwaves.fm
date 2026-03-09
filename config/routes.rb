@@ -39,6 +39,7 @@ Rails.application.routes.draw do
   resources :iptv_channels, only: [:show, :new, :create, :edit, :update, :destroy], path: "tv/channels" do
     post :import, on: :collection
   end
+  resources :folders, only: [:show, :new, :create, :edit, :update, :destroy]
   resources :videos, only: [:new, :create, :show, :edit, :update, :destroy] do
     member do
       get :stream

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_09_171759) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_09_183145) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -175,6 +175,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_171759) do
     t.datetime "updated_at", null: false
     t.text "value"
     t.index ["feature_key", "key", "value"], name: "index_flipper_gates_on_feature_key_and_key_and_value", unique: true
+  end
+
+  create_table "folders", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id", "name"], name: "index_folders_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_folders_on_user_id"
   end
 
   create_table "internet_radio_categories", force: :cascade do |t|
@@ -435,16 +445,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_171759) do
     t.datetime "created_at", null: false
     t.text "description"
     t.float "duration"
+    t.integer "episode_number"
     t.string "error_message"
     t.string "file_format"
     t.bigint "file_size"
+    t.integer "folder_id"
     t.integer "height"
+    t.integer "season_number"
     t.string "status", default: "processing", null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.string "video_codec"
     t.integer "width"
+    t.index ["folder_id", "season_number", "episode_number"], name: "index_videos_on_folder_id_and_season_number_and_episode_number"
+    t.index ["folder_id"], name: "index_videos_on_folder_id"
     t.index ["user_id"], name: "index_videos_on_user_id"
   end
 
@@ -455,6 +470,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_171759) do
   add_foreign_key "chats", "models"
   add_foreign_key "downloads", "users"
   add_foreign_key "favorites", "users"
+  add_foreign_key "folders", "users"
   add_foreign_key "internet_radio_stations", "internet_radio_categories"
   add_foreign_key "iptv_channels", "iptv_categories"
   add_foreign_key "messages", "chats"
@@ -474,5 +490,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_171759) do
   add_foreign_key "tracks", "artists"
   add_foreign_key "user_recordings", "recordings"
   add_foreign_key "user_recordings", "users"
+  add_foreign_key "videos", "folders"
   add_foreign_key "videos", "users"
 end

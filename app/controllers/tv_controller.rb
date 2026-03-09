@@ -68,7 +68,8 @@ class TvController < ApplicationController
 
   def load_videos
     @query = params[:q]
-    scope = Current.user.videos.ready.search(@query).order(created_at: :desc)
+    @folders = Current.user.folders.search(@query).order(:name)
+    scope = Current.user.videos.ready.standalone.search(@query).order(created_at: :desc)
     @pagy, @videos = pagy(scope)
   end
 

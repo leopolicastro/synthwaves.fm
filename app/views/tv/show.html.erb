@@ -3,6 +3,9 @@
     <h1 class="text-3xl font-bold font-display">TV</h1>
     <div class="flex items-center gap-3">
       <% if @tab == "videos" %>
+        <%= link_to new_folder_path, class: "px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:border-neon-cyan hover:text-neon-cyan text-sm font-medium transition-colors" do %>
+          Upload Season
+        <% end %>
         <%= link_to new_video_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink text-sm font-medium" do %>
           Upload Video
         <% end %>

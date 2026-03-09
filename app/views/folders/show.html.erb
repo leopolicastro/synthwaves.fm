@@ -1,0 +1,63 @@
+<div class="w-full">
+  <div class="mb-6">
+    <%= link_to "&larr; Back".html_safe, tv_path(tab: "videos"), class: "text-neon-cyan hover:underline" %>
+  </div>
+
+  <div class="flex items-start gap-6 mb-8">
+    <% if @folder.cover_image.attached? %>
+      <%= image_tag @folder.cover_image, class: "w-32 h-32 rounded-lg object-cover" %>
+    <% elsif (first_thumb = @folder.videos.detect { |v| v.thumbnail.attached? }) %>
+      <%= image_tag first_thumb.thumbnail, class: "w-32 h-32 rounded-lg object-cover" %>
+    <% else %>
+      <div class="w-32 h-32 rounded-lg bg-gray-800 flex items-center justify-center">
+        <svg class="w-12 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+        </svg>
+      </div>
+    <% end %>
+
+    <div class="flex-1">
+      <h1 class="text-3xl font-bold font-display text-white"><%= @folder.name %></h1>
+      <% if @folder.description.present? %>
+        <p class="text-gray-400 mt-1"><%= @folder.description %></p>
+      <% end %>
+      <div class="mt-2 text-sm text-gray-500 space-x-4">
+        <span><%= @folder.videos.count %> video(s)</span>
+        <% if @processing_count > 0 %>
+          <span class="text-neon-cyan"><%= @processing_count %> processing</span>
+        <% end %>
+        <% if @failed_count > 0 %>
+          <span class="text-red-400"><%= @failed_count %> failed</span>
+        <% end %>
+      </div>
+      <div class="mt-3 flex flex-wrap items-center gap-2">
+        <%= render "favorites/button", favorable: @folder, favorited: Current.user.favorites.exists?(favorable: @folder) %>
+        <%= link_to "Edit", edit_folder_path(@folder), class: "px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600" %>
+        <%= button_to "Delete", folder_path(@folder), method: :delete, data: { turbo_confirm: "Are you sure? Videos will be kept but unlinked." }, class: "px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700" %>
+      </div>
+    </div>
+  </div>
+
+  <% if @videos_by_season.any? %>
+    <% @videos_by_season.each do |season, videos| %>
+      <div class="mb-8">
+        <% if season %>
+          <h2 class="text-xl font-bold font-display text-white mb-4">Season <%= season %></h2>
+        <% else %>
+          <h2 class="text-xl font-bold font-display text-white mb-4">Episodes</h2>
+        <% end %>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <% videos.each do |video| %>
+            <%= render VideoCardComponent.new(video: video, show_episode_number: true) %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="text-center py-16 text-gray-400">
+      <p class="text-lg mb-2">No ready videos yet</p>
+      <p>Videos are still being processed.</p>
+    </div>
+  <% end %>
+</div>

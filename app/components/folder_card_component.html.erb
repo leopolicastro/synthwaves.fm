@@ -1,0 +1,24 @@
+<%= link_to helpers.folder_path(folder), class: "group block bg-gray-800/60 border border-gray-700 rounded-xl overflow-hidden hover:border-neon-cyan/50 hover:bg-gray-800 transition-all duration-200", data: { turbo_frame: "_top" } do %>
+  <div class="relative aspect-video bg-gray-900">
+    <% if folder.cover_image.attached? %>
+      <%= helpers.image_tag folder.cover_image, class: "w-full h-full object-cover", loading: "lazy" %>
+    <% elsif (thumb_video = folder.videos.detect { |v| v.thumbnail.attached? }) %>
+      <%= helpers.image_tag thumb_video.thumbnail, class: "w-full h-full object-cover", loading: "lazy" %>
+    <% else %>
+      <div class="w-full h-full flex items-center justify-center">
+        <svg class="w-12 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+        </svg>
+      </div>
+    <% end %>
+    <div class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 bg-black/80 rounded text-xs text-white font-medium">
+      <%= video_count %> video<%= "s" unless video_count == 1 %>
+    </div>
+  </div>
+  <div class="p-3">
+    <h3 class="text-sm font-medium text-white truncate group-hover:text-neon-cyan transition-colors"><%= folder.name %></h3>
+    <% if season_count > 0 %>
+      <p class="text-xs text-gray-400 mt-0.5"><%= season_count %> season<%= "s" unless season_count == 1 %></p>
+    <% end %>
+  </div>
+<% end %>

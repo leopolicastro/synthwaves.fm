@@ -1,6 +1,10 @@
 <div class="w-full max-w-4xl">
   <div class="mb-6">
-    <%= link_to "&larr; Back".html_safe, tv_path(tab: "videos"), class: "text-neon-cyan hover:underline" %>
+    <% if @video.folder %>
+      <%= link_to "&larr; Back to #{@video.folder.name}".html_safe, folder_path(@video.folder), class: "text-neon-cyan hover:underline" %>
+    <% else %>
+      <%= link_to "&larr; Back".html_safe, tv_path(tab: "videos"), class: "text-neon-cyan hover:underline" %>
+    <% end %>
   </div>
 
   <% if @video.status == "ready" && @video.file.attached? %>
@@ -40,6 +44,20 @@
     <h1 class="text-2xl font-bold font-display text-white"><%= @video.title %></h1>
     <% if @video.description.present? %>
       <p class="text-gray-400 mt-2"><%= @video.description %></p>
+    <% end %>
+
+    <% if @video.folder || @video.season_number || @video.episode_number %>
+      <div class="mt-3 flex flex-wrap gap-2 text-xs">
+        <% if @video.folder %>
+          <%= link_to @video.folder.name, folder_path(@video.folder), class: "px-2 py-1 bg-gray-700 text-gray-300 rounded hover:text-neon-cyan" %>
+        <% end %>
+        <% if @video.season_number %>
+          <span class="px-2 py-1 bg-gray-700 text-gray-300 rounded">Season <%= @video.season_number %></span>
+        <% end %>
+        <% if @video.episode_number %>
+          <span class="px-2 py-1 bg-gray-700 text-gray-300 rounded">Episode <%= @video.episode_number %></span>
+        <% end %>
+      </div>
     <% end %>
 
     <div class="mt-4 text-sm text-gray-500 space-y-1">

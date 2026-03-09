@@ -41,4 +41,24 @@ RSpec.describe VideoCardComponent, type: :component do
     link = html.at_css("a")
     expect(link["href"]).to eq("/videos/#{video.id}")
   end
+
+  context "with show_episode_number" do
+    it "shows episode badge when episode_number is present" do
+      video = create(:video, title: "The Pilot", episode_number: 3)
+      html = render_inline(described_class.new(video: video, show_episode_number: true))
+      expect(html.text).to include("E3")
+    end
+
+    it "does not show episode badge when show_episode_number is false" do
+      video = create(:video, title: "The Pilot", episode_number: 3)
+      html = render_inline(described_class.new(video: video, show_episode_number: false))
+      expect(html.text).not_to include("E3")
+    end
+
+    it "does not show episode badge when episode_number is nil" do
+      video = create(:video, title: "The Pilot", episode_number: nil)
+      html = render_inline(described_class.new(video: video, show_episode_number: true))
+      expect(html.text).not_to include("E")
+    end
+  end
 end

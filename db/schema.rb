@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_09_012756) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_09_024111) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -314,6 +314,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_012756) do
     t.index ["user_id"], name: "index_radio_stations_on_user_id"
   end
 
+  create_table "recordings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.float "duration"
+    t.datetime "ends_at", null: false
+    t.integer "epg_programme_id"
+    t.string "error_message"
+    t.integer "file_size"
+    t.integer "iptv_channel_id", null: false
+    t.datetime "starts_at", null: false
+    t.string "status", default: "scheduled", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["epg_programme_id"], name: "index_recordings_on_epg_programme_id"
+    t.index ["iptv_channel_id", "epg_programme_id"], name: "index_recordings_on_iptv_channel_id_and_epg_programme_id", unique: true, where: "status NOT IN ('failed', 'cancelled')"
+    t.index ["iptv_channel_id"], name: "index_recordings_on_iptv_channel_id"
+    t.index ["starts_at"], name: "index_recordings_on_starts_at"
+    t.index ["status"], name: "index_recordings_on_status"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
@@ -355,6 +374,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_012756) do
     t.index ["youtube_video_id"], name: "index_tracks_on_youtube_video_id"
   end
 
+  create_table "user_recordings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "recording_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["recording_id"], name: "index_user_recordings_on_recording_id"
+    t.index ["user_id", "recording_id"], name: "index_user_recordings_on_user_id_and_recording_id", unique: true
+    t.index ["user_id"], name: "index_user_recordings_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.boolean "admin", default: false, null: false
     t.datetime "created_at", null: false
@@ -384,8 +413,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_012756) do
   add_foreign_key "playlist_tracks", "tracks"
   add_foreign_key "playlists", "users"
   add_foreign_key "radio_stations", "users"
+  add_foreign_key "recordings", "epg_programmes"
+  add_foreign_key "recordings", "iptv_channels"
   add_foreign_key "sessions", "users"
   add_foreign_key "tool_calls", "messages"
   add_foreign_key "tracks", "albums"
   add_foreign_key "tracks", "artists"
+  add_foreign_key "user_recordings", "recordings"
+  add_foreign_key "user_recordings", "users"
 end

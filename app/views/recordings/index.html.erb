@@ -1,0 +1,19 @@
+<div class="w-full max-w-2xl">
+  <div class="mb-6">
+    <%= link_to "&larr; TV".html_safe, iptv_channels_path, class: "text-neon-cyan hover:underline" %>
+  </div>
+
+  <h1 class="text-2xl font-bold font-display text-white mb-6">Recordings</h1>
+
+  <%= turbo_stream_from "recordings_#{Current.user.id}" %>
+
+  <div id="recordings-list" class="space-y-3">
+    <% if @recordings.any? %>
+      <% @recordings.each do |recording| %>
+        <%= render "recordings/recording", recording: recording %>
+      <% end %>
+    <% else %>
+      <p class="text-gray-400">No recordings yet. Go to a TV channel and click the record button on a programme to get started.</p>
+    <% end %>
+  </div>
+</div>

@@ -2,6 +2,7 @@ class IPTVChannel < ApplicationRecord
   belongs_to :iptv_category, optional: true, counter_cache: :channels_count
 
   has_many :favorites, as: :favorable, dependent: :destroy
+  has_many :recordings, dependent: :destroy
 
   validates :name, presence: true
   validates :stream_url, presence: true

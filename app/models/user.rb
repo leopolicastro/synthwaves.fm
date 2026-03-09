@@ -10,6 +10,8 @@ class User < ApplicationRecord
   has_many :play_histories, dependent: :destroy
   has_many :radio_stations, dependent: :destroy
   has_many :downloads, dependent: :destroy
+  has_many :user_recordings, dependent: :destroy
+  has_many :recordings, through: :user_recordings
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 

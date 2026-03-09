@@ -1,0 +1,74 @@
+<div class="w-full max-w-2xl">
+  <div class="mb-6">
+    <%= link_to "&larr; Recordings".html_safe, recordings_path, class: "text-neon-cyan hover:underline" %>
+  </div>
+
+  <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
+    <h1 class="text-2xl font-bold font-display text-white mb-1"><%= @recording.title %></h1>
+    <p class="text-sm text-gray-400 mb-4"><%= @recording.iptv_channel.name %></p>
+
+    <% if @recording.ready? && @recording.file.attached? %>
+      <div class="mb-4 rounded-xl overflow-hidden bg-black aspect-video">
+        <video controls class="w-full h-full" preload="metadata">
+          <source src="<%= rails_blob_path(@recording.file) %>" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    <% end %>
+
+    <div class="space-y-2 text-sm">
+      <div class="flex justify-between">
+        <span class="text-gray-400">Status</span>
+        <span class="<%= case @recording.status
+          when 'scheduled' then 'text-yellow-400'
+          when 'recording' then 'text-red-400'
+          when 'processing' then 'text-neon-cyan'
+          when 'ready' then 'text-green-400'
+          when 'failed' then 'text-red-400'
+          when 'cancelled' then 'text-gray-500'
+          end %>">
+          <%= @recording.status.capitalize %>
+        </span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-gray-400">Scheduled</span>
+        <span class="text-white"><%= @recording.starts_at.strftime("%-I:%M %p") %> &ndash; <%= @recording.ends_at.strftime("%-I:%M %p, %b %-d") %></span>
+      </div>
+      <% if @recording.duration %>
+        <div class="flex justify-between">
+          <span class="text-gray-400">Duration</span>
+          <span class="text-white"><%= (@recording.duration / 60).round %> minutes</span>
+        </div>
+      <% end %>
+      <% if @recording.file_size %>
+        <div class="flex justify-between">
+          <span class="text-gray-400">Size</span>
+          <span class="text-white"><%= number_to_human_size(@recording.file_size) %></span>
+        </div>
+      <% end %>
+      <% if @recording.error_message.present? %>
+        <div class="flex justify-between">
+          <span class="text-gray-400">Error</span>
+          <span class="text-red-400"><%= @recording.error_message %></span>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="mt-6 flex items-center gap-3">
+      <% if @recording.ready? && @recording.file.attached? %>
+        <%= link_to "Download", file_recording_path(@recording),
+              class: "px-4 py-2 text-sm font-medium text-white bg-neon-pink rounded-lg hover:shadow-neon-pink transition-shadow" %>
+      <% end %>
+      <% if @recording.cancellable? %>
+        <%= button_to "Cancel", cancel_recording_path(@recording), method: :post,
+              class: "px-4 py-2 text-sm border border-yellow-400 text-yellow-400 rounded-lg hover:bg-yellow-400/10 transition-colors cursor-pointer",
+              data: { turbo_confirm: "Cancel this recording?" } %>
+      <% end %>
+      <% unless @recording.recording? %>
+        <%= button_to "Delete", recording_path(@recording), method: :delete,
+              class: "px-4 py-2 text-sm border border-gray-600 text-red-400 rounded-lg hover:border-red-400 transition-colors cursor-pointer",
+              data: { turbo_confirm: "Delete this recording?" } %>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -24,15 +24,31 @@ RSpec.describe "Subsonic Playlists API", type: :request do
       expect(all_tracks["songCount"]).to eq(3)
     end
 
+    it "includes Podcasts virtual playlist second" do
+      podcast_artist = create(:artist, :podcast)
+      podcast_album = create(:album, artist: podcast_artist)
+      create_list(:track, 2, album: podcast_album, artist: podcast_artist)
+      create_list(:track, 3)
+
+      get "/api/rest/getPlaylists.view", params: auth_params
+      json = JSON.parse(response.body)
+      playlists = json["subsonic-response"]["playlists"]["playlist"]
+      expect(playlists[0]["id"]).to eq("all")
+      expect(playlists[0]["songCount"]).to eq(3)
+      expect(playlists[1]["id"]).to eq("podcasts")
+      expect(playlists[1]["name"]).to eq("Podcasts")
+      expect(playlists[1]["songCount"]).to eq(2)
+    end
+
     it "does not return other users playlists" do
       other = create(:user)
       create(:playlist, user: other)
       get "/api/rest/getPlaylists.view", params: auth_params
       json = JSON.parse(response.body)
       playlists = json["subsonic-response"]["playlists"]["playlist"]
-      # Only the virtual "All Tracks" playlist should be present
-      expect(playlists.size).to eq(1)
-      expect(playlists.first["id"]).to eq("all")
+      # Only the virtual playlists should be present
+      expect(playlists.size).to eq(2)
+      expect(playlists.map { |p| p["id"] }).to eq(%w[all podcasts])
     end
   end
 
@@ -47,14 +63,32 @@ RSpec.describe "Subsonic Playlists API", type: :request do
       expect(json["subsonic-response"]["playlist"]["entry"]).to be_present
     end
 
-    it "returns all tracks when id is 'all'" do
-      tracks = create_list(:track, 3)
+    it "returns all tracks when id is 'all' excluding podcasts" do
+      podcast_artist = create(:artist, :podcast)
+      podcast_album = create(:album, artist: podcast_artist)
+      create_list(:track, 2, album: podcast_album, artist: podcast_artist)
+      create_list(:track, 3)
+
       get "/api/rest/getPlaylist.view", params: auth_params.merge(id: "all")
       json = JSON.parse(response.body)
       playlist = json["subsonic-response"]["playlist"]
       expect(playlist["id"]).to eq("all")
       expect(playlist["name"]).to eq("All Tracks")
       expect(playlist["entry"].size).to eq(3)
+    end
+
+    it "returns only podcast tracks when id is 'podcasts'" do
+      podcast_artist = create(:artist, :podcast)
+      podcast_album = create(:album, artist: podcast_artist)
+      create_list(:track, 2, album: podcast_album, artist: podcast_artist)
+      create_list(:track, 3)
+
+      get "/api/rest/getPlaylist.view", params: auth_params.merge(id: "podcasts")
+      json = JSON.parse(response.body)
+      playlist = json["subsonic-response"]["playlist"]
+      expect(playlist["id"]).to eq("podcasts")
+      expect(playlist["name"]).to eq("Podcasts")
+      expect(playlist["entry"].size).to eq(2)
     end
 
     it "returns error for nonexistent playlist" do
@@ -105,6 +139,13 @@ RSpec.describe "Subsonic Playlists API", type: :request do
       expect(json["subsonic-response"]["status"]).to eq("failed")
       expect(json["subsonic-response"]["error"]["code"]).to eq(70)
     end
+
+    it "returns error when trying to modify the Podcasts playlist" do
+      get "/api/rest/createPlaylist.view", params: auth_params.merge(playlistId: "podcasts", name: "Renamed")
+      json = JSON.parse(response.body)
+      expect(json["subsonic-response"]["status"]).to eq("failed")
+      expect(json["subsonic-response"]["error"]["code"]).to eq(70)
+    end
   end
 
   describe "GET /api/rest/deletePlaylist.view" do
@@ -117,6 +158,13 @@ RSpec.describe "Subsonic Playlists API", type: :request do
 
     it "returns error when trying to delete the All Tracks playlist" do
       get "/api/rest/deletePlaylist.view", params: auth_params.merge(id: "all")
+      json = JSON.parse(response.body)
+      expect(json["subsonic-response"]["status"]).to eq("failed")
+      expect(json["subsonic-response"]["error"]["code"]).to eq(70)
+    end
+
+    it "returns error when trying to delete the Podcasts playlist" do
+      get "/api/rest/deletePlaylist.view", params: auth_params.merge(id: "podcasts")
       json = JSON.parse(response.body)
       expect(json["subsonic-response"]["status"]).to eq("failed")
       expect(json["subsonic-response"]["error"]["code"]).to eq(70)

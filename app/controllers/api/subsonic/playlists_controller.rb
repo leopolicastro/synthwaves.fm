@@ -2,14 +2,22 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
   def get_playlists
     playlists = current_user.playlists
     render_subsonic(playlists: {
-      playlist: [all_tracks_virtual_entry] + playlists.map { |p| playlist_to_entry(p) }
+      playlist: [all_tracks_virtual_entry, podcasts_virtual_entry] + playlists.map { |p| playlist_to_entry(p) }
     })
   end
 
   def get_playlist
     if params[:id] == "all"
-      tracks = Track.includes(:album, :artist).order(:title)
+      tracks = Track.music.includes(:album, :artist).order(:title)
       render_subsonic(playlist: all_tracks_virtual_entry.merge(
+        entry: tracks.map { |t| track_to_child(t) }
+      ))
+      return
+    end
+
+    if params[:id] == "podcasts"
+      tracks = Track.podcast.includes(:album, :artist).order(:title)
+      render_subsonic(playlist: podcasts_virtual_entry.merge(
         entry: tracks.map { |t| track_to_child(t) }
       ))
       return
@@ -24,8 +32,8 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
   end
 
   def create_playlist
-    if params[:playlistId] == "all"
-      render_subsonic_error(70, "Cannot modify the All Tracks playlist")
+    if params[:playlistId].in?(%w[all podcasts])
+      render_subsonic_error(70, "Cannot modify a virtual playlist")
       return
     end
 
@@ -50,8 +58,8 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
   end
 
   def delete_playlist
-    if params[:id] == "all"
-      render_subsonic_error(70, "Cannot delete the All Tracks playlist")
+    if params[:id].in?(%w[all podcasts])
+      render_subsonic_error(70, "Cannot delete a virtual playlist")
       return
     end
 
@@ -68,8 +76,19 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
     {
       id: "all",
       name: "All Tracks",
-      songCount: Track.count,
-      duration: Track.sum(:duration).to_i,
+      songCount: Track.music.count,
+      duration: Track.music.sum(:duration).to_i,
+      owner: current_user.email_address,
+      public: false
+    }
+  end
+
+  def podcasts_virtual_entry
+    {
+      id: "podcasts",
+      name: "Podcasts",
+      songCount: Track.podcast.count,
+      duration: Track.podcast.sum(:duration).to_i,
       owner: current_user.email_address,
       public: false
     }

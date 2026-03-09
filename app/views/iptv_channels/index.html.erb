@@ -116,7 +116,10 @@
                       <span class="text-[10px] font-bold text-white"><%= channel.name.scan(/[A-Z0-9]/).first(3).join.presence || channel.name[0..1].upcase %></span>
                     <% end %>
                   </div>
-                  <span class="text-xs font-medium text-white truncate"><%= channel.name %></span>
+                  <span class="text-xs font-medium text-white truncate flex-1"><%= channel.name %></span>
+                  <div class="flex-shrink-0" onclick="event.stopPropagation()">
+                    <%= render "favorites/button", favorable: channel, favorited: @favorited_channel_ids.include?(channel.id) %>
+                  </div>
                 </div>
               <% end %>
             </div>

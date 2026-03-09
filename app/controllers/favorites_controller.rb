@@ -31,6 +31,7 @@ class FavoritesController < ApplicationController
     when "Track" then Track.find(params[:favorable_id])
     when "Album" then Album.find(params[:favorable_id])
     when "Artist" then Artist.find(params[:favorable_id])
+    when "IPTVChannel" then IPTVChannel.find(params[:favorable_id])
     else raise ActiveRecord::RecordNotFound
     end
   end

@@ -16,6 +16,8 @@ class IPTVChannelsController < ApplicationController
 
     @channels = scope.all
 
+    @favorited_channel_ids = Current.user.favorites.where(favorable_type: "IPTVChannel").pluck(:favorable_id).to_set
+
     @countries = IPTVChannel.active.where.not(country: [nil, ""]).distinct.pluck(:country).sort
 
     # EPG data for the TV Guide grid
@@ -38,6 +40,7 @@ class IPTVChannelsController < ApplicationController
     @channel = IPTVChannel.find(params[:id])
     @now_playing = @channel.now_playing
     @up_next = @channel.up_next(limit: 5)
+    @is_favorited = Current.user.favorites.exists?(favorable: @channel)
   end
 
   def new

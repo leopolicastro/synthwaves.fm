@@ -34,6 +34,13 @@ RSpec.describe "Favorites", type: :request do
       }.to change(Favorite, :count).by(1)
     end
 
+    it "creates a favorite for an IPTVChannel" do
+      channel = create(:iptv_channel)
+      expect {
+        post favorites_path, params: {favorable_type: "IPTVChannel", favorable_id: channel.id}
+      }.to change(Favorite, :count).by(1)
+    end
+
     it "is idempotent for the same favorable" do
       track = create(:track)
       post favorites_path, params: {favorable_type: "Track", favorable_id: track.id}

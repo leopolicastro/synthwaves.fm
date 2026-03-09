@@ -14,9 +14,27 @@ class Recording < ApplicationRecord
   validate :ends_at_after_starts_at
   validate :max_duration
 
+  SORT_OPTIONS = {
+    "created_at" => "Date Added",
+    "title" => "Title",
+    "starts_at" => "Scheduled Time",
+    "status" => "Status"
+  }.freeze
+
   scope :upcoming, -> { where(status: "scheduled").where("starts_at > ?", Time.current).order(:starts_at) }
   scope :active, -> { where(status: %w[scheduled recording processing]) }
   scope :completed, -> { where(status: "ready").order(created_at: :desc) }
+
+  scope :search, ->(query) {
+    if query.present?
+      joins(:iptv_channel)
+        .where("recordings.title LIKE :q OR iptv_channels.name LIKE :q", q: "%#{query}%")
+    end
+  }
+
+  scope :by_status, ->(status) {
+    where(status: status) if status.present? && status.in?(STATUSES)
+  }
 
   def scheduled?
     status == "scheduled"

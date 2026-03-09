@@ -35,6 +35,62 @@ RSpec.describe "Recordings", type: :request do
       expect(response.body).not_to include("recording_#{other_recording.id}")
     end
 
+    it "filters by search query matching title" do
+      match = create_recording_for(user, title: "Evening News")
+      no_match = create_recording_for(user, title: "Morning Show")
+
+      get recordings_path, params: { q: "News" }
+
+      expect(response.body).to include("recording_#{match.id}")
+      expect(response.body).not_to include("recording_#{no_match.id}")
+    end
+
+    it "searches by channel name" do
+      channel = create(:iptv_channel, name: "BBC One")
+      match = create_recording_for(user, iptv_channel: channel)
+      no_match = create_recording_for(user, title: "Other Show")
+
+      get recordings_path, params: { q: "BBC" }
+
+      expect(response.body).to include("recording_#{match.id}")
+      expect(response.body).not_to include("recording_#{no_match.id}")
+    end
+
+    it "shows empty state with query context" do
+      get recordings_path, params: { q: "nonexistent" }
+
+      expect(response.body).to include("No recordings found")
+      expect(response.body).to include("nonexistent")
+    end
+
+    it "filters by status" do
+      scheduled = create_recording_for(user, status: "scheduled")
+      ready = create_recording_for(user, **attributes_for(:recording, :ready))
+
+      get recordings_path, params: { status: "scheduled" }
+
+      expect(response.body).to include("recording_#{scheduled.id}")
+      expect(response.body).not_to include("recording_#{ready.id}")
+    end
+
+    it "sorts by title ascending" do
+      bravo = create_recording_for(user, title: "Bravo Show")
+      alpha = create_recording_for(user, title: "Alpha Show")
+
+      get recordings_path, params: { sort: "title", direction: "asc" }
+
+      expect(response.body.index("recording_#{alpha.id}")).to be < response.body.index("recording_#{bravo.id}")
+    end
+
+    it "default sort is created_at descending" do
+      old_rec = create_recording_for(user, title: "Old Recording", created_at: 2.days.ago)
+      new_rec = create_recording_for(user, title: "New Recording", created_at: 1.day.ago)
+
+      get recordings_path
+
+      expect(response.body.index("recording_#{new_rec.id}")).to be < response.body.index("recording_#{old_rec.id}")
+    end
+
     it "requires authentication" do
       reset!
       get recordings_path

@@ -2,7 +2,15 @@ class RecordingsController < ApplicationController
   before_action :require_feature
 
   def index
-    @recordings = Current.user.recordings.includes(:iptv_channel).order(created_at: :desc)
+    @query = params[:q]
+    @status = params[:status]
+    @sort = sort_column(Recording, default: "created_at")
+    @direction = sort_direction(default: "desc")
+    scope = Current.user.recordings.includes(:iptv_channel)
+              .search(@query)
+              .by_status(@status)
+              .order(@sort => @direction)
+    @pagy, @recordings = pagy(:offset, scope)
   end
 
   def show

@@ -73,6 +73,59 @@ RSpec.describe Recording, type: :model do
       end
     end
 
+    describe ".search" do
+      it "matches by title" do
+        match = create(:recording, title: "Evening News")
+        no_match = create(:recording, title: "Morning Show")
+
+        result = Recording.search("News")
+        expect(result).to include(match)
+        expect(result).not_to include(no_match)
+      end
+
+      it "matches by channel name" do
+        channel = create(:iptv_channel, name: "BBC One")
+        match = create(:recording, iptv_channel: channel)
+        no_match = create(:recording, title: "Other Show")
+
+        result = Recording.search("BBC")
+        expect(result).to include(match)
+        expect(result).not_to include(no_match)
+      end
+
+      it "returns all when blank" do
+        recording = create(:recording)
+        expect(Recording.search("")).to include(recording)
+        expect(Recording.search(nil)).to include(recording)
+      end
+    end
+
+    describe ".by_status" do
+      it "filters by status" do
+        scheduled = create(:recording, status: "scheduled")
+        ready = create(:recording, :ready)
+
+        result = Recording.by_status("scheduled")
+        expect(result).to include(scheduled)
+        expect(result).not_to include(ready)
+      end
+
+      it "returns all when blank" do
+        scheduled = create(:recording, status: "scheduled")
+        ready = create(:recording, :ready)
+
+        result = Recording.by_status("")
+        expect(result).to include(scheduled, ready)
+      end
+
+      it "returns all when invalid" do
+        recording = create(:recording)
+
+        result = Recording.by_status("bogus")
+        expect(result).to include(recording)
+      end
+    end
+
     describe ".completed" do
       it "returns ready recordings ordered by created_at desc" do
         old_ready = create(:recording, :ready, created_at: 2.days.ago)

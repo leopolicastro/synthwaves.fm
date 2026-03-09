@@ -346,6 +346,12 @@ export default class extends Controller {
     document.dispatchEvent(new CustomEvent("queue-panel:toggle"))
   }
 
+  // Visualizer panel
+
+  toggleVisualizer() {
+    document.dispatchEvent(new CustomEvent("visualizer-panel:toggle"))
+  }
+
   // Now playing
 
   dispatchNowPlaying(trackId) {

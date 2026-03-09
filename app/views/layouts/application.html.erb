@@ -49,6 +49,26 @@
         <div data-queue-panel-target="list" class="overflow-y-auto flex-1"></div>
       </div>
     </div>
+    <!-- Visualizer drawer (slides up from player bar) -->
+    <div id="visualizer-panel-container" data-turbo-permanent data-controller="visualizer-panel">
+      <div data-visualizer-panel-target="panel"
+           class="fixed left-0 right-0 bottom-16 h-[40vh] bg-gray-900/95 border-t border-neon-purple/30 shadow-xl z-40 transform translate-y-full transition-transform duration-300"
+           data-controller="visualizer">
+        <button type="button" data-action="visualizer-panel#close"
+                class="absolute top-2 right-2 z-10 text-gray-400 hover:text-white p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+        <div class="relative w-full h-full" data-visualizer-target="container">
+          <canvas data-visualizer-target="canvas" class="w-full h-full absolute inset-0"></canvas>
+          <div data-visualizer-target="status"
+               class="absolute inset-0 flex items-center justify-center text-gray-400 text-lg pointer-events-none">
+            Play a track to see the visualizer
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Persistent player bar -->
     <div id="player-bar" class="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-neon-cyan/20 shadow-neon-cyan z-50"
          data-turbo-permanent
@@ -126,6 +146,16 @@
                    class="hidden md:inline-block w-20 h-1 accent-neon-pink"
                    data-player-target="volume"
                    data-action="input->player#setVolume">
+            <!-- Visualizer toggle -->
+            <button data-action="player#toggleVisualizer" class="text-gray-500 hover:text-neon-cyan p-1" title="Visualizer">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <rect x="1" y="8" width="3" height="8" rx="0.5"/>
+                <rect x="6" y="4" width="3" height="16" rx="0.5"/>
+                <rect x="11" y="6" width="3" height="12" rx="0.5"/>
+                <rect x="16" y="2" width="3" height="20" rx="0.5"/>
+                <rect x="21" y="9" width="3" height="6" rx="0.5"/>
+              </svg>
+            </button>
             <!-- Queue toggle -->
             <button data-action="player#toggleQueue" class="text-gray-500 hover:text-neon-cyan p-1" title="Queue">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">

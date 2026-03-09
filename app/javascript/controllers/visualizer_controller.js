@@ -7,16 +7,18 @@ export default class extends Controller {
     this.audio = document.getElementById("persistent-audio")
     if (!this.audio) return
 
+    this._visible = false
     this._initAudioNodes()
     this._readThemeColors()
-    this._setupCanvas()
 
     this._onPlay = () => this._setActive(true)
     this._onPause = () => this._setActive(false)
     this.audio.addEventListener("play", this._onPlay)
     this.audio.addEventListener("pause", this._onPause)
 
-    this._resizeObserver = new ResizeObserver(() => this._setupCanvas())
+    this._resizeObserver = new ResizeObserver(() => {
+      if (this._visible) this._setupCanvas()
+    })
     this._resizeObserver.observe(this.containerTarget)
 
     this._themeObserver = new MutationObserver(() => this._readThemeColors())
@@ -25,8 +27,10 @@ export default class extends Controller {
       attributeFilter: ["data-theme"]
     })
 
+    this._visibilityHandler = (e) => this._onVisibilityChanged(e.detail)
+    document.addEventListener("visualizer-panel:visibilityChanged", this._visibilityHandler)
+
     this._setActive(!this.audio.paused && !!this.audio.src)
-    this._animate()
   }
 
   disconnect() {
@@ -38,9 +42,24 @@ export default class extends Controller {
       this.audio.removeEventListener("play", this._onPlay)
       this.audio.removeEventListener("pause", this._onPause)
     }
+
+    document.removeEventListener("visualizer-panel:visibilityChanged", this._visibilityHandler)
   }
 
   // Private
+
+  _onVisibilityChanged({ visible }) {
+    this._visible = visible
+    if (visible) {
+      this._setupCanvas()
+      this._animate()
+    } else {
+      if (this._frameId) {
+        cancelAnimationFrame(this._frameId)
+        this._frameId = null
+      }
+    }
+  }
 
   _initAudioNodes() {
     if (this.audio._audioContext && this.audio._analyser) return
@@ -81,6 +100,7 @@ export default class extends Controller {
   }
 
   _animate() {
+    if (!this._visible) return
     this._frameId = requestAnimationFrame(() => this._animate())
     this._draw()
   }

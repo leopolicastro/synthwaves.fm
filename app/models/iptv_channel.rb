@@ -9,4 +9,12 @@ class IPTVChannel < ApplicationRecord
   scope :by_country, ->(country) { where(country: country) if country.present? }
   scope :by_language, ->(language) { where(language: language) if language.present? }
   scope :search, ->(query) { where("name LIKE ?", "%#{query}%") if query.present? }
+
+  def now_playing
+    EPGProgramme.now_playing(tvg_id)
+  end
+
+  def up_next(limit: 3)
+    EPGProgramme.up_next(tvg_id, limit: limit)
+  end
 end

@@ -57,6 +57,28 @@ RSpec.describe "IPTVChannels", type: :request do
       expect(response.body).to include("Active Channel")
       expect(response.body).not_to include("Dead Channel")
     end
+
+    it "renders the TV Guide grid" do
+      create(:iptv_channel, name: "ESPN")
+      get iptv_channels_path
+      expect(response.body).to include("tv-guide")
+      expect(response.body).to include("ESPN")
+    end
+
+    it "displays EPG programme data in the guide" do
+      channel = create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
+      create(:epg_programme, :current, channel_id: "espn.us", title: "NHL Hockey")
+
+      get iptv_channels_path
+      expect(response.body).to include("NHL Hockey")
+    end
+
+    it "shows no schedule info when EPG data is missing" do
+      create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
+
+      get iptv_channels_path
+      expect(response.body).to include("No schedule info")
+    end
   end
 
   describe "GET /tv/:id" do
@@ -70,6 +92,34 @@ RSpec.describe "IPTVChannels", type: :request do
       channel = create(:iptv_channel, name: "CNN International")
       get iptv_channel_path(channel)
       expect(response.body).to include("CNN International")
+    end
+
+    it "displays now playing info" do
+      channel = create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
+      create(:epg_programme, :current, channel_id: "espn.us", title: "NHL Hockey", subtitle: "Red Wings @ Devils")
+
+      get iptv_channel_path(channel)
+      expect(response.body).to include("Now Playing")
+      expect(response.body).to include("NHL Hockey")
+      expect(response.body).to include("Red Wings @ Devils")
+    end
+
+    it "displays up next info" do
+      channel = create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
+      create(:epg_programme, :upcoming, channel_id: "espn.us", title: "SportsCenter")
+
+      get iptv_channel_path(channel)
+      expect(response.body).to include("Up Next")
+      expect(response.body).to include("SportsCenter")
+    end
+
+    it "renders gracefully without EPG data" do
+      channel = create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
+      get iptv_channel_path(channel)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include("Now Playing")
+      expect(response.body).not_to include("Up Next")
     end
   end
 

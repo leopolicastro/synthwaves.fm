@@ -22,3 +22,6 @@ production:
   iptv_channel_sync:
     class: IPTVChannelSyncJob
     schedule: at 4am every day
+  epg_sync:
+    class: EPGSyncJob
+    schedule: every 3 hours

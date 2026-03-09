@@ -50,5 +50,55 @@
         <%= button_to "Delete", iptv_channel_path(@channel), method: :delete, class: "px-3 py-1.5 text-sm border border-gray-600 text-red-400 rounded-lg hover:border-red-400 transition-colors cursor-pointer", data: { turbo_confirm: "Remove this channel?" } %>
       </div>
     </div>
+
+    <%# Now Playing %>
+    <% if @now_playing %>
+      <div class="mt-6 p-4 rounded-xl border border-neon-cyan/20 bg-gray-800/60">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+          </span>
+          <span class="text-xs font-medium text-red-400 uppercase tracking-wide">Now Playing</span>
+        </div>
+        <h3 class="text-lg font-semibold text-white"><%= @now_playing.title %></h3>
+        <% if @now_playing.subtitle.present? %>
+          <p class="text-sm text-gray-300 mt-0.5"><%= @now_playing.subtitle %></p>
+        <% end %>
+        <% if @now_playing.description.present? %>
+          <p class="text-sm text-gray-400 mt-2 line-clamp-3"><%= @now_playing.description %></p>
+        <% end %>
+        <div class="mt-3">
+          <div class="flex items-center justify-between text-xs text-gray-400 mb-1">
+            <span><%= @now_playing.starts_at.strftime("%-I:%M %p") %></span>
+            <span><%= @now_playing.remaining_minutes %> min remaining</span>
+            <span><%= @now_playing.ends_at.strftime("%-I:%M %p") %></span>
+          </div>
+          <div class="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+            <div class="h-full bg-neon-cyan rounded-full transition-all" style="width: <%= @now_playing.progress_percentage %>%"></div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <%# Up Next %>
+    <% if @up_next.any? %>
+      <div class="mt-4">
+        <h3 class="text-sm font-medium text-gray-400 uppercase tracking-wide mb-2">Up Next</h3>
+        <div class="space-y-1">
+          <% @up_next.each do |programme| %>
+            <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/40 border border-gray-700/30">
+              <span class="text-xs text-gray-500 w-16 flex-shrink-0"><%= programme.starts_at.strftime("%-I:%M %p") %></span>
+              <div class="min-w-0 flex-1">
+                <span class="text-sm text-white truncate block"><%= programme.title %></span>
+                <% if programme.subtitle.present? %>
+                  <span class="text-xs text-gray-400 truncate block"><%= programme.subtitle %></span>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
   </div>
 </div>

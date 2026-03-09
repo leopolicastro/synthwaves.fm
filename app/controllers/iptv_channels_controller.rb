@@ -14,13 +14,30 @@ class IPTVChannelsController < ApplicationController
     scope = scope.by_country(params[:country])
     scope = scope.order(:name)
 
-    @pagy, @channels = pagy(:offset, scope, limit: 48)
+    @channels = scope.all
 
     @countries = IPTVChannel.active.where.not(country: [nil, ""]).distinct.pluck(:country).sort
+
+    # EPG data for the TV Guide grid
+    @window_start = parse_window_time || Time.current.beginning_of_hour
+    @window_end = @window_start + 6.hours
+
+    tvg_ids = @channels.filter_map(&:tvg_id).reject(&:blank?)
+    if tvg_ids.any?
+      @programmes_by_channel = EPGProgramme
+        .where(channel_id: tvg_ids)
+        .in_window(@window_start, @window_end)
+        .order(:starts_at)
+        .group_by(&:channel_id)
+    else
+      @programmes_by_channel = {}
+    end
   end
 
   def show
     @channel = IPTVChannel.find(params[:id])
+    @now_playing = @channel.now_playing
+    @up_next = @channel.up_next(limit: 5)
   end
 
   def new
@@ -82,5 +99,13 @@ class IPTVChannelsController < ApplicationController
 
   def channel_params
     params.require(:iptv_channel).permit(:name, :stream_url, :logo_url, :country, :language, :iptv_category_id, :tvg_id)
+  end
+
+  def parse_window_time
+    return nil unless params[:window_start].present?
+
+    Time.zone.parse(params[:window_start])
+  rescue ArgumentError
+    nil
   end
 end

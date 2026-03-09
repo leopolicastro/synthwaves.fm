@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_09_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_09_012756) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -136,6 +136,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_000002) do
     t.integer "user_id", null: false
     t.index ["user_id", "downloadable_type", "downloadable_id"], name: "idx_on_user_id_downloadable_type_downloadable_id_5f957f527c"
     t.index ["user_id"], name: "index_downloads_on_user_id"
+  end
+
+  create_table "epg_programmes", force: :cascade do |t|
+    t.string "channel_id", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.datetime "ends_at", null: false
+    t.datetime "starts_at", null: false
+    t.string "subtitle"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["channel_id", "starts_at"], name: "index_epg_programmes_on_channel_id_and_starts_at"
+    t.index ["ends_at"], name: "index_epg_programmes_on_ends_at"
   end
 
   create_table "favorites", force: :cascade do |t|

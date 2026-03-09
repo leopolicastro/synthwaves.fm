@@ -1,4 +1,7 @@
-<div class="w-full" data-controller="hls-player tv-page">
+<div class="w-full" data-controller="hls-player tv-page tv-guide"
+     data-tv-guide-window-start-value="<%= @window_start.to_i %>"
+     data-tv-guide-window-end-value="<%= @window_end.to_i %>"
+     data-tv-guide-pixels-per-minute-value="7">
   <div class="flex items-center justify-between mb-6">
     <h1 class="text-3xl font-bold font-display">TV</h1>
     <div class="flex items-center gap-3">
@@ -10,7 +13,6 @@
       <%= link_to "Add Channel", new_iptv_channel_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink text-sm font-medium" %>
     </div>
   </div>
-
   <%# Video player area %>
   <div class="mb-8 relative bg-black rounded-xl overflow-hidden aspect-video max-w-4xl mx-auto">
     <video data-hls-player-target="video"
@@ -32,26 +34,10 @@
          class="absolute inset-0 flex items-center justify-center bg-black/80 text-red-400 text-sm px-4 text-center hidden">
     </div>
   </div>
-
   <div data-hls-player-target="channelName" class="text-center text-lg font-medium text-white mb-6 min-h-[1.75rem]"></div>
-
-  <%# Category filter pills %>
-  <% if @categories.any? %>
-    <div class="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
-      <%= link_to "All", iptv_channels_path(q: params[:q], country: params[:country]),
-            class: "px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors #{@current_category.nil? ? 'bg-neon-cyan text-gray-900' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}",
-            data: { turbo_frame: "tv-channels" } %>
-      <% @categories.each do |category| %>
-        <%= link_to category.name, iptv_channels_path(category: category.slug, q: params[:q], country: params[:country]),
-              class: "px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors #{@current_category == category ? 'bg-neon-cyan text-gray-900' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}",
-              data: { turbo_frame: "tv-channels" } %>
-      <% end %>
-    </div>
-  <% end %>
-
   <%# Search and country filter %>
-  <div class="flex flex-col sm:flex-row gap-3 mb-6">
-    <%= form_with url: iptv_channels_path, method: :get, data: { turbo_frame: "tv-channels" }, class: "flex-1" do |f| %>
+  <div class="flex flex-col sm:flex-row gap-3 mb-4">
+    <%= form_with url: iptv_channels_path, method: :get, class: "flex-1" do |f| %>
       <%= hidden_field_tag :category, params[:category] %>
       <%= hidden_field_tag :country, params[:country] %>
       <div class="relative">
@@ -62,9 +48,8 @@
                class="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan focus:border-transparent placeholder-gray-500">
       </div>
     <% end %>
-
     <% if @countries.any? %>
-      <%= form_with url: iptv_channels_path, method: :get, data: { turbo_frame: "tv-channels" } do %>
+      <%= form_with url: iptv_channels_path, method: :get do %>
         <%= hidden_field_tag :category, params[:category] %>
         <%= hidden_field_tag :q, params[:q] %>
         <select name="country" onchange="this.form.requestSubmit()"
@@ -72,32 +57,133 @@
           <option value="">All Countries</option>
           <% @countries.each do |country| %>
             <option value="<%= country %>" <%= 'selected' if params[:country] == country %>><%= country %></option>
-          <% end %>
-        </select>
+            <% end %>
+          </select>
+        <% end %>
       <% end %>
-    <% end %>
-  </div>
-
-  <%# Channel grid %>
-  <turbo-frame id="tv-channels" data-turbo-action="advance">
-    <% if @channels.any? %>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <% @channels.each do |channel| %>
-          <%= render(IPTVChannelCardComponent.new(channel: channel)) %>
+      <% if @categories.any? %>
+        <%= form_with url: iptv_channels_path, method: :get do %>
+          <%= hidden_field_tag :q, params[:q] %>
+          <%= hidden_field_tag :country, params[:country] %>
+          <select name="category" onchange="this.form.requestSubmit()"
+                class="px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan">
+            <option value="">All Categories</option>
+            <% @categories.each do |category| %>
+              <option value="<%= category.slug %>" <%= 'selected' if params[:category] == category.slug %>><%= category.name %></option>
+              <% end %>
+            </select>
+          <% end %>
         <% end %>
       </div>
-
-      <div class="mt-8">
-        <%== @pagy.series_nav %>
+      <%# TV Guide navigation %>
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <button type="button" data-action="tv-guide#navigateBack"
+              class="px-3 py-1.5 text-sm border border-gray-600 text-gray-300 rounded-lg hover:border-neon-cyan hover:text-neon-cyan transition-colors">
+            &larr; Back
+          </button>
+          <button type="button" data-action="tv-guide#jumpToNow"
+              class="px-3 py-1.5 text-sm bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan rounded-lg hover:bg-neon-cyan/20 transition-colors">
+            Now
+          </button>
+          <button type="button" data-action="tv-guide#navigateForward"
+              class="px-3 py-1.5 text-sm border border-gray-600 text-gray-300 rounded-lg hover:border-neon-cyan hover:text-neon-cyan transition-colors">
+            Forward &rarr;
+          </button>
+        </div>
+        <div class="text-sm text-gray-400">
+          <%= @window_start.strftime("%-I:%M %p") %> &ndash; <%= @window_end.strftime("%-I:%M %p %Z") %>
+        </div>
       </div>
-    <% else %>
-      <div class="text-center py-16 text-gray-400">
-        <svg class="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-        </svg>
-        <p class="text-lg mb-2">No channels found</p>
-        <p>Try adjusting your filters or search query.</p>
-      </div>
-    <% end %>
-  </turbo-frame>
-</div>
+      <%# TV Guide Grid %>
+      <% if @channels.any? %>
+        <div class="border border-gray-700/50 rounded-xl overflow-hidden bg-gray-900/80">
+          <div class="flex">
+            <%# Sticky channel column %>
+            <div class="flex-shrink-0 w-[160px] z-20 bg-gray-900">
+              <%# Time header spacer %>
+              <div class="h-10 border-b border-gray-700/50 bg-gray-900"></div>
+              <%# Channel rows %>
+              <% @channels.each do |channel| %>
+                <div class="h-16 border-b border-gray-700/30 flex items-center gap-2 px-3 bg-gray-900 hover:bg-gray-800 transition-colors cursor-pointer"
+                 data-action="click->hls-player#play"
+                  data-hls-player-url-param="<%= channel.stream_url %>"
+                  data-hls-player-name-param="<%= channel.name %>">
+                  <div class="w-8 h-8 rounded bg-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0">
+                    <% if channel.logo_url.present? %>
+                      <img src="<%= channel.logo_url %>" alt="" class="w-full h-full object-contain" loading="lazy">
+                    <% else %>
+                      <span class="text-[10px] font-bold text-white"><%= channel.name.scan(/[A-Z0-9]/).first(3).join.presence || channel.name[0..1].upcase %></span>
+                    <% end %>
+                  </div>
+                  <span class="text-xs font-medium text-white truncate"><%= channel.name %></span>
+                </div>
+              <% end %>
+            </div>
+            <%# Scrollable programme grid %>
+            <div class="flex-1 overflow-x-auto" data-tv-guide-target="grid">
+              <div class="relative" style="width: <%= guide_grid_width(@window_start, @window_end) %>px; min-width: 100%;">
+                <%# Time header %>
+                <div class="h-10 border-b border-gray-700/50 relative bg-gray-900/90">
+                  <% guide_time_slots(@window_start, @window_end).each do |slot| %>
+                    <% left = time_slot_left_px(slot, @window_start) %>
+                    <div class="absolute top-0 h-full flex items-center border-l border-gray-700/30 pl-2"
+                     style="left: <%= left %>px;">
+                      <span class="text-xs text-gray-400 whitespace-nowrap"><%= slot.strftime("%-I:%M %p") %></span>
+                    </div>
+                  <% end %>
+                </div>
+                <%# Programme rows %>
+                <% @channels.each do |channel| %>
+                  <div class="h-16 border-b border-gray-700/30 relative">
+                    <% programmes = @programmes_by_channel[channel.tvg_id] || [] %>
+                    <% if programmes.any? %>
+                      <% programmes.each do |programme| %>
+                        <% left = programme_left_px(programme, @window_start) %>
+                        <% width = programme_width_px(programme, @window_start, @window_end) %>
+                        <% next if width < 2 %>
+                        <div class="absolute top-1 bottom-1 rounded-md px-2 py-1 overflow-hidden cursor-pointer transition-all duration-150
+                                <%= programme.live? ? 'bg-gray-800/90 border border-neon-cyan/30 shadow-[0_0_8px_rgba(0,255,255,0.1)]' : 'bg-gray-800 border border-gray-600 hover:border-neon-cyan/50 hover:bg-gray-700' %>"
+                         style="left: <%= left %>px; width: <%= width %>px;"
+                         data-action="click->hls-player#play"
+                          data-hls-player-url-param="<%= channel.stream_url %>"
+                          data-hls-player-name-param="<%= channel.name %>"
+                          title="<%= programme.title %><%= " - #{programme.subtitle}" if programme.subtitle.present? %>">
+                          <div class="text-xs font-medium text-white truncate leading-tight"><%= programme.title %></div>
+                          <% if programme.subtitle.present? && width > 100 %>
+                            <div class="text-[10px] text-gray-400 truncate leading-tight"><%= programme.subtitle %></div>
+                          <% end %>
+                          <% if programme.live? && width > 60 %>
+                            <div class="mt-0.5 h-1 bg-gray-700 rounded-full overflow-hidden">
+                              <div class="h-full bg-neon-cyan rounded-full" style="width: <%= programme.progress_percentage %>%"></div>
+                            </div>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    <% else %>
+                      <div class="absolute inset-0 flex items-center px-3">
+                        <span class="text-xs text-gray-600 italic">No schedule info</span>
+                      </div>
+                    <% end %>
+                  </div>
+                <% end %>
+                <%# Current time marker %>
+                <div data-tv-guide-target="timeMarker"
+                 class="absolute top-0 bottom-0 w-0.5 bg-neon-cyan z-10 pointer-events-none"
+                 style="display: none; box-shadow: 0 0 8px rgba(0, 255, 255, 0.5), 0 0 16px rgba(0, 255, 255, 0.2);">
+                  <div class="w-2 h-2 bg-neon-cyan rounded-full -ml-[3px] -mt-1"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <div class="text-center py-16 text-gray-400">
+          <svg class="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+          </svg>
+          <p class="text-lg mb-2">No channels found</p>
+          <p>Try adjusting your filters or search query.</p>
+        </div>
+      <% end %>
+    </div>

@@ -1,12 +1,12 @@
-# Synthwaves.fm
+# SynthWaves.fm
 
 [![Certified Shovelware](https://justin.searls.co/img/shovelware.svg)](https://justin.searls.co/shovelware/)
 
 Self-hosted music streaming for your personal library.
 
-## What is Synthwaves.fm?
+## What is SynthWaves.fm?
 
-Synthwaves.fm is a self-hosted music streaming app built with Rails. Upload your music library, organize it by artist, album, and genre, and stream it from any device. It installs as a Progressive Web App for a native feel, works with Subsonic-compatible music apps, and keeps your music and podcasts neatly separated.
+SynthWaves.fm is a self-hosted music streaming app built with Rails. Upload your music library, organize it by artist, album, and genre, and stream it from any device. It installs as a Progressive Web App for a native feel, works with Subsonic-compatible music apps, and keeps your music and podcasts neatly separated.
 
 ## Features
 
@@ -51,7 +51,7 @@ Synthwaves.fm is a self-hosted music streaming app built with Rails. Upload your
 
 ## Use Your Favorite Apps
 
-Synthwaves.fm implements the Subsonic API, so you can connect dedicated music apps and stream your library from any platform. Popular compatible apps include DSub, play:Sub, Submariner, Clementine, Symfonium, cliamp, and many more.
+SynthWaves.fm implements the Subsonic API, so you can connect dedicated music apps and stream your library from any platform. Popular compatible apps include DSub, play:Sub, Submariner, Clementine, Symfonium, cliamp, and many more.
 
 There's also a REST API with JWT authentication for building your own integrations. API keys are manageable from the web UI under your account settings.
 

@@ -1,4 +1,4 @@
-# Synthwaves.fm
+# SynthWaves.fm
 
 Music streaming web application built with Rails 8.
 

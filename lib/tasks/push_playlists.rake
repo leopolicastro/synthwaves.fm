@@ -1,5 +1,5 @@
 namespace :playlists do
-  desc "Push cliamp playlists to a remote Synthwaves.fm instance"
+  desc "Push cliamp playlists to a remote SynthWaves.fm instance"
   task :push do
     require "net/http"
     require "uri"
@@ -44,7 +44,7 @@ namespace :playlists do
 
       payload = {
         name: name,
-        tracks: local_tracks.map { |t| { title: t[:title], artist: t[:artist], album: t[:album] } }
+        tracks: local_tracks.map { |t| {title: t[:title], artist: t[:artist], album: t[:album]} }
       }
 
       begin

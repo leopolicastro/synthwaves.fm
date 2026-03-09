@@ -62,13 +62,20 @@ class DatabaseBackupService
   end
 
   def prune_old_backups
-    objects = s3_client.list_objects_v2(bucket: bucket, prefix: @prefix)
-    sorted = objects.contents.sort_by(&:last_modified).reverse
+    response = s3_client.list_objects_v2(bucket: bucket, prefix: @prefix)
+    return if response.contents.nil? || response.contents.empty?
+
+    sorted = response.contents
+      .select { |obj| obj.key.end_with?(".sqlite3.gz") }
+      .sort_by(&:last_modified)
+      .reverse
 
     return if sorted.size <= @retention
 
     sorted[@retention..].each do |obj|
       s3_client.delete_object(bucket: bucket, key: obj.key)
+    rescue Aws::S3::Errors::NoSuchKey
+      # Object already gone, skip
     end
   end
 

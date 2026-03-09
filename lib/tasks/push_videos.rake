@@ -1,0 +1,249 @@
+namespace :videos do
+  desc "Encode (if needed) and push a video to a remote synthwaves.fm instance via S3 direct upload"
+  task :push do
+    require "net/http"
+    require "uri"
+    require "json"
+    require "digest"
+    require "base64"
+    require "open3"
+
+    remote_url = ENV.fetch("GROOVY_REMOTE_URL") { abort "GROOVY_REMOTE_URL is required" }
+    client_id = ENV.fetch("GROOVY_CLIENT_ID") { abort "GROOVY_CLIENT_ID is required" }
+    secret_key = ENV.fetch("GROOVY_SECRET_KEY") { abort "GROOVY_SECRET_KEY is required" }
+    video_path = ENV.fetch("VIDEO") { abort "VIDEO is required (path to video file)" }
+
+    abort "File not found: #{video_path}" unless File.exist?(video_path)
+
+    title = ENV.fetch("TITLE", File.basename(video_path, File.extname(video_path)))
+    folder_name = ENV["FOLDER"]
+    season_number = ENV["SEASON"]
+    episode_number = ENV["EPISODE"]
+
+    # 1. Probe input
+    puts "Probing #{File.basename(video_path)}..."
+    probe = probe_video(video_path)
+    strategy = encoding_strategy(probe, video_path)
+    puts "  Video: #{probe[:video_codec]}, Audio: #{probe[:audio_codec]}, Container: #{probe[:container]}"
+    puts "  Strategy: #{strategy}"
+
+    # 2. Encode if needed
+    upload_path = video_path
+    temp_file = nil
+
+    case strategy
+    when :remux
+      temp_file = "#{video_path}.remuxed.mp4"
+      puts "Remuxing to MP4 with faststart..."
+      remux(video_path, temp_file)
+      upload_path = temp_file
+    when :full
+      temp_file = "#{video_path}.encoded.mp4"
+      puts "Encoding with h264_videotoolbox..."
+      encode(video_path, temp_file)
+      upload_path = temp_file
+    else
+      puts "Already H264+AAC+MP4 — uploading original"
+    end
+
+    # 3. Authenticate
+    puts "Authenticating..."
+    token = authenticate(remote_url, client_id, secret_key)
+
+    # 4. Create blob via API
+    file_size = File.size(upload_path)
+    checksum = Digest::MD5.file(upload_path).base64digest
+    filename = "#{File.basename(video_path, File.extname(video_path))}.mp4"
+
+    puts "Creating blob (#{(file_size / 1024.0 / 1024.0).round(1)} MB)..."
+    blob_response = create_blob(remote_url, token, filename, file_size, checksum)
+
+    signed_id = blob_response["signed_id"]
+    upload_url = blob_response.dig("direct_upload", "url")
+    upload_headers = blob_response.dig("direct_upload", "headers")
+
+    # 5. Upload to S3
+    puts "Uploading to S3..."
+    upload_to_s3(upload_url, upload_headers, upload_path)
+    puts "  Upload complete"
+
+    # 6. Create video record
+    puts "Creating video record..."
+    video = create_video(remote_url, token, signed_id, title, folder_name, season_number, episode_number)
+    puts "  Created: \"#{video["title"]}\" (id: #{video["id"]}, status: #{video["status"]})"
+    puts "  Folder: #{video["folder"]}" if video["folder"]
+
+    puts
+    puts "Done! Video will be processed server-side (thumbnail + metadata)."
+  ensure
+    # 7. Clean up temp file
+    if temp_file && File.exist?(temp_file)
+      FileUtils.rm_f(temp_file)
+      puts "Cleaned up temp file"
+    end
+  end
+end
+
+def probe_video(path)
+  cmd = [
+    "ffprobe", "-v", "quiet", "-print_format", "json",
+    "-show_streams", "-show_format", path
+  ]
+  stdout, status = Open3.capture2(*cmd)
+  abort "ffprobe failed for #{path}" unless status.success?
+
+  data = JSON.parse(stdout)
+  video_stream = data["streams"]&.find { |s| s["codec_type"] == "video" }
+  audio_stream = data["streams"]&.find { |s| s["codec_type"] == "audio" }
+  format_name = data.dig("format", "format_name") || ""
+
+  {
+    video_codec: video_stream&.dig("codec_name"),
+    audio_codec: audio_stream&.dig("codec_name"),
+    container: format_name
+  }
+end
+
+def encoding_strategy(probe, path)
+  h264 = probe[:video_codec] == "h264"
+  aac = probe[:audio_codec]&.match?(/aac/)
+  mp4 = probe[:container]&.match?(/mp4|mov|m4v/)
+
+  if h264 && aac && mp4 && faststart?(path)
+    :none
+  elsif h264 && aac && mp4
+    :remux
+  elsif h264 && aac
+    :remux
+  else
+    :full
+  end
+end
+
+def faststart?(path)
+  # Check if moov atom is before mdata — a hallmark of faststart
+  stdout, = Open3.capture2(
+    "ffprobe", "-v", "trace", "-i", path,
+    err: [:child, :out]
+  )
+  moov_pos = stdout.index("moov")
+  mdat_pos = stdout.index("mdat")
+  moov_pos && mdat_pos && moov_pos < mdat_pos
+end
+
+def remux(input, output)
+  success = system(
+    "ffmpeg", "-y", "-i", input,
+    "-c", "copy",
+    "-movflags", "+faststart",
+    output
+  )
+  abort "ffmpeg remux failed" unless success
+end
+
+def encode(input, output)
+  success = system(
+    "ffmpeg", "-y", "-i", input,
+    "-c:v", "h264_videotoolbox", "-q:v", "65", "-allow_sw", "1",
+    "-c:a", "aac", "-b:a", "128k",
+    "-movflags", "+faststart",
+    "-tag:v", "avc1",
+    output
+  )
+  abort "ffmpeg encode failed" unless success
+end
+
+def authenticate(remote_url, client_id, secret_key)
+  uri = URI.parse("#{remote_url}/api/v1/auth/token")
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = uri.scheme == "https"
+  http.open_timeout = 15
+  http.read_timeout = 15
+
+  request = Net::HTTP::Post.new(uri.request_uri)
+  request["Content-Type"] = "application/json"
+  request.body = JSON.generate(client_id: client_id, secret_key: secret_key)
+
+  response = http.request(request)
+  json = JSON.parse(response.body)
+
+  unless response.code.to_i == 200 && json["token"]
+    abort "Authentication failed: #{json["error"] || response.body}"
+  end
+
+  puts "  Authenticated successfully"
+  json["token"]
+end
+
+def create_blob(remote_url, token, filename, byte_size, checksum)
+  uri = URI.parse("#{remote_url}/api/import/direct_uploads")
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = uri.scheme == "https"
+  http.open_timeout = 15
+  http.read_timeout = 30
+
+  request = Net::HTTP::Post.new(uri.request_uri)
+  request["Content-Type"] = "application/json"
+  request["Authorization"] = "Bearer #{token}"
+  request.body = JSON.generate(
+    filename: filename,
+    byte_size: byte_size,
+    checksum: checksum,
+    content_type: "video/mp4"
+  )
+
+  response = http.request(request)
+
+  unless response.code.to_i == 201
+    abort "Blob creation failed (#{response.code}): #{response.body}"
+  end
+
+  JSON.parse(response.body)
+end
+
+def upload_to_s3(url, headers, file_path)
+  uri = URI.parse(url)
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = uri.scheme == "https"
+  http.open_timeout = 30
+  http.read_timeout = 600
+
+  request = Net::HTTP::Put.new(uri.request_uri)
+  headers&.each { |key, value| request[key] = value }
+
+  File.open(file_path, "rb") do |file|
+    request.body_stream = file
+    request["Content-Length"] = File.size(file_path).to_s
+    response = http.request(request)
+
+    unless response.code.to_i.between?(200, 299)
+      abort "S3 upload failed (#{response.code}): #{response.body}"
+    end
+  end
+end
+
+def create_video(remote_url, token, signed_blob_id, title, folder_name, season_number, episode_number)
+  uri = URI.parse("#{remote_url}/api/import/videos")
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = uri.scheme == "https"
+  http.open_timeout = 15
+  http.read_timeout = 30
+
+  body = { signed_blob_id: signed_blob_id, title: title }
+  body[:folder_name] = folder_name if folder_name
+  body[:season_number] = season_number.to_i if season_number
+  body[:episode_number] = episode_number.to_i if episode_number
+
+  request = Net::HTTP::Post.new(uri.request_uri)
+  request["Content-Type"] = "application/json"
+  request["Authorization"] = "Bearer #{token}"
+  request.body = JSON.generate(body)
+
+  response = http.request(request)
+
+  unless response.code.to_i == 201
+    abort "Video creation failed (#{response.code}): #{response.body}"
+  end
+
+  JSON.parse(response.body)
+end

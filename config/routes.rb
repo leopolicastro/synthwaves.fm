@@ -76,6 +76,8 @@ Rails.application.routes.draw do
     namespace :import do
       resources :tracks, only: [:create]
       resources :playlists, only: [:create]
+      resources :direct_uploads, only: [:create]
+      resources :videos, only: [:create]
     end
   end
 

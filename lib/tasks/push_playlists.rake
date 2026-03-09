@@ -1,5 +1,5 @@
 namespace :playlists do
-  desc "Push cliamp playlists to a remote SynthWaves.fm instance"
+  desc "Push cliamp playlists to a remote synthwaves.fm instance"
   task :push do
     require "net/http"
     require "uri"

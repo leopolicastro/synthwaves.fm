@@ -4,7 +4,7 @@ module SubsonicResponseFormatting
   extend ActiveSupport::Concern
 
   SUBSONIC_API_VERSION = "1.16.1"
-  SERVER_NAME = "SynthWaves.fm"
+  SERVER_NAME = "synthwaves.fm"
 
   private
 

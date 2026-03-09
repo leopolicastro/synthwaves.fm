@@ -1,5 +1,5 @@
 namespace :library do
-  desc "Push local music files to a remote SynthWaves.fm instance"
+  desc "Push local music files to a remote synthwaves.fm instance"
   task :push do
     require "net/http"
     require "uri"

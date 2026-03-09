@@ -8,9 +8,9 @@ RSpec.describe LogoComponent, type: :component do
   end
 
   describe "text" do
-    it "renders SynthWaves.fm" do
+    it "renders synthwaves.fm" do
       html = render_component
-      expect(html.text).to include("SynthWaves.fm")
+      expect(html.text).to include("synthwaves.fm")
     end
   end
 

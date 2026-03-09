@@ -20,7 +20,7 @@ class RadioBrowserService
   private
 
   def get(path, **params)
-    response = HTTP.headers("User-Agent" => "SynthWaves.fm/1.0")
+    response = HTTP.headers("User-Agent" => "synthwaves.fm/1.0")
       .timeout(connect: 5, read: 15)
       .get("#{BASE_URL}#{path}", params: params)
 

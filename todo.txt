@@ -1,0 +1,4 @@
+# To Do
+
+- [ ] Block all endpoints from bots.
+- [ ] Backup database

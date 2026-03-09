@@ -11,7 +11,7 @@ class StationUrlImportService
 
   def call
     response = HTTP.follow(max_hops: 5)
-      .headers("User-Agent" => "Mozilla/5.0 (compatible; SynthWaves.fm/1.0)")
+      .headers("User-Agent" => "Mozilla/5.0 (compatible; synthwaves.fm/1.0)")
       .timeout(connect: 5, read: 15)
       .get(@url)
 

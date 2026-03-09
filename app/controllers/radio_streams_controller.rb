@@ -16,7 +16,7 @@ class RadioStreamsController < ApplicationController
     response.headers["Cache-Control"] = "no-cache"
 
     upstream = HTTP
-      .headers("User-Agent" => "Mozilla/5.0 (compatible; SynthWaves.fm/1.0)")
+      .headers("User-Agent" => "Mozilla/5.0 (compatible; synthwaves.fm/1.0)")
       .follow(max_hops: 5)
       .timeout(connect: 5, read: 30)
       .get(station.stream_url)

@@ -19,9 +19,9 @@ production:
   cleanup_stale_downloads:
     command: "Download.stale.update_all(status: 'failed', error_message: 'Timed out')"
     schedule: every hour at minute 45
-  iptv_channel_sync:
-    class: IPTVChannelSyncJob
-    schedule: at 4am every day
-  # epg_sync:
-  #   class: EPGSyncJob
-  #   schedule: every 3 hours
+  # iptv_channel_sync:
+  #   class: IPTVChannelSyncJob
+  #   schedule: at 4am every day
+  epg_sync:
+    class: EPGSyncJob
+    schedule: every 3 hours

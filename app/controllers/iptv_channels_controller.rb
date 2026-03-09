@@ -34,6 +34,17 @@ class IPTVChannelsController < ApplicationController
     else
       @programmes_by_channel = {}
     end
+
+    all_programme_ids = @programmes_by_channel.values.flatten.map(&:id)
+    if all_programme_ids.any?
+      @recording_by_programme_id = Current.user.recordings
+        .where(epg_programme_id: all_programme_ids)
+        .where.not(status: %w[failed cancelled])
+        .pluck(:epg_programme_id, :status)
+        .to_h
+    else
+      @recording_by_programme_id = {}
+    end
   end
 
   def show
@@ -41,6 +52,17 @@ class IPTVChannelsController < ApplicationController
     @now_playing = @channel.now_playing
     @up_next = @channel.up_next(limit: 5)
     @is_favorited = Current.user.favorites.exists?(favorable: @channel)
+
+    programme_ids = [@now_playing, *@up_next].compact.map(&:id)
+    if programme_ids.any?
+      @recording_by_programme_id = Current.user.recordings
+        .where(epg_programme_id: programme_ids)
+        .where.not(status: %w[failed cancelled])
+        .pluck(:epg_programme_id, :status)
+        .to_h
+    else
+      @recording_by_programme_id = {}
+    end
   end
 
   def new

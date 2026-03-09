@@ -157,13 +157,14 @@
                               <div class="h-full bg-neon-cyan rounded-full" style="width: <%= programme.progress_percentage %>%"></div>
                             </div>
                           <% end %>
-                          <% if programme.live? || programme.starts_at > Time.current %>
+                          <% rec_status = @recording_by_programme_id[programme.id] %>
+                          <% if rec_status %>
+                            <div class="absolute top-0.5 right-0.5" onclick="event.stopPropagation()">
+                              <%= render "recordings/record_button", channel: channel, programme: programme, status: rec_status, size: :small %>
+                            </div>
+                          <% elsif programme.live? || programme.starts_at > Time.current %>
                             <div class="absolute top-0.5 right-0.5 opacity-0 group-hover/prog:opacity-100 transition-opacity" onclick="event.stopPropagation()">
-                              <%= button_to recordings_path(iptv_channel_id: channel.id, epg_programme_id: programme.id), method: :post,
-                                    class: "p-0.5 text-red-400 hover:text-red-300 cursor-pointer",
-                                    title: "Record", data: { turbo_confirm: "Record \"#{programme.title}\"?" } do %>
-                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6"/></svg>
-                              <% end %>
+                              <%= render "recordings/record_button", channel: channel, programme: programme, size: :small %>
                             </div>
                           <% end %>
                         </div>

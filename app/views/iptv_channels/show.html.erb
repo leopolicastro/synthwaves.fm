@@ -64,11 +64,9 @@
         </div>
         <div class="flex items-start justify-between gap-2">
           <h3 class="text-lg font-semibold text-white"><%= @now_playing.title %></h3>
-          <%= button_to recordings_path(iptv_channel_id: @channel.id, epg_programme_id: @now_playing.id), method: :post,
-                class: "flex-shrink-0 p-1.5 text-red-400 hover:text-red-300 border border-red-400/30 rounded-lg hover:border-red-400 transition-colors cursor-pointer",
-                title: "Record", data: { turbo_confirm: "Record \"#{@now_playing.title}\"?" } do %>
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6"/></svg>
-          <% end %>
+          <div class="flex-shrink-0">
+            <%= render "recordings/record_button", channel: @channel, programme: @now_playing, status: @recording_by_programme_id[@now_playing.id] %>
+          </div>
         </div>
         <% if @now_playing.subtitle.present? %>
           <p class="text-sm text-gray-300 mt-0.5"><%= @now_playing.subtitle %></p>
@@ -103,10 +101,15 @@
                   <span class="text-xs text-gray-400 truncate block"><%= programme.subtitle %></span>
                 <% end %>
               </div>
-              <%= button_to recordings_path(iptv_channel_id: @channel.id, epg_programme_id: programme.id), method: :post,
-                    class: "flex-shrink-0 p-1 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all cursor-pointer",
-                    title: "Record", data: { turbo_confirm: "Record \"#{programme.title}\"?" } do %>
-                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6"/></svg>
+              <% rec_status = @recording_by_programme_id[programme.id] %>
+              <% if rec_status %>
+                <div class="flex-shrink-0">
+                  <%= render "recordings/record_button", channel: @channel, programme: programme, status: rec_status, size: :small %>
+                </div>
+              <% else %>
+                <div class="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-all">
+                  <%= render "recordings/record_button", channel: @channel, programme: programme, size: :small %>
+                </div>
               <% end %>
             </div>
           <% end %>

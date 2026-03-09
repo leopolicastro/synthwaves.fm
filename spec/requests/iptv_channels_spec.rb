@@ -79,6 +79,37 @@ RSpec.describe "IPTVChannels", type: :request do
       get iptv_channels_path
       expect(response.body).to include("No schedule info")
     end
+
+    it "populates recording statuses for programmes in the guide" do
+      channel = create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
+      programme = create(:epg_programme, :current, channel_id: "espn.us", title: "NHL Hockey")
+      recording = create(:recording, iptv_channel: channel, epg_programme: programme, status: "scheduled",
+                          title: programme.title, starts_at: programme.starts_at, ends_at: programme.ends_at)
+      create(:user_recording, user: user, recording: recording)
+
+      get iptv_channels_path
+      expect(response.body).to include('title="Scheduled"')
+    end
+
+    it "shows record button for programmes without recordings" do
+      create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
+      create(:epg_programme, :current, channel_id: "espn.us", title: "NHL Hockey")
+
+      get iptv_channels_path
+      expect(response.body).to include('title="Record"')
+    end
+
+    it "excludes failed and cancelled recordings from status indicators" do
+      channel = create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
+      programme = create(:epg_programme, :current, channel_id: "espn.us", title: "NHL Hockey")
+      recording = create(:recording, :failed, iptv_channel: channel, epg_programme: programme,
+                          title: programme.title, starts_at: programme.starts_at, ends_at: programme.ends_at)
+      create(:user_recording, user: user, recording: recording)
+
+      get iptv_channels_path
+      expect(response.body).not_to include('title="Scheduled"')
+      expect(response.body).to include('title="Record"')
+    end
   end
 
   describe "GET /tv/:id" do
@@ -120,6 +151,39 @@ RSpec.describe "IPTVChannels", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).not_to include("Now Playing")
       expect(response.body).not_to include("Up Next")
+    end
+
+    it "shows scheduled indicator for a recorded now-playing programme" do
+      channel = create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
+      programme = create(:epg_programme, :current, channel_id: "espn.us", title: "NHL Hockey")
+      recording = create(:recording, iptv_channel: channel, epg_programme: programme, status: "scheduled",
+                          title: programme.title, starts_at: programme.starts_at, ends_at: programme.ends_at)
+      create(:user_recording, user: user, recording: recording)
+
+      get iptv_channel_path(channel)
+      expect(response.body).to include('title="Scheduled"')
+    end
+
+    it "shows recording indicator for an actively recording programme" do
+      channel = create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
+      programme = create(:epg_programme, :current, channel_id: "espn.us", title: "NHL Hockey")
+      recording = create(:recording, :recording_now, iptv_channel: channel, epg_programme: programme,
+                          title: programme.title, starts_at: programme.starts_at, ends_at: programme.ends_at)
+      create(:user_recording, user: user, recording: recording)
+
+      get iptv_channel_path(channel)
+      expect(response.body).to include('title="Recording..."')
+    end
+
+    it "shows recorded indicator for a ready recording" do
+      channel = create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
+      programme = create(:epg_programme, :current, channel_id: "espn.us", title: "NHL Hockey")
+      recording = create(:recording, :ready, iptv_channel: channel, epg_programme: programme,
+                          title: programme.title, starts_at: programme.starts_at, ends_at: programme.ends_at)
+      create(:user_recording, user: user, recording: recording)
+
+      get iptv_channel_path(channel)
+      expect(response.body).to include('title="Recorded"')
     end
   end
 

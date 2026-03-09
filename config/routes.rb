@@ -38,6 +38,7 @@ Rails.application.routes.draw do
   get :tv, to: "tv#show"
   resources :iptv_channels, only: [:show, :new, :create, :edit, :update, :destroy], path: "tv/channels" do
     post :import, on: :collection
+    post :sync_epg, on: :member
   end
   resources :folders, only: [:show, :new, :create, :edit, :update, :destroy]
   resources :videos, only: [:new, :create, :show, :edit, :update, :destroy] do

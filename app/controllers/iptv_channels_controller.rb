@@ -57,6 +57,20 @@ class IPTVChannelsController < ApplicationController
     redirect_to tv_path, notice: "Channel removed."
   end
 
+  def sync_epg
+    @channel = IPTVChannel.find(params[:id])
+
+    if @channel.epg_url.blank?
+      redirect_to iptv_channel_path(@channel), alert: "No EPG URL configured. Edit the channel to add one."
+      return
+    end
+
+    count = EPGSyncService.sync_channel(@channel)
+    redirect_to iptv_channel_path(@channel), notice: "Synced #{count} programmes."
+  rescue HTTP::Error, HTTP::TimeoutError => e
+    redirect_to iptv_channel_path(@channel), alert: "EPG sync failed: #{e.message}"
+  end
+
   def import
     url = params[:playlist_url].to_s.strip
     if url.blank?
@@ -77,7 +91,7 @@ class IPTVChannelsController < ApplicationController
   end
 
   def channel_params
-    params.require(:iptv_channel).permit(:name, :stream_url, :logo_url, :country, :language, :iptv_category_id, :tvg_id)
+    params.require(:iptv_channel).permit(:name, :stream_url, :logo_url, :country, :language, :iptv_category_id, :tvg_id, :epg_url)
   end
 
   def parse_window_time

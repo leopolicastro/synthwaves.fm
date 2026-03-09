@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_09_183145) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_09_194120) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -147,7 +147,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_183145) do
     t.string "subtitle"
     t.string "title", null: false
     t.datetime "updated_at", null: false
-    t.index ["channel_id", "starts_at"], name: "index_epg_programmes_on_channel_id_and_starts_at"
+    t.index ["channel_id", "starts_at"], name: "index_epg_programmes_on_channel_id_and_starts_at", unique: true
     t.index ["ends_at"], name: "index_epg_programmes_on_ends_at"
   end
 
@@ -234,6 +234,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_183145) do
     t.boolean "active", default: true, null: false
     t.string "country"
     t.datetime "created_at", null: false
+    t.string "epg_url"
     t.integer "iptv_category_id"
     t.string "language"
     t.string "logo_url"

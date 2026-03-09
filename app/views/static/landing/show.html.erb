@@ -1,4 +1,4 @@
-<% content_for :title, "SynthWaves.fm — Your Music, Your Server, Your Rules" %>
+<% content_for :title, "SynthWaves.fm — Your Media, Your Server, Your Rules" %>
 <!-- Hero Section -->
 <section class="min-h-screen flex flex-col relative overflow-hidden">
   <!-- Retro grid background on hero only -->
@@ -31,12 +31,12 @@
     </h1>
     <!-- Tagline -->
     <p class="text-xl md:text-2xl text-center mb-4 max-w-3xl leading-relaxed">
-      <span class="text-neon-pink">Self-hosted music streaming</span>
+      <span class="text-neon-pink">Self-hosted media streaming</span>
       <span class="text-white"> that puts you in control.</span>
     </p>
     <p class="text-lg text-center mb-10 max-w-2xl">
-      <span class="text-neon-cyan">Your library.</span>
-      <span class="text-neon-pink">Your playlists.</span>
+      <span class="text-neon-cyan">Your music.</span>
+      <span class="text-neon-pink">Your TV.</span>
       <span class="text-neon-purple">Your server.</span>
       <span class="text-white/80">No subscriptions, no algorithms, no compromises.</span>
     </p>
@@ -66,7 +66,7 @@
       <span class="text-neon-pink">Everything</span> <span class="text-neon-cyan">you need</span>
     </h2>
     <p class="text-gray-500 text-center mb-16 text-lg max-w-2xl mx-auto">
-      A complete music platform running on your own hardware.
+      A complete media platform running on your own hardware.
     </p>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       <!-- Feature: Music Library -->
@@ -77,7 +77,7 @@
           </svg>
         </div>
         <h3 class="text-xl font-bold mb-2 text-neon-pink">Music Library</h3>
-        <p class="text-gray-400 leading-relaxed">Upload your collection and browse by artist, album, or track. Cover art and metadata extracted automatically.</p>
+        <p class="text-gray-400 leading-relaxed">Upload your collection or import from YouTube. Browse by artist, album, or track. Download as ZIP anytime.</p>
       </div>
       <!-- Feature: Playlists -->
       <div class="bg-gray-800/80 border border-neon-purple/15 rounded-2xl p-8 hover:border-neon-cyan/30 transition-colors group">
@@ -100,6 +100,26 @@
         <h3 class="text-xl font-bold mb-2 text-neon-purple">Stream Anywhere</h3>
         <p class="text-gray-400 leading-relaxed">Full player with queue, shuffle, and repeat. Native media controls on desktop and mobile via MediaSession API.</p>
       </div>
+      <!-- Feature: Live TV -->
+      <div class="bg-gray-800/80 border border-neon-purple/15 rounded-2xl p-8 hover:border-sunset-orange/30 transition-colors group">
+        <div class="w-14 h-14 bg-sunset-orange/10 border border-sunset-orange/20 rounded-xl flex items-center justify-center mb-5 group-hover:shadow-[0_0_10px_rgba(255,107,53,0.3)] transition-shadow">
+          <svg class="w-7 h-7 text-sunset-orange" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold mb-2 text-sunset-orange">Live TV</h3>
+        <p class="text-gray-400 leading-relaxed">Stream IPTV channels via HLS. Import M3U playlists, filter by category, country, or language, and favorite the channels you watch most.</p>
+      </div>
+      <!-- Feature: TV Guide & DVR -->
+      <div class="bg-gray-800/80 border border-neon-purple/15 rounded-2xl p-8 hover:border-neon-purple/30 transition-colors group">
+        <div class="w-14 h-14 bg-neon-purple/10 border border-neon-purple/20 rounded-xl flex items-center justify-center mb-5 group-hover:shadow-neon-pink transition-shadow">
+          <svg class="w-7 h-7 text-neon-purple" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold mb-2 text-neon-purple">TV Guide & DVR</h3>
+        <p class="text-gray-400 leading-relaxed">Browse the electronic program guide with real-time progress indicators. Schedule recordings and download them as MP4.</p>
+      </div>
       <!-- Feature: Podcasts -->
       <div class="bg-gray-800/80 border border-neon-purple/15 rounded-2xl p-8 hover:border-laser-green/30 transition-colors group">
         <div class="w-14 h-14 bg-laser-green/10 border border-laser-green/20 rounded-xl flex items-center justify-center mb-5 group-hover:shadow-[0_0_10px_rgba(57,255,20,0.3)] transition-shadow">
@@ -120,15 +140,15 @@
         <h3 class="text-xl font-bold mb-2 text-sunset-orange">Internet Radio</h3>
         <p class="text-gray-400 leading-relaxed">Add any internet radio stream URL. Live indicator shows what's playing in real time.</p>
       </div>
-      <!-- Feature: AI Chat -->
-      <div class="bg-gray-800/80 border border-neon-purple/15 rounded-2xl p-8 hover:border-neon-cyan/30 transition-colors group">
-        <div class="w-14 h-14 bg-neon-cyan/10 border border-neon-cyan/20 rounded-xl flex items-center justify-center mb-5 group-hover:shadow-neon-cyan transition-shadow">
-          <svg class="w-7 h-7 text-neon-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+      <!-- Feature: Themes -->
+      <div class="bg-gray-800/80 border border-neon-purple/15 rounded-2xl p-8 hover:border-neon-pink/30 transition-colors group">
+        <div class="w-14 h-14 bg-neon-pink/10 border border-neon-pink/20 rounded-xl flex items-center justify-center mb-5 group-hover:shadow-neon-pink transition-shadow">
+          <svg class="w-7 h-7 text-neon-pink" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
           </svg>
         </div>
-        <h3 class="text-xl font-bold mb-2 text-neon-cyan">AI Assistant</h3>
-        <p class="text-gray-400 leading-relaxed">Chat with an AI that knows your library. Get recommendations, discover connections, and explore your music.</p>
+        <h3 class="text-xl font-bold mb-2 text-neon-pink">Themes</h3>
+        <p class="text-gray-400 leading-relaxed">Four music-genre-inspired themes &mdash; Synthwave, Reggae, Punk, and Jazz. Swap the entire look with one click.</p>
       </div>
     </div>
   </div>
@@ -203,7 +223,7 @@
       Ready to groove?
     </h2>
     <p class="text-gray-400 text-lg mb-10">
-      Set up your server, upload your music, and start streaming in minutes.
+      Set up your server, add your media, and start streaming in minutes.
     </p>
     <%= link_to new_registration_path, class: "inline-block bg-sunset-gradient hover:shadow-neon-pink text-white px-12 py-4 rounded-xl font-semibold text-lg transition-shadow shadow-lg" do %>
       Get Started Free

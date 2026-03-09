@@ -8,7 +8,6 @@ export default class extends Controller {
     if (!this.audio) return
 
     this._visible = false
-    this._initAudioNodes()
     this._readThemeColors()
 
     this._onPlay = () => this._setActive(true)
@@ -51,6 +50,7 @@ export default class extends Controller {
   _onVisibilityChanged({ visible }) {
     this._visible = visible
     if (visible) {
+      this._initAudioNodes()
       this._setupCanvas()
       this._animate()
     } else {
@@ -64,16 +64,20 @@ export default class extends Controller {
   _initAudioNodes() {
     if (this.audio._audioContext && this.audio._analyser) return
 
-    const ctx = new (window.AudioContext || window.webkitAudioContext)()
-    const source = ctx.createMediaElementSource(this.audio)
-    const analyser = ctx.createAnalyser()
-    analyser.fftSize = 256
-    source.connect(analyser)
-    analyser.connect(ctx.destination)
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)()
+      const source = ctx.createMediaElementSource(this.audio)
+      const analyser = ctx.createAnalyser()
+      analyser.fftSize = 256
+      source.connect(analyser)
+      analyser.connect(ctx.destination)
 
-    this.audio._audioContext = ctx
-    this.audio._sourceNode = source
-    this.audio._analyser = analyser
+      this.audio._audioContext = ctx
+      this.audio._sourceNode = source
+      this.audio._analyser = analyser
+    } catch (e) {
+      console.warn("Visualizer: could not init Web Audio nodes", e)
+    }
   }
 
   _readThemeColors() {

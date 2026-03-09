@@ -84,7 +84,7 @@ class TracksController < ApplicationController
     if @track.youtube?
       head :not_found
     elsif @track.audio_file.attached?
-      redirect_to rails_blob_url(@track.audio_file), allow_other_host: true
+      redirect_to rails_storage_proxy_url(@track.audio_file)
     else
       head :not_found
     end

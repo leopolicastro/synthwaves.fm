@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_08_231131) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_09_000002) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -162,6 +162,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_231131) do
     t.datetime "updated_at", null: false
     t.text "value"
     t.index ["feature_key", "key", "value"], name: "index_flipper_gates_on_feature_key_and_key_and_value", unique: true
+  end
+
+  create_table "iptv_categories", force: :cascade do |t|
+    t.integer "channels_count", default: 0
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_iptv_categories_on_name", unique: true
+    t.index ["slug"], name: "index_iptv_categories_on_slug", unique: true
+  end
+
+  create_table "iptv_channels", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.string "country"
+    t.datetime "created_at", null: false
+    t.integer "iptv_category_id"
+    t.string "language"
+    t.string "logo_url"
+    t.string "name", null: false
+    t.string "stream_url", null: false
+    t.string "tvg_id"
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_iptv_channels_on_active"
+    t.index ["country"], name: "index_iptv_channels_on_country"
+    t.index ["iptv_category_id"], name: "index_iptv_channels_on_iptv_category_id"
+    t.index ["name"], name: "index_iptv_channels_on_name"
+    t.index ["tvg_id"], name: "index_iptv_channels_on_tvg_id", unique: true
   end
 
   create_table "maintenance_tasks_runs", force: :cascade do |t|
@@ -333,6 +361,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_231131) do
   add_foreign_key "chats", "models"
   add_foreign_key "downloads", "users"
   add_foreign_key "favorites", "users"
+  add_foreign_key "iptv_channels", "iptv_categories"
   add_foreign_key "messages", "chats"
   add_foreign_key "messages", "models"
   add_foreign_key "messages", "tool_calls"

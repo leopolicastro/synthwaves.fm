@@ -1,0 +1,54 @@
+<div class="w-full" data-controller="hls-player"
+     data-hls-player-autoplay-url-value="<%= @channel.stream_url %>"
+     data-hls-player-autoplay-name-value="<%= @channel.name %>">
+  <div class="mb-6">
+    <%= link_to iptv_channels_path, class: "text-sm text-gray-400 hover:text-neon-cyan transition-colors" do %>
+      &larr; Back to TV
+    <% end %>
+  </div>
+
+  <%# Video player %>
+  <div class="mb-6 relative bg-black rounded-xl overflow-hidden aspect-video max-w-4xl mx-auto">
+    <video data-hls-player-target="video"
+           class="w-full h-full"
+           controls
+           playsinline></video>
+    <div data-hls-player-target="loading"
+         class="absolute inset-0 flex items-center justify-center bg-black/50">
+      <div class="w-8 h-8 border-2 border-neon-cyan border-t-transparent rounded-full animate-spin"></div>
+    </div>
+    <div data-hls-player-target="error"
+         class="absolute inset-0 flex items-center justify-center bg-black/80 text-red-400 text-sm px-4 text-center hidden">
+    </div>
+  </div>
+
+  <%# Channel info %>
+  <div class="max-w-4xl mx-auto">
+    <div class="flex items-center gap-4 mb-4">
+      <% if @channel.logo_url.present? %>
+        <div class="w-14 h-14 rounded-lg bg-gray-800 overflow-hidden flex-shrink-0">
+          <img src="<%= @channel.logo_url %>" alt="<%= @channel.name %>" class="w-full h-full object-contain">
+        </div>
+      <% end %>
+      <div>
+        <h1 class="text-2xl font-bold font-display"><%= @channel.name %></h1>
+        <div class="flex items-center gap-3 text-sm text-gray-400 mt-1">
+          <% if @channel.iptv_category.present? %>
+            <%= link_to @channel.iptv_category.name, iptv_channels_path(category: @channel.iptv_category.slug),
+                  class: "hover:text-neon-cyan transition-colors" %>
+          <% end %>
+          <% if @channel.country.present? %>
+            <span><%= @channel.country %></span>
+          <% end %>
+          <% if @channel.language.present? %>
+            <span><%= @channel.language %></span>
+          <% end %>
+        </div>
+      </div>
+      <div class="ml-auto flex items-center gap-3">
+        <%= link_to "Edit", edit_iptv_channel_path(@channel), class: "px-3 py-1.5 text-sm border border-gray-600 text-gray-300 rounded-lg hover:border-neon-cyan hover:text-neon-cyan transition-colors" %>
+        <%= button_to "Delete", iptv_channel_path(@channel), method: :delete, class: "px-3 py-1.5 text-sm border border-gray-600 text-red-400 rounded-lg hover:border-red-400 transition-colors cursor-pointer", data: { turbo_confirm: "Remove this channel?" } %>
+      </div>
+    </div>
+  </div>
+</div>

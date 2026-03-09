@@ -13,6 +13,9 @@
             <% if Flipper.enabled?(:youtube_radio, Current.user) %>
               <%= link_to "Radio", radio_stations_path, class: "text-white hover:text-neon-cyan transition-colors" %>
             <% end %>
+            <% if Flipper.enabled?(:iptv, Current.user) %>
+              <%= link_to "TV", iptv_channels_path, class: "text-white hover:text-neon-cyan transition-colors" %>
+            <% end %>
           </nav>
         <% end %>
       </div>
@@ -49,6 +52,9 @@
               <%= link_to "Playlists", playlists_path, class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
               <% if Flipper.enabled?(:youtube_radio, Current.user) %>
                 <%= link_to "Radio", radio_stations_path, class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
+              <% end %>
+              <% if Flipper.enabled?(:iptv, Current.user) %>
+                <%= link_to "TV", iptv_channels_path, class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
               <% end %>
               <%= link_to "Search", search_path, class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
               <div class="border-t border-gray-700 my-1"></div>

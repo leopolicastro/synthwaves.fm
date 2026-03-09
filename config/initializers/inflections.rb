@@ -13,6 +13,7 @@
 ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym "API"
   inflect.acronym "JWT"
+  inflect.acronym "IPTV"
 end
 
 # These inflection rules are supported but not enabled by default:

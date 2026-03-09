@@ -1,0 +1,103 @@
+<div class="w-full" data-controller="hls-player">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-bold font-display">TV</h1>
+    <div class="flex items-center gap-3">
+      <%= form_with url: import_iptv_channels_path, method: :post, class: "flex items-center gap-2" do %>
+        <input type="url" name="playlist_url" placeholder="M3U playlist URL..."
+               class="w-48 lg:w-64 px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan focus:border-transparent placeholder-gray-500">
+        <button type="submit" class="px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:border-neon-cyan hover:text-neon-cyan text-sm font-medium transition-colors">Import</button>
+      <% end %>
+      <%= link_to "Add Channel", new_iptv_channel_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink text-sm font-medium" %>
+    </div>
+  </div>
+
+  <%# Video player area %>
+  <div class="mb-8 relative bg-black rounded-xl overflow-hidden aspect-video max-w-4xl mx-auto">
+    <video data-hls-player-target="video"
+           class="w-full h-full hidden"
+           controls
+           playsinline></video>
+    <div data-hls-player-target="placeholder"
+         class="absolute inset-0 flex flex-col items-center justify-center text-gray-500">
+      <svg class="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+      </svg>
+      <p class="text-sm">Select a channel to start watching</p>
+    </div>
+    <div data-hls-player-target="loading"
+         class="absolute inset-0 flex items-center justify-center bg-black/50 hidden">
+      <div class="w-8 h-8 border-2 border-neon-cyan border-t-transparent rounded-full animate-spin"></div>
+    </div>
+    <div data-hls-player-target="error"
+         class="absolute inset-0 flex items-center justify-center bg-black/80 text-red-400 text-sm px-4 text-center hidden">
+    </div>
+  </div>
+
+  <div data-hls-player-target="channelName" class="text-center text-lg font-medium text-white mb-6 min-h-[1.75rem]"></div>
+
+  <%# Category filter pills %>
+  <% if @categories.any? %>
+    <div class="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+      <%= link_to "All", iptv_channels_path(q: params[:q], country: params[:country]),
+            class: "px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors #{@current_category.nil? ? 'bg-neon-cyan text-gray-900' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}",
+            data: { turbo_frame: "tv-channels" } %>
+      <% @categories.each do |category| %>
+        <%= link_to category.name, iptv_channels_path(category: category.slug, q: params[:q], country: params[:country]),
+              class: "px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors #{@current_category == category ? 'bg-neon-cyan text-gray-900' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}",
+              data: { turbo_frame: "tv-channels" } %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%# Search and country filter %>
+  <div class="flex flex-col sm:flex-row gap-3 mb-6">
+    <%= form_with url: iptv_channels_path, method: :get, data: { turbo_frame: "tv-channels" }, class: "flex-1" do |f| %>
+      <%= hidden_field_tag :category, params[:category] %>
+      <%= hidden_field_tag :country, params[:country] %>
+      <div class="relative">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input type="text" name="q" value="<%= params[:q] %>" placeholder="Search channels..."
+               class="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan focus:border-transparent placeholder-gray-500">
+      </div>
+    <% end %>
+
+    <% if @countries.any? %>
+      <%= form_with url: iptv_channels_path, method: :get, data: { turbo_frame: "tv-channels" } do %>
+        <%= hidden_field_tag :category, params[:category] %>
+        <%= hidden_field_tag :q, params[:q] %>
+        <select name="country" onchange="this.form.requestSubmit()"
+                class="px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan">
+          <option value="">All Countries</option>
+          <% @countries.each do |country| %>
+            <option value="<%= country %>" <%= 'selected' if params[:country] == country %>><%= country %></option>
+          <% end %>
+        </select>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Channel grid %>
+  <turbo-frame id="tv-channels" data-turbo-action="advance">
+    <% if @channels.any? %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <% @channels.each do |channel| %>
+          <%= render(IPTVChannelCardComponent.new(channel: channel)) %>
+        <% end %>
+      </div>
+
+      <div class="mt-8">
+        <%== @pagy.series_nav %>
+      </div>
+    <% else %>
+      <div class="text-center py-16 text-gray-400">
+        <svg class="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+        </svg>
+        <p class="text-lg mb-2">No channels found</p>
+        <p>Try adjusting your filters or search query.</p>
+      </div>
+    <% end %>
+  </turbo-frame>
+</div>

@@ -62,7 +62,11 @@ class DatabaseBackupService
   end
 
   def prune_old_backups
-    response = s3_client.list_objects_v2(bucket: bucket, prefix: @prefix)
+    response = begin
+      s3_client.list_objects_v2(bucket: bucket, prefix: @prefix)
+    rescue Aws::S3::Errors::NoSuchKey
+      return
+    end
     return if response.contents.nil? || response.contents.empty?
 
     sorted = response.contents

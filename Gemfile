@@ -92,3 +92,5 @@ gem "wahwah"
 gem "aws-sdk-s3", require: false
 
 gem "http"
+
+gem "rubyzip", "~> 2.3"

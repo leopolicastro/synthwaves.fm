@@ -221,6 +221,39 @@ RSpec.describe "Tracks", type: :request do
     end
   end
 
+  describe "GET /tracks/:id/download" do
+    let(:track) { create(:track) }
+
+    it "redirects to blob with attachment disposition when audio file is attached" do
+      track.audio_file.attach(
+        io: File.open(Rails.root.join("spec/fixtures/files/test.mp3")),
+        filename: "test.mp3",
+        content_type: "audio/mpeg"
+      )
+
+      get download_track_path(track)
+
+      expect(response).to have_http_status(:redirect)
+      expect(response.location).to include("disposition=attachment")
+    end
+
+    it "redirects with alert for YouTube tracks" do
+      youtube_track = create(:track, youtube_video_id: "abc123")
+
+      get download_track_path(youtube_track)
+
+      expect(response).to redirect_to(track_path(youtube_track))
+      expect(flash[:alert]).to eq("This track is not available for download.")
+    end
+
+    it "redirects with alert when no audio file is attached" do
+      get download_track_path(track)
+
+      expect(response).to redirect_to(track_path(track))
+      expect(flash[:alert]).to eq("This track is not available for download.")
+    end
+  end
+
   describe "GET /tracks/:id/stream" do
     let(:track) { create(:track) }
 

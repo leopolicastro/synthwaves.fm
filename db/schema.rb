@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_08_221632) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_08_231131) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -122,6 +122,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_221632) do
     t.integer "model_id"
     t.datetime "updated_at", null: false
     t.index ["model_id"], name: "index_chats_on_model_id"
+  end
+
+  create_table "downloads", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "downloadable_id"
+    t.string "downloadable_type", null: false
+    t.string "error_message"
+    t.integer "processed_tracks", default: 0
+    t.string "status", default: "pending", null: false
+    t.integer "total_tracks", default: 0
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id", "downloadable_type", "downloadable_id"], name: "idx_on_user_id_downloadable_type_downloadable_id_5f957f527c"
+    t.index ["user_id"], name: "index_downloads_on_user_id"
   end
 
   create_table "favorites", force: :cascade do |t|
@@ -317,6 +331,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_221632) do
   add_foreign_key "albums", "artists"
   add_foreign_key "api_keys", "users"
   add_foreign_key "chats", "models"
+  add_foreign_key "downloads", "users"
   add_foreign_key "favorites", "users"
   add_foreign_key "messages", "chats"
   add_foreign_key "messages", "models"

@@ -28,6 +28,10 @@
     <meta name="turbo-refresh-scroll" content="preserve">
   </head>
   <body class="bg-gray-900 synthwave-bg text-white pb-24 scanlines" data-controller="youtube-player">
+    <% if authenticated? %>
+      <%= turbo_stream_from "downloads_#{Current.user.id}" %>
+      <div id="download-notifications" class="fixed top-20 right-4 z-50 space-y-2"></div>
+    <% end %>
     <%= render 'navbar' %>
     <%= render 'alerts' %>
     <main class="container mx-auto my-28 px-5 flex">

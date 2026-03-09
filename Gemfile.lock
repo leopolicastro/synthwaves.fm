@@ -436,6 +436,7 @@ GEM
       ruby_llm-schema (~> 0)
       zeitwerk (~> 2)
     ruby_llm-schema (0.3.0)
+    rubyzip (2.4.1)
     safely_block (0.5.0)
     sanitize (7.0.0)
       crass (~> 1.0.2)
@@ -573,6 +574,7 @@ DEPENDENCIES
   rails (~> 8.1.2)
   rspec-rails
   ruby_llm
+  rubyzip (~> 2.3)
   shoulda-matchers
   solid_cable
   solid_cache
@@ -744,6 +746,7 @@ CHECKSUMS
   ruby-vips (2.3.0) sha256=e685ec02c13969912debbd98019e50492e12989282da5f37d05f5471442f5374
   ruby_llm (1.13.2) sha256=f8bd7fa0e3c486368b318167775eac086896e3477986ad5ca2c3b38b1e2913c5
   ruby_llm-schema (0.3.0) sha256=a591edc5ca1b7f0304f0e2261de61ba4b3bea17be09f5cf7558153adfda3dec6
+  rubyzip (2.4.1) sha256=8577c88edc1fde8935eb91064c5cb1aef9ad5494b940cf19c775ee833e075615
   safely_block (0.5.0) sha256=782c342bc400a79c1233c40cf8c379da6116c6cfd1d7c1f17f0ef2ef11090103
   sanitize (7.0.0) sha256=269d1b9d7326e69307723af5643ec032ff86ad616e72a3b36d301ac75a273984
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1

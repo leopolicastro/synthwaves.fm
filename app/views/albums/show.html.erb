@@ -27,6 +27,7 @@
               playlists: current_user_playlists,
               new_playlist_name: @album.title
             ) %>
+        <%= button_to "Download", downloads_path(downloadable_type: "Album", downloadable_id: @album.id), class: "inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-neon-cyan bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors" %>
         <%= button_to "Fetch cover", fetch_cover_album_path(@album), class: "inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-neon-cyan bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors" %>
         <% if @album.youtube_playlist_url.present? %>
           <%= button_to "Refresh Episodes", refresh_album_path(@album), class: "inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-neon-cyan bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors" %>
@@ -61,6 +62,11 @@
       <% @tracks.each do |track| %>
         <%= render TrackRowComponent.new(track: track, number: (@sort == "disc_number" ? track.track_number : nil), show_album: false, hide_artist_if: @album.artist) do |c| %>
           <% c.with_trailing do %>
+            <% if track.audio_file.attached? && !track.youtube? %>
+              <%= link_to download_track_path(track), class: "text-gray-400 hover:text-neon-cyan", title: "Download" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <% end %>
+            <% end %>
             <%= render "favorites/button", favorable: track, favorited: @favorited_track_ids.include?(track.id) %>
             <%= render "playlist_tracks/add_menu", track: track, playlists: current_user_playlists %>
           <% end %>

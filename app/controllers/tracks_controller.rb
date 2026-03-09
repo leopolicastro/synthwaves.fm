@@ -1,5 +1,5 @@
 class TracksController < ApplicationController
-  before_action :set_track, only: [:show, :edit, :update, :destroy, :stream]
+  before_action :set_track, only: [:show, :edit, :update, :destroy, :stream, :download]
   before_action :require_admin, only: [:edit, :update, :destroy]
 
   def index
@@ -88,6 +88,15 @@ class TracksController < ApplicationController
     else
       head :not_found
     end
+  end
+
+  def download
+    if @track.youtube? || !@track.audio_file.attached?
+      redirect_to track_path(@track), alert: "This track is not available for download."
+      return
+    end
+
+    redirect_to rails_blob_path(@track.audio_file, disposition: "attachment"), allow_other_host: true
   end
 
   private

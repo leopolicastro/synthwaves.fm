@@ -20,7 +20,13 @@ Rails.application.routes.draw do
     post :fetch_cover, on: :member
   end
   resources :tracks, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
-    member { get :stream }
+    member do
+      get :stream
+      get :download
+    end
+  end
+  resources :downloads, only: [:create, :show] do
+    member { get :file }
   end
   resources :playlists do
     resources :tracks, controller: "playlist_tracks", only: [:create, :destroy], as: :tracks

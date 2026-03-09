@@ -10,13 +10,15 @@ class TvController < ApplicationController
       load_guide
     when "videos"
       load_videos
+    when "recordings"
+      load_recordings
     end
   end
 
   private
 
   def available_tabs
-    %w[guide videos]
+    %w[guide videos recordings]
   end
 
   def load_guide
@@ -68,6 +70,18 @@ class TvController < ApplicationController
     @query = params[:q]
     scope = Current.user.videos.ready.search(@query).order(created_at: :desc)
     @pagy, @videos = pagy(scope)
+  end
+
+  def load_recordings
+    @query = params[:q]
+    @status = params[:status]
+    @sort = sort_column(Recording, default: "created_at")
+    @direction = sort_direction(default: "desc")
+    scope = Current.user.recordings.includes(:iptv_channel)
+              .search(@query)
+              .by_status(@status)
+              .order(@sort => @direction)
+    @pagy, @recordings = pagy(scope)
   end
 
   def require_feature

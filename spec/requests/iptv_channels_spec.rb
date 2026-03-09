@@ -112,6 +112,30 @@ RSpec.describe "IPTVChannels", type: :request do
     end
   end
 
+  describe "GET /tv?tab=recordings" do
+    it "returns success" do
+      get tv_path(tab: "recordings")
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "displays the user's recordings" do
+      recording = create(:recording, title: "NHL Hockey")
+      create(:user_recording, user: user, recording: recording)
+
+      get tv_path(tab: "recordings")
+      expect(response.body).to include("NHL Hockey")
+    end
+
+    it "does not show other users' recordings" do
+      other_user = create(:user)
+      recording = create(:recording, title: "Secret Show")
+      create(:user_recording, user: other_user, recording: recording)
+
+      get tv_path(tab: "recordings")
+      expect(response.body).not_to include("Secret Show")
+    end
+  end
+
   describe "GET /tv/channels/:id" do
     it "returns success" do
       channel = create(:iptv_channel)

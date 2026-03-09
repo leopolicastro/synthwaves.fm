@@ -27,6 +27,8 @@ export default class extends Controller {
   }
 
   async submit(event) {
+    if (this.uploadsComplete) return
+
     event.preventDefault()
 
     const files = Array.from(this.inputTarget.files)
@@ -54,6 +56,7 @@ export default class extends Controller {
     })
 
     this.submitTarget.value = "Creating videos..."
+    this.uploadsComplete = true
     form.requestSubmit()
   }
 

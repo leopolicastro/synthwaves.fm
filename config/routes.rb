@@ -57,6 +57,7 @@ Rails.application.routes.draw do
   get "search/dropdown", to: "search#dropdown"
   get :search, to: "search#index"
   get :library, to: "library#show"
+  get :visualizer, to: "visualizer#show"
 
   draw :subsonic
 

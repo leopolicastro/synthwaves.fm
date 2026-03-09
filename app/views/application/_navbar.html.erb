@@ -19,6 +19,7 @@
             <% if Flipper.enabled?(:internet_radio, Current.user) %>
               <%= link_to "Internet Radio", internet_radio_stations_path, class: "text-white hover:text-neon-cyan transition-colors" %>
             <% end %>
+            <%= link_to "Visualizer", visualizer_path, class: "text-white hover:text-neon-cyan transition-colors" %>
           </nav>
         <% end %>
       </div>
@@ -62,6 +63,7 @@
               <% if Flipper.enabled?(:internet_radio, Current.user) %>
                 <%= link_to "Internet Radio", internet_radio_stations_path, class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
               <% end %>
+              <%= link_to "Visualizer", visualizer_path, class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
               <%= link_to "Search", search_path, class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
               <div class="border-t border-gray-700 my-1"></div>
             </div>

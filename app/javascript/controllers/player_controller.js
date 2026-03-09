@@ -26,6 +26,9 @@ export default class extends Controller {
       this.audio.addEventListener("play", () => {
         this.updatePlayPauseIcon()
         this.startPositionSave()
+        if (this.audio._audioContext && this.audio._audioContext.state === "suspended") {
+          this.audio._audioContext.resume()
+        }
       })
       this.audio.addEventListener("pause", () => {
         this.updatePlayPauseIcon()

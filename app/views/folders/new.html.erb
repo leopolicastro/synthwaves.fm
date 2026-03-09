@@ -1,8 +1,8 @@
 <div class="w-full max-w-lg">
   <h1 class="text-3xl font-bold font-display mb-6">Upload Season</h1>
 
-  <%= form_with url: folders_path, method: :post, multipart: true, class: "space-y-4",
-                data: { controller: "bulk-upload" } do |f| %>
+  <%= form_with url: folders_path, method: :post, class: "space-y-4",
+                data: { controller: "bulk-upload", action: "submit->bulk-upload#submit" } do |f| %>
     <% if @folder.errors.any? %>
       <div class="bg-red-900/20 border border-red-800 rounded-lg p-4">
         <ul class="text-sm text-red-400">
@@ -49,7 +49,8 @@
     </div>
 
     <div>
-      <%= f.submit "Upload Season", class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink cursor-pointer" %>
+      <%= f.submit "Upload Season", class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink cursor-pointer",
+                                    data: { bulk_upload_target: "submit" } %>
     </div>
   <% end %>
 </div>

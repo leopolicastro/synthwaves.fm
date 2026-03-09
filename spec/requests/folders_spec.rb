@@ -13,15 +13,24 @@ RSpec.describe "Folders", type: :request do
   end
 
   describe "POST /folders" do
+    def create_video_blob(filename: "test.mp4")
+      ActiveStorage::Blob.create_and_upload!(
+        io: Rails.root.join("spec/fixtures/files/test.mp4").open,
+        filename: filename,
+        content_type: "video/mp4"
+      )
+    end
+
     it "creates a folder and videos from uploaded files" do
-      file1 = fixture_file_upload("test.mp4", "video/mp4")
-      file2 = fixture_file_upload("test.mp4", "video/mp4")
+      blob1 = create_video_blob(filename: "Episode 1.mp4")
+      blob2 = create_video_blob(filename: "Episode 2.mp4")
 
       expect {
         post folders_path, params: {
           folder_name: "My Show",
           season_number: "1",
-          video_files: [file1, file2]
+          signed_blob_ids: [blob1.signed_id, blob2.signed_id],
+          filenames: ["Episode 1.mp4", "Episode 2.mp4"]
         }
       }.to change(Folder, :count).by(1)
         .and change(Video, :count).by(2)
@@ -35,13 +44,14 @@ RSpec.describe "Folders", type: :request do
 
     it "reuses an existing folder with the same name" do
       existing = create(:folder, user: user, name: "My Show")
-      file = fixture_file_upload("test.mp4", "video/mp4")
+      blob = create_video_blob
 
       expect {
         post folders_path, params: {
           folder_name: "My Show",
           season_number: "1",
-          video_files: [file]
+          signed_blob_ids: [blob.signed_id],
+          filenames: ["test.mp4"]
         }
       }.not_to change(Folder, :count)
 
@@ -49,13 +59,13 @@ RSpec.describe "Folders", type: :request do
     end
 
     it "parses episode numbers from filenames" do
-      file = fixture_file_upload("test.mp4", "video/mp4")
-      allow_any_instance_of(ActionDispatch::Http::UploadedFile).to receive(:original_filename).and_return("S01E03 - The Pilot.mp4")
+      blob = create_video_blob(filename: "S01E03 - The Pilot.mp4")
 
       post folders_path, params: {
         folder_name: "My Show",
         season_number: "1",
-        video_files: [file]
+        signed_blob_ids: [blob.signed_id],
+        filenames: ["S01E03 - The Pilot.mp4"]
       }
 
       video = Video.last
@@ -65,13 +75,14 @@ RSpec.describe "Folders", type: :request do
     end
 
     it "assigns sequential episode numbers when not parseable" do
-      file1 = fixture_file_upload("test.mp4", "video/mp4")
-      file2 = fixture_file_upload("test.mp4", "video/mp4")
+      blob1 = create_video_blob(filename: "random_file.mp4")
+      blob2 = create_video_blob(filename: "another_file.mp4")
 
       post folders_path, params: {
         folder_name: "My Show",
         season_number: "2",
-        video_files: [file1, file2]
+        signed_blob_ids: [blob1.signed_id, blob2.signed_id],
+        filenames: ["random_file.mp4", "another_file.mp4"]
       }
 
       videos = Video.last(2).sort_by(&:episode_number)
@@ -80,26 +91,27 @@ RSpec.describe "Folders", type: :request do
     end
 
     it "enqueues VideoConversionJob for each video" do
-      file1 = fixture_file_upload("test.mp4", "video/mp4")
-      file2 = fixture_file_upload("test.mp4", "video/mp4")
+      blob1 = create_video_blob
+      blob2 = create_video_blob
 
       expect {
         post folders_path, params: {
           folder_name: "My Show",
           season_number: "1",
-          video_files: [file1, file2]
+          signed_blob_ids: [blob1.signed_id, blob2.signed_id],
+          filenames: ["test1.mp4", "test2.mp4"]
         }
       }.to have_enqueued_job(VideoConversionJob).exactly(2).times
     end
 
     it "rejects when folder name is blank" do
-      file = fixture_file_upload("test.mp4", "video/mp4")
-      post folders_path, params: {folder_name: "", video_files: [file]}
+      blob = create_video_blob
+      post folders_path, params: {folder_name: "", signed_blob_ids: [blob.signed_id], filenames: ["test.mp4"]}
       expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "rejects when no files are uploaded" do
-      post folders_path, params: {folder_name: "My Show", video_files: []}
+      post folders_path, params: {folder_name: "My Show", signed_blob_ids: []}
       expect(response).to have_http_status(:unprocessable_content)
     end
   end

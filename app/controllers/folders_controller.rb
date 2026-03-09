@@ -8,7 +8,8 @@ class FoldersController < ApplicationController
 
   def create
     folder_name = params[:folder_name].to_s.strip
-    uploaded_files = Array(params[:video_files]).reject(&:blank?)
+    signed_blob_ids = Array(params[:signed_blob_ids]).reject(&:blank?)
+    filenames = Array(params[:filenames]).reject(&:blank?)
 
     if folder_name.blank?
       @folder = Folder.new
@@ -18,7 +19,7 @@ class FoldersController < ApplicationController
       return
     end
 
-    if uploaded_files.empty?
+    if signed_blob_ids.empty?
       @folder = Folder.new(name: folder_name)
       @folder.errors.add(:base, "At least one video file is required")
       @existing_folders = Current.user.folders.order(:name)
@@ -31,25 +32,28 @@ class FoldersController < ApplicationController
     ActiveRecord::Base.transaction do
       @folder = Current.user.folders.find_or_create_by!(name: folder_name)
 
-      uploaded_files.each_with_index do |file, index|
-        parsed = FilenameEpisodeParser.parse(file.original_filename, default_season: season_number)
-        file_format = file.original_filename[/\.\w+$/]&.delete(".")
+      signed_blob_ids.each_with_index do |signed_id, index|
+        filename = filenames[index] || "video_#{index + 1}.mp4"
+        parsed = FilenameEpisodeParser.parse(filename, default_season: season_number)
+        file_format = filename[/\.\w+$/]&.delete(".")
+
+        blob = ActiveStorage::Blob.find_signed!(signed_id)
 
         video = @folder.videos.new(
           user: Current.user,
-          title: parsed.title.presence || file.original_filename.sub(/\.\w+$/, ""),
+          title: parsed.title.presence || filename.sub(/\.\w+$/, ""),
           season_number: parsed.season_number || season_number,
           episode_number: parsed.episode_number || (index + 1),
           file_format: file_format,
-          file_size: file.size,
+          file_size: blob.byte_size,
           status: "processing"
         )
-        video.file.attach(file)
+        video.file.attach(blob)
         video.save!
       end
     end
 
-    redirect_to @folder, notice: "#{uploaded_files.size} video(s) uploaded to #{@folder.name}."
+    redirect_to @folder, notice: "#{signed_blob_ids.size} video(s) uploaded to #{@folder.name}."
   rescue ActiveRecord::RecordInvalid => e
     @folder ||= Folder.new(name: folder_name)
     @folder.errors.add(:base, e.message)

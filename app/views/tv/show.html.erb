@@ -1,37 +1,37 @@
 <div class="w-full" data-controller="tv-page">
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="text-3xl font-bold font-display">TV</h1>
-    <div class="flex items-center gap-3">
-      <% if @tab == "videos" %>
-        <%= link_to new_folder_path, class: "px-4 py-2 border border-gray-600 text-gray-400 rounded-lg hover:border-neon-cyan hover:text-neon-cyan text-sm font-medium transition-colors" do %>
-          Upload Season
+  <turbo-frame id="tv-content" data-turbo-action="advance">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-3xl font-bold font-display">TV</h1>
+      <div class="flex items-center gap-3">
+        <% if @tab == "videos" %>
+          <%= link_to new_folder_path, class: "px-4 py-2 border border-gray-600 text-gray-400 rounded-lg hover:border-neon-cyan hover:text-neon-cyan text-sm font-medium transition-colors", data: { turbo_frame: "_top" } do %>
+            Upload Season
+          <% end %>
+          <%= link_to new_video_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink text-sm font-medium", data: { turbo_frame: "_top" } do %>
+            Upload Video
+          <% end %>
+        <% elsif @tab == "guide" %>
+          <%= form_with url: import_iptv_channels_path, method: :post, class: "flex items-center gap-2", data: { turbo_frame: "_top" } do %>
+            <input type="url" name="playlist_url" placeholder="M3U playlist URL..."
+                   class="w-48 lg:w-64 px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan focus:border-transparent placeholder-gray-500">
+            <button type="submit" class="px-4 py-2 border border-gray-600 text-gray-400 rounded-lg hover:border-neon-cyan hover:text-neon-cyan text-sm font-medium transition-colors">Import</button>
+          <% end %>
+          <%= link_to "Add Channel", new_iptv_channel_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink text-sm font-medium", data: { turbo_frame: "_top" } %>
         <% end %>
-        <%= link_to new_video_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink text-sm font-medium" do %>
-          Upload Video
-        <% end %>
-      <% elsif @tab == "guide" %>
-        <%= form_with url: import_iptv_channels_path, method: :post, class: "flex items-center gap-2" do %>
-          <input type="url" name="playlist_url" placeholder="M3U playlist URL..."
-                 class="w-48 lg:w-64 px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan focus:border-transparent placeholder-gray-500">
-          <button type="submit" class="px-4 py-2 border border-gray-600 text-gray-400 rounded-lg hover:border-neon-cyan hover:text-neon-cyan text-sm font-medium transition-colors">Import</button>
-        <% end %>
-        <%= link_to "Add Channel", new_iptv_channel_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink text-sm font-medium" %>
+      </div>
+    </div>
+
+    <% tab_labels = { "guide" => "Guide", "videos" => "Videos", "recordings" => "Recordings" } %>
+
+    <%# Tabs %>
+    <div class="flex gap-1 mb-6 border-b border-gray-700 overflow-x-auto flex-nowrap">
+      <% @available_tabs.each do |key| %>
+        <%= link_to tab_labels[key], tv_path(tab: key),
+              class: "px-4 py-2.5 text-sm font-medium transition-colors -mb-px whitespace-nowrap #{@tab == key ? 'text-neon-cyan border-b-2 border-neon-cyan' : 'text-gray-400 hover:text-white'}",
+              data: { turbo_frame: "tv-content" } %>
       <% end %>
     </div>
-  </div>
 
-  <% tab_labels = { "guide" => "Guide", "videos" => "Videos", "recordings" => "Recordings" } %>
-
-  <%# Tabs %>
-  <div class="flex gap-1 mb-6 border-b border-gray-700 overflow-x-auto flex-nowrap">
-    <% @available_tabs.each do |key| %>
-      <%= link_to tab_labels[key], tv_path(tab: key),
-            class: "px-4 py-2.5 text-sm font-medium transition-colors -mb-px whitespace-nowrap #{@tab == key ? 'text-neon-cyan border-b-2 border-neon-cyan' : 'text-gray-400 hover:text-white'}",
-            data: { turbo_frame: "tv-content" } %>
-    <% end %>
-  </div>
-
-  <turbo-frame id="tv-content" data-turbo-action="advance">
     <%= render "tv/#{@tab}" %>
   </turbo-frame>
 </div>

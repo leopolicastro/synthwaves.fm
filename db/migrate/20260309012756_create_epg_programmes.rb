@@ -1,4 +1,4 @@
-class CreateEpgProgrammes < ActiveRecord::Migration[8.1]
+class CreateEPGProgrammes < ActiveRecord::Migration[8.1]
   def change
     create_table :epg_programmes do |t|
       t.string :channel_id, null: false

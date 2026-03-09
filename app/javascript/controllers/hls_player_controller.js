@@ -31,6 +31,11 @@ export default class extends Controller {
     this.hideError()
     this.updateChannelName(name)
 
+    // Pause any music/YouTube playing through the bottom player
+    const audio = document.getElementById("persistent-audio")
+    if (audio && !audio.paused) audio.pause()
+    document.dispatchEvent(new CustomEvent("youtube:stop"))
+
     const video = this.videoTarget
     video.classList.remove("hidden")
     if (this.hasPlaceholderTarget) this.placeholderTarget.classList.add("hidden")

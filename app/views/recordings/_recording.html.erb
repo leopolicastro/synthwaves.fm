@@ -41,7 +41,7 @@
 
     <div class="flex items-center gap-2 flex-shrink-0">
       <% if recording.ready? && recording.file.attached? %>
-        <%= link_to recording_path(recording), class: "p-1.5 text-neon-cyan hover:text-white transition-colors", title: "Watch" do %>
+        <%= link_to recording_path(recording), class: "p-1.5 text-neon-cyan hover:text-white transition-colors", title: "Watch", data: { turbo_frame: "_top" } do %>
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         <% end %>
         <%= link_to file_recording_path(recording), class: "p-1.5 text-gray-400 hover:text-white transition-colors", title: "Download" do %>

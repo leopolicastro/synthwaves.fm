@@ -17,6 +17,8 @@
                 <%= link_to favorite.favorable.name, artist_path(favorite.favorable), class: "text-neon-cyan hover:underline" %>
               <% when IPTVChannel %>
                 <%= link_to favorite.favorable.name, iptv_channel_path(favorite.favorable), class: "text-neon-cyan hover:underline" %>
+              <% when InternetRadioStation %>
+                <%= link_to favorite.favorable.name, internet_radio_station_path(favorite.favorable), class: "text-neon-cyan hover:underline" %>
               <% end %>
             </div>
           </div>

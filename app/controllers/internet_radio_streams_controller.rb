@@ -1,17 +1,18 @@
-class RadioStreamsController < ApplicationController
+class InternetRadioStreamsController < ApplicationController
   include ActionController::Live
 
   before_action :require_feature
 
   def show
-    station = RadioStation.find(params[:radio_station_id])
+    station = InternetRadioStation.find(params[:internet_radio_station_id])
 
-    unless station.stream?
-      head :not_found
-      return
+    content_type = case station.codec&.downcase
+    when "aac" then "audio/aac"
+    when "ogg" then "audio/ogg"
+    else "audio/mpeg"
     end
 
-    response.headers["Content-Type"] = "audio/mpeg"
+    response.headers["Content-Type"] = content_type
     response.headers["X-Accel-Buffering"] = "no"
     response.headers["Cache-Control"] = "no-cache"
 
@@ -27,7 +28,7 @@ class RadioStreamsController < ApplicationController
   rescue ActionController::Live::ClientDisconnected
     # Client disconnected — expected for streams
   rescue HTTP::Error => e
-    logger.error "Stream proxy error for station #{station&.id}: #{e.message}"
+    logger.error "Stream proxy error for internet radio station #{station&.id}: #{e.message}"
     head :bad_gateway unless response.committed?
   ensure
     response.stream.close
@@ -36,6 +37,6 @@ class RadioStreamsController < ApplicationController
   private
 
   def require_feature
-    redirect_to root_path, alert: "This feature is not available." unless Flipper.enabled?(:youtube_radio, Current.user)
+    redirect_to root_path, alert: "This feature is not available." unless Flipper.enabled?(:internet_radio, Current.user)
   end
 end

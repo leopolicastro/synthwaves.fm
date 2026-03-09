@@ -7,6 +7,6 @@ RSpec.describe Favorite, type: :model do
   end
 
   describe "validations" do
-    it { should validate_inclusion_of(:favorable_type).in_array(%w[Track Album Artist IPTVChannel]) }
+    it { should validate_inclusion_of(:favorable_type).in_array(%w[Track Album Artist IPTVChannel InternetRadioStation]) }
   end
 end

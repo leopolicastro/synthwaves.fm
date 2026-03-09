@@ -41,6 +41,13 @@ RSpec.describe "Favorites", type: :request do
       }.to change(Favorite, :count).by(1)
     end
 
+    it "creates a favorite for an InternetRadioStation" do
+      station = create(:internet_radio_station)
+      expect {
+        post favorites_path, params: {favorable_type: "InternetRadioStation", favorable_id: station.id}
+      }.to change(Favorite, :count).by(1)
+    end
+
     it "is idempotent for the same favorable" do
       track = create(:track)
       post favorites_path, params: {favorable_type: "Track", favorable_id: track.id}

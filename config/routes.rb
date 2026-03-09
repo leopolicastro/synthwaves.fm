@@ -38,6 +38,13 @@ Rails.application.routes.draw do
   resources :iptv_channels, only: [:index, :show, :new, :create, :edit, :update, :destroy], path: "tv" do
     post :import, on: :collection
   end
+  resources :internet_radio_stations, only: [:index, :show, :edit, :update, :destroy], path: "internet-radio" do
+    collection do
+      post :import
+      post :import_url
+    end
+    resource :stream, only: [:show], controller: "internet_radio_streams"
+  end
   resources :recordings, only: [:index, :show, :create, :destroy] do
     member do
       post :cancel

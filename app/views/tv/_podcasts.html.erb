@@ -1,5 +1,5 @@
 <div data-controller="search" class="mb-6">
-  <%= form_with url: music_path, method: :get, data: { turbo_frame: "music-content", search_target: "form", action: "input->search#submit" } do |f| %>
+  <%= form_with url: tv_path, method: :get, data: { turbo_frame: "tv-content", search_target: "form", action: "input->search#submit" } do |f| %>
     <input type="hidden" name="tab" value="podcasts">
     <input type="text" name="q" value="<%= @query %>" placeholder="Search podcasts..."
            class="flex-1 rounded-lg bg-gray-800 border-gray-700 text-white text-lg px-4 py-3 focus:outline-neon-cyan w-full"

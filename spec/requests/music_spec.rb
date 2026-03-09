@@ -47,26 +47,6 @@ RSpec.describe "Music", type: :request do
       expect(response.body).to include("Test Track")
     end
 
-    it "renders the podcasts tab" do
-      login_user(create(:user))
-      podcast_artist = create(:artist, :podcast, name: "My Great Podcast")
-
-      get music_path(tab: "podcasts")
-
-      expect(response).to have_http_status(:success)
-      expect(response.body).to include("My Great Podcast")
-    end
-
-    it "does not show music artists in the podcasts tab" do
-      login_user(create(:user))
-      create(:artist, name: "Music Only Band", category: :music)
-
-      get music_path(tab: "podcasts")
-
-      expect(response).to have_http_status(:success)
-      expect(response.body).not_to include("Music Only Band")
-    end
-
     it "falls back to artists for invalid tab" do
       login_user(create(:user))
       get music_path(tab: "invalid")

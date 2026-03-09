@@ -12,13 +12,15 @@ class TvController < ApplicationController
       load_videos
     when "recordings"
       load_recordings
+    when "podcasts"
+      load_podcasts
     end
   end
 
   private
 
   def available_tabs
-    %w[guide videos recordings]
+    %w[guide videos recordings podcasts]
   end
 
   def load_guide
@@ -83,6 +85,14 @@ class TvController < ApplicationController
               .by_status(@status)
               .order(@sort => @direction)
     @pagy, @recordings = pagy(scope)
+  end
+
+  def load_podcasts
+    @query = params[:q]
+    scope = Artist.podcast.includes(albums: {cover_image_attachment: :blob})
+      .search(@query)
+      .order(:name)
+    @pagy, @podcasts = pagy(:offset, scope)
   end
 
   def require_feature

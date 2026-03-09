@@ -12,8 +12,6 @@ class MusicController < ApplicationController
       load_albums
     when "tracks"
       load_tracks
-    when "podcasts"
-      load_podcasts
     when "playlists"
       load_playlists
     when "radio"
@@ -26,7 +24,7 @@ class MusicController < ApplicationController
   private
 
   def available_tabs
-    tabs = %w[artists albums tracks podcasts playlists]
+    tabs = %w[artists albums tracks playlists]
     tabs << "radio" if Flipper.enabled?(:youtube_radio, Current.user)
     tabs << "internet_radio" if Flipper.enabled?(:internet_radio, Current.user)
     tabs
@@ -57,14 +55,6 @@ class MusicController < ApplicationController
     scope = Track.music.includes(:artist, :album).search(@query).order(:title)
     @pagy, @tracks = pagy(:offset, scope)
     @favorited_track_ids = Current.user.favorites.where(favorable_type: "Track").pluck(:favorable_id).to_set
-  end
-
-  def load_podcasts
-    @query = params[:q]
-    scope = Artist.podcast.includes(albums: {cover_image_attachment: :blob})
-      .search(@query)
-      .order(:name)
-    @pagy, @podcasts = pagy(:offset, scope)
   end
 
   def load_playlists

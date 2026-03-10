@@ -6,6 +6,7 @@
      data-song-row-artist-value="<%= track.artist.name %>"
      <% if track.album.cover_image.attached? %>
      data-song-row-cover-url-value="<%= url_for(track.album.cover_image) %>"
+     <% end %>
      <% if track.artist.podcast? %>
      data-song-row-is-podcast-value="true"
      <% end %>

@@ -9,5 +9,12 @@ FactoryBot.define do
     file_format { "mp3" }
     file_size { 5_000_000 }
     bitrate { 320 }
+
+    trait :youtube do
+      youtube_video_id { "dQw4w9WgXcQ" }
+      file_format { nil }
+      file_size { nil }
+      bitrate { nil }
+    end
   end
 end

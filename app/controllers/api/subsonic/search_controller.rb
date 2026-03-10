@@ -7,8 +7,8 @@ class API::Subsonic::SearchController < API::Subsonic::BaseController
     pattern = "%#{query}%"
 
     artists = Artist.where("name LIKE ?", pattern).limit(artist_count)
-    albums = Album.includes(:artist, :tracks).where("title LIKE ?", pattern).limit(album_count)
-    tracks = Track.includes(:album, :artist).where("title LIKE ?", pattern).limit(song_count)
+    albums = Album.with_streamable_tracks.includes(:artist, :tracks).where("albums.title LIKE ?", pattern).limit(album_count)
+    tracks = Track.streamable.includes(:album, :artist).where("title LIKE ?", pattern).limit(song_count)
 
     render_subsonic(searchResult3: {
       artist: artists.map { |a| {id: a.id.to_s, name: a.name, albumCount: a.albums.size} },

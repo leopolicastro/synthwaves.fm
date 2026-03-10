@@ -34,6 +34,7 @@ class API::Subsonic::InteractionController < API::Subsonic::BaseController
       },
       song: song_favs.filter_map { |f|
         next unless f.favorable
+        next if f.favorable.youtube?
         track_to_child(f.favorable).merge(starred: f.created_at.iso8601)
       }
     })

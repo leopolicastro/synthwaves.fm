@@ -14,6 +14,7 @@ class Album < ApplicationRecord
 
   scope :music, -> { joins(:artist).merge(Artist.music) }
   scope :podcast, -> { joins(:artist).merge(Artist.podcast) }
+  scope :with_streamable_tracks, -> { joins(:tracks).merge(Track.streamable).distinct }
   scope :search, ->(query) {
     where("albums.title LIKE :q", q: "%#{query}%") if query.present?
   }

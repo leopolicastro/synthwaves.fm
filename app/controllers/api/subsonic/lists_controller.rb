@@ -24,13 +24,13 @@ class API::Subsonic::ListsController < API::Subsonic::BaseController
     end
 
     render_subsonic(albumList2: {
-      album: albums.offset(offset).limit(size).map { |a| album_to_entry(a) }
+      album: albums.with_streamable_tracks.offset(offset).limit(size).map { |a| album_to_entry(a) }
     })
   end
 
   def get_random_songs
     size = (params[:size] || 10).to_i.clamp(1, 500)
-    tracks = Track.includes(:album, :artist).order("RANDOM()").limit(size)
+    tracks = Track.streamable.includes(:album, :artist).order("RANDOM()").limit(size)
     render_subsonic(randomSongs: {
       song: tracks.map { |t| track_to_child(t) }
     })

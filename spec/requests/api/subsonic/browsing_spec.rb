@@ -67,6 +67,20 @@ RSpec.describe "Subsonic Browsing API", type: :request do
       expect(json["subsonic-response"]["album"]["song"]).to be_present
     end
 
+    it "excludes YouTube tracks from song list" do
+      album = create(:album)
+      streamable = create(:track, album: album, artist: album.artist, title: "Streamable")
+      youtube = create(:track, :youtube, album: album, artist: album.artist, title: "YouTube Only")
+
+      get "/api/rest/getAlbum.view", params: auth_params.merge(id: album.id)
+      json = JSON.parse(response.body)
+      songs = json["subsonic-response"]["album"]["song"]
+      titles = songs.map { |s| s["title"] }
+      expect(titles).to include("Streamable")
+      expect(titles).not_to include("YouTube Only")
+      expect(json["subsonic-response"]["album"]["songCount"]).to eq(1)
+    end
+
     it "returns error for nonexistent album" do
       get "/api/rest/getAlbum.view", params: auth_params.merge(id: 99999)
       json = JSON.parse(response.body)
@@ -82,6 +96,15 @@ RSpec.describe "Subsonic Browsing API", type: :request do
       get "/api/rest/getSong.view", params: auth_params.merge(id: track.id)
       json = JSON.parse(response.body)
       expect(json["subsonic-response"]["song"]["title"]).to eq(track.title)
+    end
+
+    it "returns error for YouTube track" do
+      youtube_track = create(:track, :youtube)
+
+      get "/api/rest/getSong.view", params: auth_params.merge(id: youtube_track.id)
+      json = JSON.parse(response.body)
+      expect(json["subsonic-response"]["status"]).to eq("failed")
+      expect(json["subsonic-response"]["error"]["code"]).to eq(70)
     end
 
     it "returns error for nonexistent song" do

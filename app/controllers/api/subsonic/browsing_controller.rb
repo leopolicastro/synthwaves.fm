@@ -21,7 +21,7 @@ class API::Subsonic::BrowsingController < API::Subsonic::BaseController
 
   def get_artist
     artist = Artist.find(params[:id])
-    albums = artist.albums.includes(:tracks)
+    albums = artist.albums.with_streamable_tracks.includes(:tracks)
     render_subsonic(artist: {
       id: artist.id.to_s,
       name: artist.name,
@@ -35,14 +35,14 @@ class API::Subsonic::BrowsingController < API::Subsonic::BaseController
   def get_album
     album = Album.includes(:artist, tracks: :artist).find(params[:id])
     render_subsonic(album: album_to_entry(album).merge(
-      song: album.tracks.order(:disc_number, :track_number).map { |t| track_to_child(t) }
+      song: album.tracks.streamable.order(:disc_number, :track_number).map { |t| track_to_child(t) }
     ))
   rescue ActiveRecord::RecordNotFound
     render_subsonic_error(70, "Album not found")
   end
 
   def get_song
-    track = Track.includes(:album, :artist).find(params[:id])
+    track = Track.streamable.includes(:album, :artist).find(params[:id])
     render_subsonic(song: track_to_child(track))
   rescue ActiveRecord::RecordNotFound
     render_subsonic_error(70, "Song not found")

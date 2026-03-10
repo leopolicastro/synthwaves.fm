@@ -8,7 +8,7 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
 
   def get_playlist
     if params[:id] == "all"
-      tracks = Track.music.includes(:album, :artist).order(:title)
+      tracks = Track.music.streamable.includes(:album, :artist).order(:title)
       render_subsonic(playlist: all_tracks_virtual_entry.merge(
         entry: tracks.map { |t| track_to_child(t) }
       ))
@@ -16,7 +16,7 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
     end
 
     if params[:id] == "podcasts"
-      tracks = Track.podcast.includes(:album, :artist).order(:title)
+      tracks = Track.podcast.streamable.includes(:album, :artist).order(:title)
       render_subsonic(playlist: podcasts_virtual_entry.merge(
         entry: tracks.map { |t| track_to_child(t) }
       ))
@@ -25,7 +25,7 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
 
     playlist = current_user.playlists.includes(playlist_tracks: {track: [:album, :artist]}).find(params[:id])
     render_subsonic(playlist: playlist_to_entry(playlist).merge(
-      entry: playlist.playlist_tracks.order(:position).map { |pt| track_to_child(pt.track) }
+      entry: playlist.playlist_tracks.order(:position).filter_map { |pt| track_to_child(pt.track) unless pt.track.youtube? }
     ))
   rescue ActiveRecord::RecordNotFound
     render_subsonic_error(70, "Playlist not found")
@@ -76,8 +76,8 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
     {
       id: "all",
       name: "All Tracks",
-      songCount: Track.music.count,
-      duration: Track.music.sum(:duration).to_i,
+      songCount: Track.music.streamable.count,
+      duration: Track.music.streamable.sum(:duration).to_i,
       owner: current_user.email_address,
       public: false
     }
@@ -87,8 +87,8 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
     {
       id: "podcasts",
       name: "Podcasts",
-      songCount: Track.podcast.count,
-      duration: Track.podcast.sum(:duration).to_i,
+      songCount: Track.podcast.streamable.count,
+      duration: Track.podcast.streamable.sum(:duration).to_i,
       owner: current_user.email_address,
       public: false
     }
@@ -98,8 +98,8 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
     {
       id: playlist.id.to_s,
       name: playlist.name,
-      songCount: playlist.tracks.size,
-      duration: playlist.tracks.sum(:duration).to_i,
+      songCount: playlist.tracks.merge(Track.streamable).size,
+      duration: playlist.tracks.merge(Track.streamable).sum(:duration).to_i,
       owner: current_user.email_address,
       public: false
     }

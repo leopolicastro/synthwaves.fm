@@ -74,6 +74,40 @@ RSpec.describe Track, type: :model do
     end
   end
 
+  describe ".streamable" do
+    it "includes tracks without youtube_video_id" do
+      track = create(:track)
+      expect(Track.streamable).to include(track)
+    end
+
+    it "excludes tracks with youtube_video_id" do
+      youtube_track = create(:track, :youtube)
+      expect(Track.streamable).not_to include(youtube_track)
+    end
+
+    it "chains with .music" do
+      music_track = create(:track, artist: create(:artist, category: "music"))
+      youtube_music = create(:track, :youtube, artist: create(:artist, category: "music"))
+      podcast_track = create(:track, artist: create(:artist, :podcast))
+
+      result = Track.music.streamable
+      expect(result).to include(music_track)
+      expect(result).not_to include(youtube_music)
+      expect(result).not_to include(podcast_track)
+    end
+
+    it "chains with .podcast" do
+      podcast_artist = create(:artist, :podcast)
+      podcast_album = create(:album, artist: podcast_artist)
+      podcast_track = create(:track, album: podcast_album, artist: podcast_artist)
+      youtube_podcast = create(:track, :youtube, album: podcast_album, artist: podcast_artist)
+
+      result = Track.podcast.streamable
+      expect(result).to include(podcast_track)
+      expect(result).not_to include(youtube_podcast)
+    end
+  end
+
   describe "callbacks" do
     it "enqueues AudioConversionJob for webm files" do
       track = build(:track, file_format: "webm")

@@ -95,13 +95,14 @@ module SubsonicResponseFormatting
   end
 
   def album_to_entry(album)
+    streamable = album.tracks.reject(&:youtube?)
     {
       id: album.id.to_s,
       name: album.title,
       artist: album.artist.name,
       artistId: album.artist_id.to_s,
-      songCount: album.tracks.size,
-      duration: album.tracks.sum(:duration).to_i,
+      songCount: streamable.size,
+      duration: streamable.sum(&:duration).to_i,
       year: album.year,
       genre: album.genre,
       coverArt: album.id.to_s

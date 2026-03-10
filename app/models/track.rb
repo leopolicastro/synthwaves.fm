@@ -11,6 +11,7 @@ class Track < ApplicationRecord
 
   scope :music, -> { joins(:artist).merge(Artist.music) }
   scope :podcast, -> { joins(:artist).merge(Artist.podcast) }
+  scope :streamable, -> { where(youtube_video_id: nil) }
 
   ALBUM_SORT_OPTIONS = {
     "disc_number" => "Track Number",

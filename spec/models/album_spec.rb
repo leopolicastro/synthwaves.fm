@@ -34,6 +34,36 @@ RSpec.describe Album, type: :model do
     end
   end
 
+  describe ".with_streamable_tracks" do
+    it "includes albums that have at least one streamable track" do
+      album = create(:album)
+      create(:track, album: album, artist: album.artist)
+
+      expect(Album.with_streamable_tracks).to include(album)
+    end
+
+    it "excludes albums where all tracks are YouTube-only" do
+      album = create(:album)
+      create(:track, :youtube, album: album, artist: album.artist)
+
+      expect(Album.with_streamable_tracks).not_to include(album)
+    end
+
+    it "includes albums with a mix of streamable and YouTube tracks" do
+      album = create(:album)
+      create(:track, album: album, artist: album.artist)
+      create(:track, :youtube, album: album, artist: album.artist)
+
+      expect(Album.with_streamable_tracks).to include(album)
+    end
+
+    it "excludes albums with no tracks" do
+      album = create(:album)
+
+      expect(Album.with_streamable_tracks).not_to include(album)
+    end
+  end
+
   describe "category scopes" do
     let!(:music_album) { create(:album, artist: create(:artist, category: "music")) }
     let!(:podcast_album) { create(:album, artist: create(:artist, :podcast)) }

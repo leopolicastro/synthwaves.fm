@@ -272,4 +272,31 @@ RSpec.describe "Tracks", type: :request do
       expect(response).to have_http_status(:redirect)
     end
   end
+
+  describe "GET /tracks/:id/lyrics" do
+    it "returns lyrics as JSON when present" do
+      track = create(:track, :with_lyrics)
+      get lyrics_track_path(track), as: :json
+      expect(response).to have_http_status(:ok)
+      json = JSON.parse(response.body)
+      expect(json["lyrics"]).to include("Verse 1")
+    end
+
+    it "returns null lyrics when track has no lyrics" do
+      track = create(:track)
+      get lyrics_track_path(track), as: :json
+      expect(response).to have_http_status(:ok)
+      json = JSON.parse(response.body)
+      expect(json["lyrics"]).to be_nil
+    end
+  end
+
+  describe "PATCH /tracks/:id with lyrics" do
+    let(:track) { create(:track) }
+
+    it "updates lyrics" do
+      patch track_path(track), params: { track: { lyrics: "New lyrics here" } }
+      expect(track.reload.lyrics).to eq("New lyrics here")
+    end
+  end
 end

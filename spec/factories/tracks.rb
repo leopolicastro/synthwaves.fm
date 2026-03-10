@@ -16,5 +16,9 @@ FactoryBot.define do
       file_size { nil }
       bitrate { nil }
     end
+
+    trait :with_lyrics do
+      lyrics { "Verse 1\nSome lyrics here\n\nChorus\nThe chorus goes here" }
+    end
   end
 end

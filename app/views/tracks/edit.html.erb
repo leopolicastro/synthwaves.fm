@@ -28,6 +28,11 @@
     </div>
 
     <div>
+      <%= f.label :lyrics, class: "block text-sm font-medium text-gray-400 mb-1" %>
+      <%= f.text_area :lyrics, rows: 8, class: "w-full rounded-lg bg-gray-800 border-gray-700 text-white focus:outline-neon-cyan font-mono text-sm", placeholder: "Paste lyrics here..." %>
+    </div>
+
+    <div>
       <%= f.submit "Save", class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink cursor-pointer" %>
       <%= link_to "Cancel", track_path(@track), class: "px-4 py-2 text-gray-400 hover:text-neon-cyan" %>
     </div>

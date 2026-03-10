@@ -1,5 +1,5 @@
 class TracksController < ApplicationController
-  before_action :set_track, only: [:show, :edit, :update, :destroy, :stream, :download]
+  before_action :set_track, only: [:show, :edit, :update, :destroy, :stream, :download, :lyrics]
   before_action :require_admin, only: [:edit, :update, :destroy]
 
   def index
@@ -99,6 +99,10 @@ class TracksController < ApplicationController
     redirect_to rails_blob_path(@track.audio_file, disposition: "attachment"), allow_other_host: true
   end
 
+  def lyrics
+    render json: { lyrics: @track.lyrics }
+  end
+
   private
 
   def set_track
@@ -110,7 +114,7 @@ class TracksController < ApplicationController
   end
 
   def track_params
-    params.require(:track).permit(:title, :track_number, :disc_number)
+    params.require(:track).permit(:title, :track_number, :disc_number, :lyrics)
   end
 
   def extract_metadata(uploaded_file, file_format)

@@ -23,6 +23,7 @@ Rails.application.routes.draw do
     member do
       get :stream
       get :download
+      get :lyrics
     end
   end
   resources :downloads, only: [:index, :create, :show] do

@@ -183,6 +183,26 @@
   }
 }
 
+/* Fullscreen now-playing background */
+.fullscreen-np-bg {
+  background:
+    radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--color-neon-purple) 15%, transparent) 0%, transparent 60%),
+    var(--color-gray-900);
+  animation: np-pulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes np-pulse {
+  0% { background-size: 100% 100%; }
+  100% { background-size: 120% 120%; }
+}
+
+/* Album art neon glow */
+.album-art-glow {
+  box-shadow:
+    0 0 30px color-mix(in srgb, var(--color-neon-pink) 30%, transparent),
+    0 0 60px color-mix(in srgb, var(--color-neon-purple) 20%, transparent);
+}
+
 /* Now-playing highlight */
 [data-now-playing="true"] {
   @apply bg-neon-cyan/10;

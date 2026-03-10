@@ -78,6 +78,52 @@
         </div>
       </div>
     </div>
+    <!-- Fullscreen Now Playing overlay -->
+    <div id="fullscreen-now-playing" data-turbo-permanent data-controller="fullscreen-now-playing">
+      <div data-fullscreen-now-playing-target="overlay"
+           class="hidden opacity-0 fixed inset-0 z-[60] transition-opacity duration-300 fullscreen-np-bg flex flex-col items-center justify-center p-8">
+        <button data-action="fullscreen-now-playing#close" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 z-10">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <!-- Album art -->
+        <div data-fullscreen-now-playing-target="albumArt"
+             class="w-64 h-64 sm:w-80 sm:h-80 rounded-lg overflow-hidden crt-screen album-art-glow mb-8">
+          <div class="w-full h-full bg-gray-700 rounded-lg flex items-center justify-center">
+            <svg class="w-16 h-16 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
+          </div>
+        </div>
+        <!-- Track info -->
+        <div class="text-center mb-6">
+          <h2 data-fullscreen-now-playing-target="title" class="text-2xl sm:text-3xl font-bold font-display text-white mb-1"></h2>
+          <p data-fullscreen-now-playing-target="artist" class="text-lg text-gray-400"></p>
+        </div>
+        <!-- Progress bar -->
+        <div class="w-full max-w-md mb-4">
+          <div class="h-1.5 bg-gray-700 rounded-full cursor-pointer" data-action="click->fullscreen-now-playing#seek">
+            <div data-fullscreen-now-playing-target="progress" class="h-full bg-gradient-to-r from-neon-pink to-neon-cyan rounded-full transition-all duration-200" style="width: 0%"></div>
+          </div>
+          <div class="flex justify-between mt-1">
+            <span data-fullscreen-now-playing-target="currentTime" class="text-xs text-gray-500 tabular-nums">0:00</span>
+            <span data-fullscreen-now-playing-target="duration" class="text-xs text-gray-500 tabular-nums">0:00</span>
+          </div>
+        </div>
+        <!-- Controls -->
+        <div class="flex items-center gap-6">
+          <button data-action="fullscreen-now-playing#previous" class="text-gray-400 hover:text-white">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z"/></svg>
+          </button>
+          <button data-action="fullscreen-now-playing#togglePlayback" class="w-16 h-16 rounded-full bg-neon-pink text-white flex items-center justify-center hover:shadow-neon-pink transition-shadow">
+            <svg data-fullscreen-now-playing-target="playIcon" class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+            <svg data-fullscreen-now-playing-target="pauseIcon" class="w-8 h-8 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M5.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75A.75.75 0 007.25 3h-1.5zM12.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75a.75.75 0 00-.75-.75h-1.5z"/></svg>
+          </button>
+          <button data-action="fullscreen-now-playing#next" class="text-gray-400 hover:text-white">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M11.555 5.168A1 1 0 0010 6v2.798l-5.445-3.63A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4z"/></svg>
+          </button>
+        </div>
+        <!-- Lyrics area placeholder -->
+        <div data-fullscreen-now-playing-target="lyrics" class="mt-8 w-full max-w-md text-center text-gray-500 text-sm max-h-32 overflow-y-auto"></div>
+      </div>
+    </div>
     <!-- Persistent player bar -->
     <div id="player-bar" class="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-neon-cyan/20 shadow-neon-cyan z-50"
          data-turbo-permanent
@@ -176,6 +222,12 @@
                 <button data-action="player#setCrossfade" data-duration="12" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">12s</button>
               </div>
             </div>
+            <!-- Fullscreen now playing toggle -->
+            <button data-action="click->fullscreen-now-playing#toggle" class="text-gray-500 hover:text-neon-cyan p-1" title="Now Playing">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+              </svg>
+            </button>
             <!-- Visualizer toggle -->
             <button data-action="player#toggleVisualizer" class="text-gray-500 hover:text-neon-cyan p-1" title="Visualizer">
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">

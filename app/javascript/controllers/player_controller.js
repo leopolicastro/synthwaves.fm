@@ -132,9 +132,11 @@ export default class extends Controller {
     try {
       const track = JSON.parse(savedTrack)
       this.currentTrackId = track.trackId
+      this.currentCoverUrl = track.coverUrl || null
       this.titleTarget.textContent = track.title || "Not playing"
       this.artistTarget.textContent = track.artist || ""
       this.currentIsLive = track.isLive || false
+      this._updateArtwork(track.coverUrl)
 
       if (this.currentIsLive) {
         this.showLiveMode()
@@ -160,13 +162,12 @@ export default class extends Controller {
         }
       }
 
-      this.dispatchNowPlaying(track.trackId)
+      this.dispatchNowPlaying({ trackId: track.trackId, title: track.title, artist: track.artist, coverUrl: track.coverUrl })
 
       if ("mediaSession" in navigator && track.title) {
-        navigator.mediaSession.metadata = new MediaMetadata({
-          title: track.title,
-          artist: track.isLive ? "Live" : (track.artist || "")
-        })
+        const metadata = { title: track.title, artist: track.isLive ? "Live" : (track.artist || "") }
+        if (track.coverUrl) metadata.artwork = [{ src: track.coverUrl }]
+        navigator.mediaSession.metadata = new MediaMetadata(metadata)
       }
     } catch (e) {
       // Ignore invalid saved data
@@ -216,7 +217,7 @@ export default class extends Controller {
 
   // Playback
 
-  playTrack({ trackId, title, artist, streamUrl, isLive }) {
+  playTrack({ trackId, title, artist, streamUrl, isLive, coverUrl }) {
     if (this.youtubeActive) {
       document.dispatchEvent(new CustomEvent("youtube:stop"))
       this.youtubeActive = false
@@ -225,9 +226,11 @@ export default class extends Controller {
 
     this.currentIsLive = isLive || false
     this.currentTrackId = trackId
+    this.currentCoverUrl = coverUrl || null
     this._currentYouTubeVideoId = null
     this.titleTarget.textContent = title
     this.artistTarget.textContent = isLive ? "Live" : artist
+    this._updateArtwork(coverUrl)
 
     if (this.currentIsLive) {
       this.showLiveMode()
@@ -235,8 +238,8 @@ export default class extends Controller {
       this.showNormalMode()
     }
 
-    this.saveCurrentTrack({ trackId, title, artist, streamUrl, isLive: isLive || false })
-    this.dispatchNowPlaying(trackId)
+    this.saveCurrentTrack({ trackId, title, artist, streamUrl, isLive: isLive || false, coverUrl: coverUrl || null })
+    this.dispatchNowPlaying({ trackId, title, artist, coverUrl })
 
     // If casting, send to cast device instead of local audio
     if (this.castActive) {
@@ -251,10 +254,9 @@ export default class extends Controller {
     this.startPositionSave()
 
     if ("mediaSession" in navigator) {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title,
-        artist: isLive ? "Live" : artist
-      })
+      const metadata = { title, artist: isLive ? "Live" : artist }
+      if (coverUrl) metadata.artwork = [{ src: coverUrl }]
+      navigator.mediaSession.metadata = new MediaMetadata(metadata)
     }
 
     if (!isLive) {
@@ -262,18 +264,20 @@ export default class extends Controller {
     }
   }
 
-  playYouTube({ trackId, title, artist, youtubeVideoId, isLive }) {
+  playYouTube({ trackId, title, artist, youtubeVideoId, isLive, coverUrl }) {
     this.audio.pause()
     this.audio.removeAttribute("src")
 
     this.youtubeActive = true
     this.currentIsLive = isLive || false
     this.currentTrackId = trackId
+    this.currentCoverUrl = coverUrl || null
     this._currentYouTubeVideoId = youtubeVideoId
     this.youtubeCurrentTime = 0
     this.youtubeDuration = 0
     this.titleTarget.textContent = title
     this.artistTarget.textContent = artist
+    this._updateArtwork(coverUrl)
 
     if (this.currentIsLive) {
       this.showLiveMode()
@@ -285,15 +289,14 @@ export default class extends Controller {
       detail: { videoId: youtubeVideoId, isLive: this.currentIsLive }
     }))
 
-    this.saveCurrentTrack({ trackId, title, artist, youtubeVideoId, isLive: isLive || false })
+    this.saveCurrentTrack({ trackId, title, artist, youtubeVideoId, isLive: isLive || false, coverUrl: coverUrl || null })
     this.startPositionSave()
-    this.dispatchNowPlaying(trackId)
+    this.dispatchNowPlaying({ trackId, title, artist, coverUrl })
 
     if ("mediaSession" in navigator) {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title,
-        artist: isLive ? "Live" : artist
-      })
+      const metadata = { title, artist: isLive ? "Live" : artist }
+      if (coverUrl) metadata.artwork = [{ src: coverUrl }]
+      navigator.mediaSession.metadata = new MediaMetadata(metadata)
     }
 
     if (!isLive && trackId) {
@@ -395,10 +398,19 @@ export default class extends Controller {
 
   // Now playing
 
-  dispatchNowPlaying(trackId) {
+  dispatchNowPlaying({ trackId, title, artist, coverUrl }) {
     document.dispatchEvent(new CustomEvent("player:nowPlaying", {
-      detail: { trackId }
+      detail: { trackId, title, artist, coverUrl }
     }))
+  }
+
+  _updateArtwork(coverUrl) {
+    if (!this.hasArtworkTarget) return
+    if (coverUrl) {
+      this.artworkTarget.innerHTML = `<img src="${coverUrl}" class="w-10 h-10 rounded object-cover" alt="">`
+    } else {
+      this.artworkTarget.innerHTML = '<svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>'
+    }
   }
 
   // Local audio events

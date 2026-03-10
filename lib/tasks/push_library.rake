@@ -1,13 +1,16 @@
 namespace :library do
   desc "Push local music files to a remote synthwaves.fm instance"
-  task :push do
+  task push: :environment do
     require "net/http"
     require "uri"
     require "json"
 
-    remote_url = ENV.fetch("GROOVY_REMOTE_URL") { abort "GROOVY_REMOTE_URL is required" }
-    client_id = ENV.fetch("GROOVY_CLIENT_ID") { abort "GROOVY_CLIENT_ID is required" }
-    secret_key = ENV.fetch("GROOVY_SECRET_KEY") { abort "GROOVY_SECRET_KEY is required" }
+    groovy = Rails.application.credentials.groovy
+    abort "groovy credentials not configured" unless groovy
+
+    remote_url = groovy[:url] || abort("groovy.url is required in credentials")
+    client_id = groovy[:client_id] || abort("groovy.client_id is required in credentials")
+    secret_key = groovy[:secret_key] || abort("groovy.secret_key is required in credentials")
     music_path = ENV.fetch("MUSIC_PATH", "/Volumes/music")
 
     token = authenticate(remote_url, client_id, secret_key)

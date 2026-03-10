@@ -1,6 +1,6 @@
 namespace :videos do
   desc "Encode (if needed) and push a video to a remote synthwaves.fm instance via S3 direct upload"
-  task :push do
+  task push: :environment do
     require "net/http"
     require "uri"
     require "json"
@@ -8,79 +8,124 @@ namespace :videos do
     require "base64"
     require "open3"
 
-    remote_url = ENV.fetch("GROOVY_REMOTE_URL") { abort "GROOVY_REMOTE_URL is required" }
-    client_id = ENV.fetch("GROOVY_CLIENT_ID") { abort "GROOVY_CLIENT_ID is required" }
-    secret_key = ENV.fetch("GROOVY_SECRET_KEY") { abort "GROOVY_SECRET_KEY is required" }
-    video_path = ENV.fetch("VIDEO") { abort "VIDEO is required (path to video file)" }
+    groovy = Rails.application.credentials.groovy
+    abort "groovy credentials not configured" unless groovy
 
-    abort "File not found: #{video_path}" unless File.exist?(video_path)
+    remote_url = groovy[:url] || abort("groovy.url is required in credentials")
+    client_id = groovy[:client_id] || abort("groovy.client_id is required in credentials")
+    secret_key = groovy[:secret_key] || abort("groovy.secret_key is required in credentials")
+    input_path = ENV.fetch("VIDEO") { abort "VIDEO is required (path to video file or directory)" }
+    abort "Not found: #{input_path}" unless File.exist?(input_path)
 
-    title = ENV.fetch("TITLE", File.basename(video_path, File.extname(video_path)))
     folder_name = ENV["FOLDER"]
-    season_number = ENV["SEASON"]
-    episode_number = ENV["EPISODE"]
+    video_extensions = %w[mp4 mkv avi mov m4v wmv flv webm ts]
 
-    # 1. Probe input
-    puts "Probing #{File.basename(video_path)}..."
-    probe = probe_video(video_path)
-    strategy = encoding_strategy(probe, video_path)
-    puts "  Video: #{probe[:video_codec]}, Audio: #{probe[:audio_codec]}, Container: #{probe[:container]}"
-    puts "  Strategy: #{strategy}"
-
-    # 2. Encode if needed
-    upload_path = video_path
-    temp_file = nil
-
-    case strategy
-    when :remux
-      temp_file = "#{video_path}.remuxed.mp4"
-      puts "Remuxing to MP4 with faststart..."
-      remux(video_path, temp_file)
-      upload_path = temp_file
-    when :full
-      temp_file = "#{video_path}.encoded.mp4"
-      puts "Encoding with h264_videotoolbox..."
-      encode(video_path, temp_file)
-      upload_path = temp_file
+    # Collect video files — single file or recursive directory scan
+    if File.directory?(input_path)
+      pattern = File.join(input_path, "**", "*.{#{video_extensions.join(",")}}")
+      video_files = Dir.glob(pattern).sort
+      abort "No video files found in #{input_path}" if video_files.empty?
+      puts "Found #{video_files.size} video files in #{input_path}"
     else
-      puts "Already H264+AAC+MP4 — uploading original"
+      video_files = [input_path]
     end
 
-    # 3. Authenticate
+    # Authenticate and re-authenticate before token expires
     puts "Authenticating..."
     token = authenticate(remote_url, client_id, secret_key)
+    token_issued_at = Time.now
 
-    # 4. Create blob via API
-    file_size = File.size(upload_path)
-    checksum = Digest::MD5.file(upload_path).base64digest
-    filename = "#{File.basename(video_path, File.extname(video_path))}.mp4"
+    uploaded = 0
+    failed = 0
 
-    puts "Creating blob (#{(file_size / 1024.0 / 1024.0).round(1)} MB)..."
-    blob_response = create_blob(remote_url, token, filename, file_size, checksum)
+    video_files.each_with_index do |video_path, index|
+      temp_file = nil
+      label = video_files.size > 1 ? "[#{index + 1}/#{video_files.size}] " : ""
 
-    signed_id = blob_response["signed_id"]
-    upload_url = blob_response.dig("direct_upload", "url")
-    upload_headers = blob_response.dig("direct_upload", "headers")
+      begin
+        # Re-authenticate if token is older than 50 minutes
+        if Time.now - token_issued_at > 3000
+          puts "  Refreshing token..."
+          token = authenticate(remote_url, client_id, secret_key)
+          token_issued_at = Time.now
+        end
 
-    # 5. Upload to S3
-    puts "Uploading to S3..."
-    upload_to_s3(upload_url, upload_headers, upload_path)
-    puts "  Upload complete"
+        title = ENV.fetch("TITLE", File.basename(video_path, File.extname(video_path)))
+        season_number = ENV["SEASON"]
+        episode_number = ENV["EPISODE"]
 
-    # 6. Create video record
-    puts "Creating video record..."
-    video = create_video(remote_url, token, signed_id, title, folder_name, season_number, episode_number)
-    puts "  Created: \"#{video["title"]}\" (id: #{video["id"]}, status: #{video["status"]})"
-    puts "  Folder: #{video["folder"]}" if video["folder"]
+        # 1. Probe input
+        puts "#{label}Probing #{File.basename(video_path)}..."
+        probe = probe_video(video_path)
+        strategy = encoding_strategy(probe, video_path)
+        puts "  Video: #{probe[:video_codec]}, Audio: #{probe[:audio_codec]}, Container: #{probe[:container]}"
+        puts "  Strategy: #{strategy}"
+
+        # 2. Encode if needed
+        upload_path = video_path
+
+        case strategy
+        when :remux
+          temp_file = "#{video_path}.remuxed.mp4"
+          puts "  Remuxing to MP4 with faststart..."
+          remux(video_path, temp_file)
+          upload_path = temp_file
+        when :full
+          temp_file = "#{video_path}.encoded.mp4"
+          puts "  Encoding with h264_videotoolbox..."
+          encode(video_path, temp_file)
+          upload_path = temp_file
+        else
+          puts "  Already H264+AAC+MP4 — uploading original"
+        end
+
+        # 3. Create blob via API
+        file_size = File.size(upload_path)
+        checksum = Digest::MD5.file(upload_path).base64digest
+        filename = "#{File.basename(video_path, File.extname(video_path))}.mp4"
+
+        puts "  Creating blob (#{(file_size / 1024.0 / 1024.0).round(1)} MB)..."
+        blob_response = create_blob(remote_url, token, filename, file_size, checksum)
+
+        signed_id = blob_response["signed_id"]
+        upload_url = blob_response.dig("direct_upload", "url")
+        upload_headers = blob_response.dig("direct_upload", "headers")
+
+        # 4. Upload to S3
+        puts "  Uploading to S3..."
+        upload_to_s3(upload_url, upload_headers, upload_path)
+        puts "  Upload complete"
+
+        # 5. Create video record
+        puts "  Creating video record..."
+        video = create_video(remote_url, token, signed_id, title, folder_name, season_number, episode_number)
+        puts "  Created: \"#{video["title"]}\" (id: #{video["id"]}, status: #{video["status"]})"
+
+        # 6. Move original to _uploaded on the volume root
+        volume_root = if video_path.start_with?("/Volumes/")
+          File.join("/Volumes", video_path.split("/")[2])
+        else
+          File.dirname(video_path)
+        end
+        uploaded_dir = File.join(volume_root, "_uploaded")
+        FileUtils.mkdir_p(uploaded_dir)
+        dest = File.join(uploaded_dir, File.basename(video_path))
+        FileUtils.mv(video_path, dest)
+        puts "  Moved to #{dest}"
+
+        uploaded += 1
+      rescue => e
+        puts "  ERROR: #{e.message}"
+        failed += 1
+      ensure
+        if temp_file && File.exist?(temp_file)
+          FileUtils.rm_f(temp_file)
+        end
+      end
+    end
 
     puts
-    puts "Done! Video will be processed server-side (thumbnail + metadata)."
-  ensure
-    # 7. Clean up temp file
-    if temp_file && File.exist?(temp_file)
-      FileUtils.rm_f(temp_file)
-      puts "Cleaned up temp file"
-    end
+    puts "Done! #{uploaded} uploaded, #{failed} failed."
   end
 end
 

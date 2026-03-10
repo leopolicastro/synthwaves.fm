@@ -1,3 +1,5 @@
+require_relative "remote_api"
+
 namespace :playlists do
   desc "Push cliamp playlists to a remote synthwaves.fm instance"
   task :push do
@@ -10,7 +12,7 @@ namespace :playlists do
     secret_key = ENV.fetch("GROOVY_SECRET_KEY") { abort "GROOVY_SECRET_KEY is required" }
     playlists_path = ENV.fetch("CLIAMP_PLAYLISTS_PATH", File.expand_path("~/.config/cliamp/playlists"))
 
-    token = authenticate(remote_url, client_id, secret_key)
+    token = RemoteAPI.authenticate(remote_url, client_id, secret_key)
 
     files = Dir.glob(File.join(playlists_path, "*.toml")).sort
 
@@ -107,26 +109,4 @@ def parse_toml_playlist(path)
   end
   tracks << current if current
   tracks
-end
-
-def authenticate(remote_url, client_id, secret_key)
-  uri = URI.parse("#{remote_url}/api/v1/auth/token")
-  http = Net::HTTP.new(uri.host, uri.port)
-  http.use_ssl = uri.scheme == "https"
-  http.open_timeout = 15
-  http.read_timeout = 15
-
-  request = Net::HTTP::Post.new(uri.request_uri)
-  request["Content-Type"] = "application/json"
-  request.body = JSON.generate(client_id: client_id, secret_key: secret_key)
-
-  response = http.request(request)
-  json = JSON.parse(response.body)
-
-  unless response.code.to_i == 200 && json["token"]
-    abort "Authentication failed: #{json["error"] || response.body}"
-  end
-
-  puts "Authenticated successfully"
-  json["token"]
 end

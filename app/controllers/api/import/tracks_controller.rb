@@ -1,15 +1,58 @@
 class API::Import::TracksController < API::Import::BaseController
   def create
-    uploaded_file = params[:audio_file]
-
-    if uploaded_file.blank?
-      render json: { error: "audio_file is required" }, status: :unprocessable_entity
-      return
+    if params[:signed_blob_id].present?
+      create_from_direct_upload
+    elsif params[:audio_file].present?
+      create_from_multipart
+    else
+      render json: { error: "audio_file or signed_blob_id is required" }, status: :unprocessable_entity
     end
+  end
 
+  private
+
+  def create_from_multipart
+    uploaded_file = params[:audio_file]
     file_format = uploaded_file.original_filename[/\.\w+$/]&.delete(".")
     metadata = extract_metadata(uploaded_file)
 
+    create_track(
+      metadata: metadata,
+      file_format: file_format,
+      file_size: uploaded_file.size,
+      fallback_title: uploaded_file.original_filename.sub(/\.\w+$/, "")
+    ) { |track| track.audio_file.attach(uploaded_file) }
+  end
+
+  def create_from_direct_upload
+    blob = ActiveStorage::Blob.find_signed!(params[:signed_blob_id])
+
+    metadata = {
+      title: params[:title],
+      artist: params[:artist],
+      album: params[:album],
+      year: params[:year]&.to_i,
+      genre: params[:genre],
+      track_number: params[:track_number]&.to_i,
+      disc_number: params[:disc_number]&.to_i,
+      duration: params[:duration]&.to_f,
+      bitrate: params[:bitrate]&.to_i,
+      cover_art: nil
+    }
+
+    if params[:cover_art].present? && params[:cover_art_mime_type].present?
+      metadata[:cover_art] = { data: Base64.decode64(params[:cover_art]), mime_type: params[:cover_art_mime_type] }
+    end
+
+    create_track(
+      metadata: metadata,
+      file_format: params[:file_format],
+      file_size: blob.byte_size,
+      fallback_title: blob.filename.to_s.sub(/\.\w+$/, "")
+    ) { |track| track.audio_file.attach(blob) }
+  end
+
+  def create_track(metadata:, file_format:, file_size:, fallback_title:)
     artist = Artist.find_or_create_by!(name: metadata[:artist] || "Unknown Artist")
     album = Album.find_or_create_by!(title: metadata[:album] || "Unknown Album", artist: artist) do |a|
       a.year = metadata[:year]
@@ -20,15 +63,10 @@ class API::Import::TracksController < API::Import::BaseController
       CoverArtAttachJob.perform_later(album, Base64.strict_encode64(metadata[:cover_art][:data]), metadata[:cover_art][:mime_type])
     end
 
-    title = metadata[:title] || uploaded_file.original_filename.sub(/\.\w+$/, "")
+    title = metadata[:title] || fallback_title
     track_number = metadata[:track_number]
 
-    existing = Track.find_by(
-      title: title,
-      album: album,
-      artist: artist,
-      track_number: track_number
-    )
+    existing = Track.find_by(title: title, album: album, artist: artist, track_number: track_number)
 
     if existing&.audio_file&.attached?
       render json: {
@@ -52,11 +90,11 @@ class API::Import::TracksController < API::Import::BaseController
       duration: metadata[:duration],
       bitrate: metadata[:bitrate],
       file_format: file_format,
-      file_size: uploaded_file.size
+      file_size: file_size
     )
 
     begin
-      track.audio_file.attach(uploaded_file)
+      yield track
     rescue => e
       render json: { error: "Upload failed: #{e.message}" }, status: :service_unavailable
       return
@@ -74,8 +112,6 @@ class API::Import::TracksController < API::Import::BaseController
       render json: { error: track.errors.full_messages.join(", ") }, status: :unprocessable_entity
     end
   end
-
-  private
 
   def extract_metadata(uploaded_file)
     MetadataExtractor.call(uploaded_file.tempfile.path)

@@ -42,7 +42,7 @@ RSpec.describe "API Import Tracks", type: :request do
 
       expect(response).to have_http_status(:unprocessable_entity)
       json = JSON.parse(response.body)
-      expect(json["error"]).to eq("audio_file is required")
+      expect(json["error"]).to eq("audio_file or signed_blob_id is required")
     end
 
     it "returns unauthorized without valid credentials" do

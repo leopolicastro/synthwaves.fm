@@ -1,9 +1,8 @@
+require_relative "remote_api"
+
 namespace :videos do
   desc "Encode (if needed) and push a video to a remote synthwaves.fm instance via S3 direct upload"
   task push: :environment do
-    require "net/http"
-    require "uri"
-    require "json"
     require "digest"
     require "base64"
     require "open3"
@@ -32,7 +31,7 @@ namespace :videos do
 
     # Authenticate and re-authenticate before token expires
     puts "Authenticating..."
-    token = authenticate(remote_url, client_id, secret_key)
+    token = RemoteAPI.authenticate(remote_url, client_id, secret_key)
     token_issued_at = Time.now
 
     uploaded = 0
@@ -46,7 +45,7 @@ namespace :videos do
         # Re-authenticate if token is older than 50 minutes
         if Time.now - token_issued_at > 3000
           puts "  Refreshing token..."
-          token = authenticate(remote_url, client_id, secret_key)
+          token = RemoteAPI.authenticate(remote_url, client_id, secret_key)
           token_issued_at = Time.now
         end
 
@@ -85,7 +84,7 @@ namespace :videos do
         filename = "#{File.basename(video_path, File.extname(video_path))}.mp4"
 
         puts "  Creating blob (#{(file_size / 1024.0 / 1024.0).round(1)} MB)..."
-        blob_response = create_blob(remote_url, token, filename, file_size, checksum)
+        blob_response = RemoteAPI.create_blob(remote_url, token, filename, file_size, checksum, "video/mp4")
 
         signed_id = blob_response["signed_id"]
         upload_url = blob_response.dig("direct_upload", "url")
@@ -93,12 +92,12 @@ namespace :videos do
 
         # 4. Upload to S3
         puts "  Uploading to S3..."
-        upload_to_s3(upload_url, upload_headers, upload_path)
+        RemoteAPI.upload_to_s3(upload_url, upload_headers, upload_path)
         puts "  Upload complete"
 
         # 5. Create video record
         puts "  Creating video record..."
-        video = create_video(remote_url, token, signed_id, title, folder_name, season_number, episode_number)
+        video = create_video_record(remote_url, token, signed_id, title, folder_name, season_number, episode_number)
         puts "  Created: \"#{video["title"]}\" (id: #{video["id"]}, status: #{video["status"]})"
 
         # 6. Move original to _uploaded on the volume root
@@ -198,76 +197,7 @@ def encode(input, output)
   abort "ffmpeg encode failed" unless success
 end
 
-def authenticate(remote_url, client_id, secret_key)
-  uri = URI.parse("#{remote_url}/api/v1/auth/token")
-  http = Net::HTTP.new(uri.host, uri.port)
-  http.use_ssl = uri.scheme == "https"
-  http.open_timeout = 15
-  http.read_timeout = 15
-
-  request = Net::HTTP::Post.new(uri.request_uri)
-  request["Content-Type"] = "application/json"
-  request.body = JSON.generate(client_id: client_id, secret_key: secret_key)
-
-  response = http.request(request)
-  json = JSON.parse(response.body)
-
-  unless response.code.to_i == 200 && json["token"]
-    abort "Authentication failed: #{json["error"] || response.body}"
-  end
-
-  puts "  Authenticated successfully"
-  json["token"]
-end
-
-def create_blob(remote_url, token, filename, byte_size, checksum)
-  uri = URI.parse("#{remote_url}/api/import/direct_uploads")
-  http = Net::HTTP.new(uri.host, uri.port)
-  http.use_ssl = uri.scheme == "https"
-  http.open_timeout = 15
-  http.read_timeout = 30
-
-  request = Net::HTTP::Post.new(uri.request_uri)
-  request["Content-Type"] = "application/json"
-  request["Authorization"] = "Bearer #{token}"
-  request.body = JSON.generate(
-    filename: filename,
-    byte_size: byte_size,
-    checksum: checksum,
-    content_type: "video/mp4"
-  )
-
-  response = http.request(request)
-
-  unless response.code.to_i == 201
-    abort "Blob creation failed (#{response.code}): #{response.body}"
-  end
-
-  JSON.parse(response.body)
-end
-
-def upload_to_s3(url, headers, file_path)
-  uri = URI.parse(url)
-  http = Net::HTTP.new(uri.host, uri.port)
-  http.use_ssl = uri.scheme == "https"
-  http.open_timeout = 30
-  http.read_timeout = 600
-
-  request = Net::HTTP::Put.new(uri.request_uri)
-  headers&.each { |key, value| request[key] = value }
-
-  File.open(file_path, "rb") do |file|
-    request.body_stream = file
-    request["Content-Length"] = File.size(file_path).to_s
-    response = http.request(request)
-
-    unless response.code.to_i.between?(200, 299)
-      abort "S3 upload failed (#{response.code}): #{response.body}"
-    end
-  end
-end
-
-def create_video(remote_url, token, signed_blob_id, title, folder_name, season_number, episode_number)
+def create_video_record(remote_url, token, signed_blob_id, title, folder_name, season_number, episode_number)
   uri = URI.parse("#{remote_url}/api/import/videos")
   http = Net::HTTP.new(uri.host, uri.port)
   http.use_ssl = uri.scheme == "https"

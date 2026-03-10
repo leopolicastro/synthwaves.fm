@@ -270,14 +270,14 @@ export default class extends Controller {
       document.dispatchEvent(new CustomEvent("cast:loadMedia", {
         detail: { streamUrl, title, artist }
       }))
+      document.dispatchEvent(new CustomEvent("player:sourceChanged", {
+        detail: { streamUrl }
+      }))
     } else {
-      this.audio.src = streamUrl
-      this.audio.play()
+      // Resolve the redirect to get the direct URL (e.g. presigned S3 URL)
+      // so AirPlay sends the resolved URL to the Apple TV, not the app URL
+      this._resolveAndPlay(streamUrl)
     }
-
-    document.dispatchEvent(new CustomEvent("player:sourceChanged", {
-      detail: { streamUrl }
-    }))
 
     this.startPositionSave()
 
@@ -597,6 +597,25 @@ export default class extends Controller {
     } else {
       this.playIconTarget.classList.add("hidden")
       this.pauseIconTarget.classList.remove("hidden")
+    }
+  }
+
+  async _resolveAndPlay(streamUrl) {
+    try {
+      const response = await fetch(streamUrl, { method: "HEAD" })
+      const resolvedUrl = response.url
+      this.audio.src = resolvedUrl
+      this.audio.play()
+      document.dispatchEvent(new CustomEvent("player:sourceChanged", {
+        detail: { streamUrl: resolvedUrl }
+      }))
+    } catch (e) {
+      // Fall back to original URL if resolve fails
+      this.audio.src = streamUrl
+      this.audio.play()
+      document.dispatchEvent(new CustomEvent("player:sourceChanged", {
+        detail: { streamUrl }
+      }))
     }
   }
 

@@ -26,9 +26,9 @@ export default class extends Controller {
       this.audio.addEventListener("play", () => {
         this.updatePlayPauseIcon()
         this.startPositionSave()
-        if (this.audio._audioContext && this.audio._audioContext.state === "suspended") {
-          this.audio._audioContext.resume()
-        }
+      })
+      this.audio.addEventListener("error", (e) => {
+        console.warn("Audio error:", this.audio.error?.message, this.audio.error?.code)
       })
       this.audio.addEventListener("pause", () => {
         this.updatePlayPauseIcon()
@@ -56,9 +56,11 @@ export default class extends Controller {
     document.addEventListener("youtube:timeUpdate", this.youtubeTimeHandler)
     document.addEventListener("youtube:stopped", this.youtubeStoppedHandler)
     this.castStateHandler = (e) => this.onCastStateChanged(e.detail)
+    this.airplayStateHandler = (e) => this.onAirplayStateChanged(e.detail)
     document.addEventListener("queue:repeatChanged", this.repeatChangedHandler)
     document.addEventListener("queue:shuffleChanged", this.shuffleChangedHandler)
     document.addEventListener("cast:stateChanged", this.castStateHandler)
+    document.addEventListener("airplay:stateChanged", this.airplayStateHandler)
     document.addEventListener("queue:nextTrackInfo", this.nextTrackInfoHandler)
     document.addEventListener("player:seekForward", this.seekForwardHandler)
     document.addEventListener("player:seekBackward", this.seekBackwardHandler)
@@ -86,6 +88,7 @@ export default class extends Controller {
     document.removeEventListener("queue:repeatChanged", this.repeatChangedHandler)
     document.removeEventListener("queue:shuffleChanged", this.shuffleChangedHandler)
     document.removeEventListener("cast:stateChanged", this.castStateHandler)
+    document.removeEventListener("airplay:stateChanged", this.airplayStateHandler)
     document.removeEventListener("queue:nextTrackInfo", this.nextTrackInfoHandler)
     document.removeEventListener("player:seekForward", this.seekForwardHandler)
     document.removeEventListener("player:seekBackward", this.seekBackwardHandler)
@@ -230,6 +233,10 @@ export default class extends Controller {
     }
   }
 
+  onAirplayStateChanged({ active }) {
+    this.airplayActive = active
+  }
+
   // Playback
 
   playTrack({ trackId, title, artist, streamUrl, isLive, coverUrl, isPodcast }) {
@@ -267,6 +274,10 @@ export default class extends Controller {
       this.audio.src = streamUrl
       this.audio.play()
     }
+
+    document.dispatchEvent(new CustomEvent("player:sourceChanged", {
+      detail: { streamUrl }
+    }))
 
     this.startPositionSave()
 
@@ -664,6 +675,10 @@ export default class extends Controller {
         })
 
         this._crossfading = false
+
+        document.dispatchEvent(new CustomEvent("player:sourceChanged", {
+          detail: { streamUrl: preload.src }
+        }))
         // Trigger queue advance (without playing since we already started)
         document.dispatchEvent(new CustomEvent("queue:next"))
       }

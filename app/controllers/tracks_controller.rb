@@ -84,7 +84,11 @@ class TracksController < ApplicationController
     if @track.youtube?
       head :not_found
     elsif @track.audio_file.attached?
-      redirect_to rails_storage_proxy_url(@track.audio_file)
+      if params[:proxy].present? || !cloud_storage?
+        redirect_to rails_storage_proxy_url(@track.audio_file)
+      else
+        redirect_to @track.audio_file.url(expires_in: 4.hours), allow_other_host: true
+      end
     else
       head :not_found
     end
@@ -116,6 +120,10 @@ class TracksController < ApplicationController
 
   def track_params
     params.require(:track).permit(:title, :track_number, :disc_number, :lyrics)
+  end
+
+  def cloud_storage?
+    !ActiveStorage::Blob.service.is_a?(ActiveStorage::Service::DiskService)
   end
 
   def extract_metadata(uploaded_file, file_format)

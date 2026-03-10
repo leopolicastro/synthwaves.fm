@@ -8,6 +8,7 @@ export default class extends Controller {
     if (!this.audio) return
 
     this._visible = false
+    this._airplayActive = false
     this._readThemeColors()
 
     this._onPlay = () => this._setActive(true)
@@ -29,6 +30,12 @@ export default class extends Controller {
     this._visibilityHandler = (e) => this._onVisibilityChanged(e.detail)
     document.addEventListener("visualizer-panel:visibilityChanged", this._visibilityHandler)
 
+    this._sourceChangedHandler = (e) => this._onSourceChanged(e.detail)
+    document.addEventListener("player:sourceChanged", this._sourceChangedHandler)
+
+    this._airplayHandler = (e) => this._onAirplayStateChanged(e.detail)
+    document.addEventListener("airplay:stateChanged", this._airplayHandler)
+
     this._setActive(!this.audio.paused && !!this.audio.src)
   }
 
@@ -36,6 +43,7 @@ export default class extends Controller {
     if (this._frameId) cancelAnimationFrame(this._frameId)
     if (this._resizeObserver) this._resizeObserver.disconnect()
     if (this._themeObserver) this._themeObserver.disconnect()
+    if (this._syncInterval) clearInterval(this._syncInterval)
 
     if (this.audio) {
       this.audio.removeEventListener("play", this._onPlay)
@@ -43,40 +51,151 @@ export default class extends Controller {
     }
 
     document.removeEventListener("visualizer-panel:visibilityChanged", this._visibilityHandler)
+    document.removeEventListener("player:sourceChanged", this._sourceChangedHandler)
+    document.removeEventListener("airplay:stateChanged", this._airplayHandler)
+
+    this._teardownShadow()
   }
 
   // Private
 
+  _onAirplayStateChanged({ active }) {
+    this._airplayActive = active
+    if (active && this._visible) {
+      // Close visualizer when AirPlay becomes active
+      document.dispatchEvent(new CustomEvent("visualizer-panel:close"))
+    }
+  }
+
   _onVisibilityChanged({ visible }) {
     this._visible = visible
     if (visible) {
+      if (this._airplayActive) {
+        this._showStatus("Visualizer unavailable during AirPlay")
+        return
+      }
       this._initAudioNodes()
       this._setupCanvas()
       this._animate()
+      this._startSync()
     } else {
       if (this._frameId) {
         cancelAnimationFrame(this._frameId)
         this._frameId = null
       }
+      this._stopSync()
+      this._pauseShadow()
     }
   }
 
+  _onSourceChanged({ streamUrl }) {
+    if (!this._visible || !this._shadowAudio) return
+    this._updateShadowSrc(streamUrl)
+  }
+
   _initAudioNodes() {
-    if (this.audio._audioContext && this.audio._analyser) return
+    if (this._audioContext && this._analyser) return
 
     try {
+      const shadow = this._ensureShadowAudio()
+      this._updateShadowSrc(this.audio.src)
+
       const ctx = new (window.AudioContext || window.webkitAudioContext)()
-      const source = ctx.createMediaElementSource(this.audio)
+      const source = ctx.createMediaElementSource(shadow)
       const analyser = ctx.createAnalyser()
       analyser.fftSize = 256
       source.connect(analyser)
       analyser.connect(ctx.destination)
 
-      this.audio._audioContext = ctx
-      this.audio._sourceNode = source
-      this.audio._analyser = analyser
+      this._audioContext = ctx
+      this._sourceNode = source
+      this._analyser = analyser
     } catch (e) {
       console.warn("Visualizer: could not init Web Audio nodes", e)
+    }
+  }
+
+  _ensureShadowAudio() {
+    let shadow = document.getElementById("persistent-audio-visualizer")
+    if (!shadow) {
+      shadow = document.createElement("audio")
+      shadow.id = "persistent-audio-visualizer"
+      shadow.crossOrigin = "anonymous"
+      shadow.preload = "auto"
+      shadow.volume = 0
+      document.documentElement.appendChild(shadow)
+    }
+    this._shadowAudio = shadow
+    return shadow
+  }
+
+  _updateShadowSrc(streamUrl) {
+    if (!this._shadowAudio || !streamUrl) return
+    // Use proxy URL for same-origin access (Web Audio API requires CORS)
+    const proxyUrl = streamUrl.includes("?") ? `${streamUrl}&proxy=1` : `${streamUrl}?proxy=1`
+    if (this._shadowAudio.src !== proxyUrl) {
+      this._shadowAudio.src = proxyUrl
+      this._shadowAudio.load()
+    }
+    // Sync playback state
+    if (!this.audio.paused) {
+      this._shadowAudio.currentTime = this.audio.currentTime
+      this._shadowAudio.play().catch(() => {})
+    }
+  }
+
+  _startSync() {
+    this._stopSync()
+    this._syncInterval = setInterval(() => {
+      if (!this._shadowAudio || !this.audio) return
+
+      // Mirror play/pause
+      if (!this.audio.paused && this._shadowAudio.paused) {
+        this._shadowAudio.play().catch(() => {})
+      } else if (this.audio.paused && !this._shadowAudio.paused) {
+        this._shadowAudio.pause()
+      }
+
+      // Sync time if drifted
+      if (!this.audio.paused && Math.abs(this.audio.currentTime - this._shadowAudio.currentTime) > 0.5) {
+        this._shadowAudio.currentTime = this.audio.currentTime
+      }
+    }, 1000)
+  }
+
+  _stopSync() {
+    if (this._syncInterval) {
+      clearInterval(this._syncInterval)
+      this._syncInterval = null
+    }
+  }
+
+  _pauseShadow() {
+    if (this._shadowAudio) {
+      this._shadowAudio.pause()
+      this._shadowAudio.removeAttribute("src")
+      this._shadowAudio.load()
+    }
+  }
+
+  _teardownShadow() {
+    this._stopSync()
+    if (this._shadowAudio) {
+      this._shadowAudio.pause()
+      this._shadowAudio.removeAttribute("src")
+    }
+    if (this._audioContext) {
+      this._audioContext.close().catch(() => {})
+      this._audioContext = null
+      this._analyser = null
+      this._sourceNode = null
+    }
+  }
+
+  _showStatus(message) {
+    if (this.hasStatusTarget) {
+      this.statusTarget.textContent = message
+      this.statusTarget.classList.remove("hidden")
     }
   }
 
@@ -114,7 +233,7 @@ export default class extends Controller {
     const ctx = canvas.getContext("2d")
     const w = canvas.width
     const h = canvas.height
-    const analyser = this.audio._analyser
+    const analyser = this._analyser
 
     ctx.clearRect(0, 0, w, h)
 

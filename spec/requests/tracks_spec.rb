@@ -262,14 +262,37 @@ RSpec.describe "Tracks", type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
-    it "redirects when audio file is attached" do
-      track.audio_file.attach(
-        io: File.open(Rails.root.join("spec/fixtures/files/test.mp3")),
-        filename: "test.mp3",
-        content_type: "audio/mpeg"
-      )
-      get stream_track_path(track)
-      expect(response).to have_http_status(:redirect)
+    context "when audio file is attached" do
+      before do
+        track.audio_file.attach(
+          io: File.open(Rails.root.join("spec/fixtures/files/test.mp3")),
+          filename: "test.mp3",
+          content_type: "audio/mpeg"
+        )
+      end
+
+      it "redirects to proxy URL with disk storage" do
+        get stream_track_path(track)
+        expect(response).to have_http_status(:redirect)
+        expect(response.location).to include("rails/active_storage")
+      end
+
+      it "redirects to proxy URL when proxy param is present" do
+        get stream_track_path(track, proxy: "1")
+        expect(response).to have_http_status(:redirect)
+        expect(response.location).to include("rails/active_storage")
+      end
+
+      it "redirects to direct URL with cloud storage" do
+        s3_url = "https://bucket.s3.amazonaws.com/test.mp3?signed=1"
+        allow(ActiveStorage::Blob.service).to receive(:is_a?)
+          .with(ActiveStorage::Service::DiskService).and_return(false)
+        allow_any_instance_of(ActiveStorage::Blob).to receive(:url).and_return(s3_url)
+
+        get stream_track_path(track)
+        expect(response).to have_http_status(:redirect)
+        expect(response.location).to eq(s3_url)
+      end
     end
   end
 

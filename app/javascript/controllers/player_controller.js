@@ -486,6 +486,11 @@ export default class extends Controller {
 
   onLoadedMetadata() {
     if (this.youtubeActive || this.currentIsLive) return
+    if (!isFinite(this.audio.duration)) {
+      this.currentIsLive = true
+      this.showLiveMode()
+      return
+    }
     this.durationTarget.textContent = this.formatTime(this.audio.duration)
   }
 
@@ -703,7 +708,7 @@ export default class extends Controller {
   }
 
   formatTime(seconds) {
-    if (!seconds || isNaN(seconds)) return "0:00"
+    if (!seconds || isNaN(seconds) || !isFinite(seconds)) return "0:00"
     const mins = Math.floor(seconds / 60)
     const secs = Math.floor(seconds % 60)
     return `${mins}:${secs.toString().padStart(2, "0")}`

@@ -43,6 +43,7 @@ export default class extends Controller {
     this.youtubeStoppedHandler = () => this.onYouTubeStopped()
     this.repeatChangedHandler = (e) => this.onRepeatChanged(e.detail)
     this.shuffleChangedHandler = (e) => this.onShuffleChanged(e.detail)
+    this.nextTrackInfoHandler = (e) => this._onNextTrackInfo(e.detail)
 
     document.addEventListener("player:play", this.playTrackHandler)
     document.addEventListener("player:playYouTube", this.playYouTubeHandler)
@@ -53,6 +54,7 @@ export default class extends Controller {
     document.addEventListener("queue:repeatChanged", this.repeatChangedHandler)
     document.addEventListener("queue:shuffleChanged", this.shuffleChangedHandler)
     document.addEventListener("cast:stateChanged", this.castStateHandler)
+    document.addEventListener("queue:nextTrackInfo", this.nextTrackInfoHandler)
 
     if ("mediaSession" in navigator) {
       navigator.mediaSession.setActionHandler("play", () => this.toggle())
@@ -74,6 +76,7 @@ export default class extends Controller {
     document.removeEventListener("queue:repeatChanged", this.repeatChangedHandler)
     document.removeEventListener("queue:shuffleChanged", this.shuffleChangedHandler)
     document.removeEventListener("cast:stateChanged", this.castStateHandler)
+    document.removeEventListener("queue:nextTrackInfo", this.nextTrackInfoHandler)
   }
 
   // Persistent audio element — lives on <html> so Turbo never detaches it
@@ -88,6 +91,21 @@ export default class extends Controller {
       document.documentElement.appendChild(audio)
     }
     return audio
+  }
+
+  _ensurePreloadAudio() {
+    let audio = document.getElementById("persistent-audio-preload")
+    if (!audio) {
+      audio = document.createElement("audio")
+      audio.id = "persistent-audio-preload"
+      audio.preload = "auto"
+      document.documentElement.appendChild(audio)
+    }
+    return audio
+  }
+
+  get crossfadeDuration() {
+    return parseInt(localStorage.getItem("crossfadeDuration") || "0")
   }
 
   // Session restore
@@ -391,6 +409,13 @@ export default class extends Controller {
       const percent = (this.audio.currentTime / this.audio.duration) * 100
       this.progressTarget.style.width = `${percent}%`
       this.currentTimeTarget.textContent = this.formatTime(this.audio.currentTime)
+
+      // Crossfade trigger: start crossfade when remaining time <= crossfade duration
+      const remaining = this.audio.duration - this.audio.currentTime
+      const cfDuration = this.crossfadeDuration
+      if (cfDuration > 0 && remaining <= cfDuration && remaining > 0.5 && !this._crossfading) {
+        this._startCrossfade()
+      }
     }
   }
 
@@ -400,6 +425,7 @@ export default class extends Controller {
   }
 
   onEnded() {
+    if (this._crossfading) return // Crossfade already handling transition
     if (this.repeatMode === "one") {
       this.audio.currentTime = 0
       this.audio.play()
@@ -504,6 +530,80 @@ export default class extends Controller {
         body: JSON.stringify({ track_id: trackId })
       })
     }
+  }
+
+  // Preload and crossfade
+
+  _onNextTrackInfo({ track }) {
+    if (!track || track.youtubeVideoId) {
+      this._pendingPreload = null
+      return
+    }
+    this._pendingPreload = track
+    // Preload next track for gapless/crossfade
+    const preload = this._ensurePreloadAudio()
+    if (preload.src !== track.streamUrl) {
+      preload.src = track.streamUrl
+      preload.load()
+    }
+  }
+
+  _startCrossfade() {
+    if (!this._pendingPreload || this._pendingPreload.youtubeVideoId) return
+    if (this.repeatMode === "one") return
+
+    this._crossfading = true
+    const preload = this._ensurePreloadAudio()
+    const cfDuration = this.crossfadeDuration * 1000 // ms
+    const oldAudio = this.audio
+    const targetVolume = oldAudio.volume
+
+    preload.volume = 0
+    preload.play()
+
+    const startTime = performance.now()
+    const fade = () => {
+      const elapsed = performance.now() - startTime
+      const progress = Math.min(elapsed / cfDuration, 1)
+      oldAudio.volume = targetVolume * (1 - progress)
+      preload.volume = targetVolume * progress
+      if (progress < 1) {
+        requestAnimationFrame(fade)
+      } else {
+        // Swap complete
+        oldAudio.pause()
+        oldAudio.removeAttribute("src")
+        oldAudio.volume = targetVolume
+
+        // Swap IDs so this.audio points to the new playing element
+        oldAudio.id = "persistent-audio-preload"
+        preload.id = "persistent-audio"
+        this.audio = preload
+
+        // Re-attach listeners for the new audio element
+        this.audio.addEventListener("timeupdate", () => this.onTimeUpdate())
+        this.audio.addEventListener("ended", () => this.onEnded())
+        this.audio.addEventListener("loadedmetadata", () => this.onLoadedMetadata())
+        this.audio.addEventListener("play", () => {
+          this.updatePlayPauseIcon()
+          this.startPositionSave()
+        })
+        this.audio.addEventListener("pause", () => {
+          this.updatePlayPauseIcon()
+          this.stopPositionSave()
+        })
+
+        this._crossfading = false
+        // Trigger queue advance (without playing since we already started)
+        document.dispatchEvent(new CustomEvent("queue:next"))
+      }
+    }
+    requestAnimationFrame(fade)
+  }
+
+  setCrossfade(event) {
+    const duration = parseInt(event.currentTarget.dataset.duration)
+    localStorage.setItem("crossfadeDuration", duration.toString())
   }
 
   formatTime(seconds) {

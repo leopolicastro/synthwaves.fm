@@ -19,6 +19,7 @@ export default class extends Controller {
     this.moveItemHandler = (e) => this.moveItem(e.detail.from, e.detail.to)
     this.playIndexHandler = (e) => this.playIndex(e.detail.index)
     this.clearHandler = () => this.clear()
+    this.peekNextHandler = () => this._dispatchNextTrackInfo()
 
     document.addEventListener("queue:add", this.addHandler)
     document.addEventListener("queue:playNow", this.playNowHandler)
@@ -30,6 +31,7 @@ export default class extends Controller {
     document.addEventListener("queue:moveItem", this.moveItemHandler)
     document.addEventListener("queue:playIndex", this.playIndexHandler)
     document.addEventListener("queue:clear", this.clearHandler)
+    document.addEventListener("queue:peekNext", this.peekNextHandler)
   }
 
   disconnect() {
@@ -43,6 +45,7 @@ export default class extends Controller {
     document.removeEventListener("queue:moveItem", this.moveItemHandler)
     document.removeEventListener("queue:playIndex", this.playIndexHandler)
     document.removeEventListener("queue:clear", this.clearHandler)
+    document.removeEventListener("queue:peekNext", this.peekNextHandler)
   }
 
   add(track) {
@@ -214,6 +217,30 @@ export default class extends Controller {
     }
   }
 
+  peekNext() {
+    if (this.shuffleEnabled) {
+      if (this.shufflePosition < this.shuffleOrder.length - 1) {
+        return this.queue[this.shuffleOrder[this.shufflePosition + 1]] || null
+      } else if (this.repeatMode === "all" && this.queue.length > 0) {
+        return this.queue[0] || null
+      }
+    } else {
+      if (this.currentIndex < this.queue.length - 1) {
+        return this.queue[this.currentIndex + 1] || null
+      } else if (this.repeatMode === "all" && this.queue.length > 0) {
+        return this.queue[0] || null
+      }
+    }
+    return null
+  }
+
+  _dispatchNextTrackInfo() {
+    const next = this.peekNext()
+    document.dispatchEvent(new CustomEvent("queue:nextTrackInfo", {
+      detail: { track: next }
+    }))
+  }
+
   generateShuffleOrder() {
     const indices = Array.from({ length: this.queue.length }, (_, i) => i)
     const currentPos = indices.indexOf(this.currentIndex)
@@ -242,6 +269,7 @@ export default class extends Controller {
         shufflePosition: this.shufflePosition
       }
     }))
+    this._dispatchNextTrackInfo()
   }
 
   saveShuffleState() {

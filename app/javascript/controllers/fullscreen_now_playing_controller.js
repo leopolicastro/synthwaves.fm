@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["overlay", "albumArt", "title", "artist", "progress", "currentTime", "duration", "playIcon", "pauseIcon", "lyrics"]
+  static targets = ["overlay", "albumArt", "title", "artist", "progress", "currentTime", "duration", "playIcon", "pauseIcon"]
 
   connect() {
     this._visible = false
@@ -13,11 +13,27 @@ export default class extends Controller {
     document.addEventListener("fullscreen-now-playing:toggle", this._toggleHandler)
     document.addEventListener("fullscreen-now-playing:close", this._closeHandler)
 
+    this._onTimeUpdate = () => this._updateProgress()
+    this._onPlay = () => this._updatePlayPause(false)
+    this._onPause = () => this._updatePlayPause(true)
+
+    this._bindToAudio()
+
+    if (!this._audio) {
+      this._observer = new MutationObserver(() => {
+        if (document.getElementById("persistent-audio")) {
+          this._bindToAudio()
+          this._observer.disconnect()
+          this._observer = null
+        }
+      })
+      this._observer.observe(document.documentElement, { childList: true })
+    }
+  }
+
+  _bindToAudio() {
     this._audio = document.getElementById("persistent-audio")
     if (this._audio) {
-      this._onTimeUpdate = () => this._updateProgress()
-      this._onPlay = () => this._updatePlayPause(false)
-      this._onPause = () => this._updatePlayPause(true)
       this._audio.addEventListener("timeupdate", this._onTimeUpdate)
       this._audio.addEventListener("play", this._onPlay)
       this._audio.addEventListener("pause", this._onPause)
@@ -33,6 +49,10 @@ export default class extends Controller {
       this._audio.removeEventListener("timeupdate", this._onTimeUpdate)
       this._audio.removeEventListener("play", this._onPlay)
       this._audio.removeEventListener("pause", this._onPause)
+    }
+    if (this._observer) {
+      this._observer.disconnect()
+      this._observer = null
     }
   }
 
@@ -60,7 +80,6 @@ export default class extends Controller {
 
   togglePlayback() {
     document.dispatchEvent(new CustomEvent("player:toggle"))
-    // Also dispatch to the player controller's toggle
     const audio = document.getElementById("persistent-audio")
     if (audio) {
       if (audio.paused) audio.play(); else audio.pause()
@@ -95,11 +114,14 @@ export default class extends Controller {
   }
 
   _updateProgress() {
-    if (!this._audio || !this._audio.duration || !this._visible) return
-    const percent = (this._audio.currentTime / this._audio.duration) * 100
-    if (this.hasProgressTarget) this.progressTarget.style.width = `${percent}%`
-    if (this.hasCurrentTimeTarget) this.currentTimeTarget.textContent = this._formatTime(this._audio.currentTime)
-    if (this.hasDurationTarget) this.durationTarget.textContent = this._formatTime(this._audio.duration)
+    if (!this._audio || !this._visible) return
+
+    if (this._audio.duration && isFinite(this._audio.duration)) {
+      const percent = (this._audio.currentTime / this._audio.duration) * 100
+      if (this.hasProgressTarget) this.progressTarget.style.width = `${percent}%`
+      if (this.hasCurrentTimeTarget) this.currentTimeTarget.textContent = this._formatTime(this._audio.currentTime)
+      if (this.hasDurationTarget) this.durationTarget.textContent = this._formatTime(this._audio.duration)
+    }
   }
 
   _updatePlayPause(paused) {

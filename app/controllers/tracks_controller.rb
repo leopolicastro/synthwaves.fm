@@ -100,7 +100,8 @@ class TracksController < ApplicationController
   end
 
   def lyrics
-    render json: { lyrics: @track.lyrics }
+    lyrics = LyricsService.new(@track).fetch
+    render json: { lyrics: lyrics }
   end
 
   private

@@ -1,0 +1,9 @@
+<div data-controller="lyrics"
+     <% if @track_id %>data-lyrics-track-id-value="<%= @track_id %>"<% end %>>
+  <% if @show_header %>
+    <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">Lyrics</h3>
+  <% end %>
+  <div data-lyrics-target="content"
+       class="text-sm text-center <%= @max_height %> overflow-y-auto scroll-smooth leading-relaxed">
+  </div>
+</div>

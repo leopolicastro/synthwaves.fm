@@ -282,7 +282,10 @@ RSpec.describe "Tracks", type: :request do
       expect(json["lyrics"]).to include("Verse 1")
     end
 
-    it "returns null lyrics when track has no lyrics" do
+    it "returns null lyrics when track has no lyrics and LRCLIB has none" do
+      stub_request(:get, /lrclib\.net\/api\/search/)
+        .to_return(status: 200, body: "[]", headers: { "Content-Type" => "application/json" })
+
       track = create(:track)
       get lyrics_track_path(track), as: :json
       expect(response).to have_http_status(:ok)

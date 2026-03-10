@@ -1,57 +1,65 @@
-<div class="w-full max-w-2xl">
-  <div class="mb-6">
-    <%= link_to "&larr; Back".html_safe, tracks_path, class: "text-neon-cyan hover:underline" %>
-  </div>
+<div class="w-full flex flex-col lg:flex-row gap-6">
+  <div class="flex-1 max-w-2xl">
+    <div class="mb-6">
+      <%= link_to "&larr; Back".html_safe, tracks_path, class: "text-neon-cyan hover:underline" %>
+    </div>
 
-  <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
-    <div class="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
-      <% if @track.album.cover_image.attached? %>
-        <%= image_tag @track.album.cover_image, class: "w-24 h-24 sm:w-32 sm:h-32 rounded-lg object-cover" %>
-      <% else %>
-        <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-lg bg-gray-700 flex items-center justify-center">
-          <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
-        </div>
-      <% end %>
-      <div>
-        <h1 class="text-2xl font-bold font-display text-white"><%= @track.title %></h1>
-        <p class="text-gray-400"><%= link_to @track.artist.name, artist_path(@track.artist), class: "hover:underline" %></p>
-        <p class="text-gray-500"><%= link_to @track.album.title, album_path(@track.album), class: "hover:underline" %></p>
+    <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
+      <div class="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+        <% if @track.album.cover_image.attached? %>
+          <%= image_tag @track.album.cover_image, class: "w-24 h-24 sm:w-32 sm:h-32 rounded-lg object-cover" %>
+        <% else %>
+          <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-lg bg-gray-700 flex items-center justify-center">
+            <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
+          </div>
+        <% end %>
+        <div>
+          <h1 class="text-2xl font-bold font-display text-white"><%= @track.title %></h1>
+          <p class="text-gray-400"><%= link_to @track.artist.name, artist_path(@track.artist), class: "hover:underline" %></p>
+          <p class="text-gray-500"><%= link_to @track.album.title, album_path(@track.album), class: "hover:underline" %></p>
 
-        <div class="mt-4 text-sm text-gray-500 space-y-1">
-          <% if @track.track_number %><p>Track <%= @track.track_number %></p><% end %>
-          <% if @track.duration %><p>Duration: <%= format_duration(@track.duration) %></p><% end %>
-          <% if @track.bitrate %><p>Bitrate: <%= @track.bitrate %> kbps</p><% end %>
-          <% if @track.file_format %><p>Format: <%= @track.file_format.upcase %></p><% end %>
-          <% if @track.youtube? %><p>Source: YouTube</p><% end %>
-        </div>
+          <div class="mt-4 text-sm text-gray-500 space-y-1">
+            <% if @track.track_number %><p>Track <%= @track.track_number %></p><% end %>
+            <% if @track.duration %><p>Duration: <%= format_duration(@track.duration) %></p><% end %>
+            <% if @track.bitrate %><p>Bitrate: <%= @track.bitrate %> kbps</p><% end %>
+            <% if @track.file_format %><p>Format: <%= @track.file_format.upcase %></p><% end %>
+            <% if @track.youtube? %><p>Source: YouTube</p><% end %>
+          </div>
 
-        <div class="mt-4">
-          <%= render "taggings/tags", taggable: @track %>
-        </div>
+          <div class="mt-4">
+            <%= render "taggings/tags", taggable: @track %>
+          </div>
 
-        <div class="mt-4 flex flex-wrap items-center gap-2">
-          <%= render "favorites/button", favorable: @track, favorited: Current.user.favorites.exists?(favorable: @track) %>
-          <button class="px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink"
-                  data-controller="song-row"
-                  data-song-row-track-id-value="<%= @track.id %>"
-                  data-song-row-title-value="<%= @track.title %>"
-                  data-song-row-artist-value="<%= @track.artist.name %>"
-                  <% if @track.youtube? %>
-                  data-song-row-youtube-video-id-value="<%= @track.youtube_video_id %>"
-                  <% else %>
-                  data-song-row-stream-url-value="<%= stream_track_path(@track) %>"
-                  <% end %>
-                  data-action="song-row#play">
-            Play
-          </button>
-          <% if !@track.youtube? && @track.audio_file.attached? %>
-            <%= link_to "Download", download_track_path(@track), class: "px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600" %>
-          <% end %>
-          <%= link_to "Edit", edit_track_path(@track), class: "px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600" %>
-          <%= button_to "Delete", track_path(@track), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700" %>
-          <%= render "playlist_tracks/add_menu", track: @track, playlists: current_user_playlists, menu_class: "left-0" %>
+          <div class="mt-4 flex flex-wrap items-center gap-2">
+            <%= render "favorites/button", favorable: @track, favorited: Current.user.favorites.exists?(favorable: @track) %>
+            <button class="px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink"
+                    data-controller="song-row"
+                    data-song-row-track-id-value="<%= @track.id %>"
+                    data-song-row-title-value="<%= @track.title %>"
+                    data-song-row-artist-value="<%= @track.artist.name %>"
+                    <% if @track.youtube? %>
+                    data-song-row-youtube-video-id-value="<%= @track.youtube_video_id %>"
+                    <% else %>
+                    data-song-row-stream-url-value="<%= stream_track_path(@track) %>"
+                    <% end %>
+                    data-action="song-row#play">
+              Play
+            </button>
+            <% if !@track.youtube? && @track.audio_file.attached? %>
+              <%= link_to "Download", download_track_path(@track), class: "px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600" %>
+            <% end %>
+            <%= link_to "Edit", edit_track_path(@track), class: "px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600" %>
+            <%= button_to "Delete", track_path(@track), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700" %>
+            <%= render "playlist_tracks/add_menu", track: @track, playlists: current_user_playlists, menu_class: "left-0" %>
+          </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="lg:w-80 lg:mt-12">
+    <div class="bg-gray-800 rounded-lg border border-gray-700 p-5">
+      <%= render LyricsComponent.new(track_id: @track.id, show_header: true) %>
     </div>
   </div>
 </div>

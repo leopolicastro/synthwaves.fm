@@ -66,6 +66,7 @@ Rails.application.routes.draw do
   get "search/dropdown", to: "search#dropdown"
   get :search, to: "search#index"
   get :library, to: "library#show"
+  resources :smart_playlists, only: [:index, :show], path: "smart-playlists"
   draw :subsonic
 
   draw :madmin

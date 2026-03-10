@@ -1,0 +1,27 @@
+<div class="w-full">
+  <div class="flex items-center gap-3 mb-6">
+    <%= link_to smart_playlists_path, class: "text-gray-400 hover:text-white transition-colors" do %>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    <% end %>
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-bold font-display text-white"><%= @definition[:name] %></h1>
+      <p class="text-sm text-gray-400"><%= @definition[:description] %></p>
+    </div>
+  </div>
+
+  <div class="bg-gray-800 rounded-lg border border-gray-700 divide-y divide-gray-700">
+    <% @tracks.each_with_index do |track, i| %>
+      <%= render TrackRowComponent.new(
+        track: track,
+        number: i + 1,
+        link_title: true,
+        link_subtitle: true,
+        show_album: true,
+        show_duration: true
+      ) %>
+    <% end %>
+    <% if @tracks.empty? %>
+      <div class="px-4 py-8 text-center text-gray-500 text-sm">No tracks match this playlist yet</div>
+    <% end %>
+  </div>
+</div>

@@ -31,6 +31,7 @@ namespace :library do
     created = 0
     existing = 0
     failed = 0
+    deleted = 0
 
     files.each_with_index do |file_path, index|
       label = "[#{index + 1}/#{files.size}]"
@@ -74,9 +75,13 @@ namespace :library do
         if response.code.to_i == 201
           puts "#{label} \"#{json["title"]}\" by #{json["artist"]} — created"
           created += 1
+          File.delete(file_path)
+          deleted += 1
         elsif response.code.to_i == 200 && json["created"] == false
-          puts "#{label} \"#{json["title"]}\" by #{json["artist"]} — exists"
+          puts "#{label} \"#{json["title"]}\" by #{json["artist"]} — exists, deleting local copy"
           existing += 1
+          File.delete(file_path)
+          deleted += 1
         else
           puts "#{label} #{file_name} — FAILED (#{response.code}: #{json["error"] || response.body})"
           failed += 1
@@ -88,7 +93,7 @@ namespace :library do
     end
 
     puts
-    puts "Done: #{created} created, #{existing} already existed, #{failed} failed"
+    puts "Done: #{created} created, #{existing} already existed, #{failed} failed, #{deleted} deleted locally"
   end
 end
 

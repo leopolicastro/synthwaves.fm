@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["progress", "title", "artist", "artwork", "playIcon", "pauseIcon", "currentTime", "duration", "volume", "progressBar", "liveIndicator", "prevButton", "nextButton", "repeatOff", "repeatAll", "repeatOne", "shuffleIcon"]
+  static targets = ["progress", "title", "artist", "artwork", "playIcon", "pauseIcon", "currentTime", "duration", "volume", "progressBar", "liveIndicator", "prevButton", "nextButton", "repeatOff", "repeatAll", "repeatOne", "shuffleIcon", "speedControl", "speedDisplay"]
   static values = { playHistoryUrl: String }
 
   connect() {
@@ -233,6 +233,7 @@ export default class extends Controller {
   // Playback
 
   playTrack({ trackId, title, artist, streamUrl, isLive, coverUrl }) {
+  playTrack({ trackId, title, artist, streamUrl, isLive, isPodcast }) {
     if (this.youtubeActive) {
       document.dispatchEvent(new CustomEvent("youtube:stop"))
       this.youtubeActive = false
@@ -240,6 +241,7 @@ export default class extends Controller {
     }
 
     this.currentIsLive = isLive || false
+    this.currentIsPodcast = isPodcast || false
     this.currentTrackId = trackId
     this.currentCoverUrl = coverUrl || null
     this._currentYouTubeVideoId = null
@@ -255,6 +257,10 @@ export default class extends Controller {
 
     this.saveCurrentTrack({ trackId, title, artist, streamUrl, isLive: isLive || false, coverUrl: coverUrl || null })
     this.dispatchNowPlaying({ trackId, title, artist, coverUrl })
+    this._applyPlaybackRate()
+
+    this.saveCurrentTrack({ trackId, title, artist, streamUrl, isLive: isLive || false, isPodcast: isPodcast || false })
+    this.dispatchNowPlaying(trackId)
 
     // If casting, send to cast device instead of local audio
     if (this.castActive) {
@@ -663,6 +669,37 @@ export default class extends Controller {
   setCrossfade(event) {
     const duration = parseInt(event.currentTarget.dataset.duration)
     localStorage.setItem("crossfadeDuration", duration.toString())
+  }
+
+  // Playback speed (podcasts)
+
+  setSpeed(event) {
+    const rate = parseFloat(event.currentTarget.dataset.rate)
+    this.audio.playbackRate = rate
+    localStorage.setItem("podcastPlaybackRate", rate.toString())
+    if (this.hasSpeedDisplayTarget) {
+      this.speedDisplayTarget.textContent = `${rate}x`
+    }
+  }
+
+  _applyPlaybackRate() {
+    if (this.currentIsPodcast) {
+      const rate = parseFloat(localStorage.getItem("podcastPlaybackRate") || "1")
+      this.audio.playbackRate = rate
+      this._showSpeedControl(true, rate)
+    } else {
+      this.audio.playbackRate = 1.0
+      this._showSpeedControl(false, 1.0)
+    }
+  }
+
+  _showSpeedControl(show, rate) {
+    if (this.hasSpeedControlTarget) {
+      this.speedControlTarget.classList.toggle("hidden", !show)
+    }
+    if (this.hasSpeedDisplayTarget) {
+      this.speedDisplayTarget.textContent = `${rate}x`
+    }
   }
 
   formatTime(seconds) {

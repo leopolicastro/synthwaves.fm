@@ -48,6 +48,8 @@ RSpec.describe VideoDownloadJob, type: :job do
 
       expect(video.download_status).to eq("failed")
       expect(video.download_error).to include("download error")
+      expect(video.status).to eq("failed")
+      expect(video.error_message).to include("Download failed")
     end
 
     it "cleans up temp directory" do

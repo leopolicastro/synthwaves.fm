@@ -30,6 +30,8 @@ class Video < ApplicationRecord
   private
 
   def convert_video
+    return unless file.attached?
+
     VideoConversionJob.perform_later(id)
   end
 end

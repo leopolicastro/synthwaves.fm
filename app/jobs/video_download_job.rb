@@ -31,7 +31,7 @@ class VideoDownloadJob < ApplicationJob
 
     VideoConversionJob.perform_later(video.id)
   rescue MediaDownloadService::Error, StandardError => e
-    video&.update!(download_status: "failed", download_error: e.message.truncate(500))
+    video&.update!(download_status: "failed", download_error: e.message.truncate(500), status: "failed", error_message: "Download failed: #{e.message.truncate(500)}")
     broadcast_status(video, user_id) if video
     raise unless e.is_a?(MediaDownloadService::Error)
   ensure

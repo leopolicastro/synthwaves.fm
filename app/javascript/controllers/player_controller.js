@@ -49,8 +49,10 @@ export default class extends Controller {
     document.addEventListener("youtube:stateChange", this.youtubeStateHandler)
     document.addEventListener("youtube:timeUpdate", this.youtubeTimeHandler)
     document.addEventListener("youtube:stopped", this.youtubeStoppedHandler)
+    this.castStateHandler = (e) => this.onCastStateChanged(e.detail)
     document.addEventListener("queue:repeatChanged", this.repeatChangedHandler)
     document.addEventListener("queue:shuffleChanged", this.shuffleChangedHandler)
+    document.addEventListener("cast:stateChanged", this.castStateHandler)
 
     if ("mediaSession" in navigator) {
       navigator.mediaSession.setActionHandler("play", () => this.toggle())
@@ -71,6 +73,7 @@ export default class extends Controller {
     document.removeEventListener("youtube:stopped", this.youtubeStoppedHandler)
     document.removeEventListener("queue:repeatChanged", this.repeatChangedHandler)
     document.removeEventListener("queue:shuffleChanged", this.shuffleChangedHandler)
+    document.removeEventListener("cast:stateChanged", this.castStateHandler)
   }
 
   // Persistent audio element — lives on <html> so Turbo never detaches it
@@ -183,6 +186,15 @@ export default class extends Controller {
     localStorage.setItem("playerCurrentTime", "0")
   }
 
+  // Cast state
+
+  onCastStateChanged({ active }) {
+    this.castActive = active
+    if (!active) {
+      // Resume local playback when cast disconnects
+    }
+  }
+
   // Playback
 
   playTrack({ trackId, title, artist, streamUrl, isLive }) {
@@ -204,12 +216,20 @@ export default class extends Controller {
       this.showNormalMode()
     }
 
-    this.audio.src = streamUrl
-    this.audio.play()
-
     this.saveCurrentTrack({ trackId, title, artist, streamUrl, isLive: isLive || false })
-    this.startPositionSave()
     this.dispatchNowPlaying(trackId)
+
+    // If casting, send to cast device instead of local audio
+    if (this.castActive) {
+      document.dispatchEvent(new CustomEvent("cast:loadMedia", {
+        detail: { streamUrl, title, artist }
+      }))
+    } else {
+      this.audio.src = streamUrl
+      this.audio.play()
+    }
+
+    this.startPositionSave()
 
     if ("mediaSession" in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
@@ -263,7 +283,9 @@ export default class extends Controller {
   }
 
   toggle() {
-    if (this.youtubeActive) {
+    if (this.castActive) {
+      document.dispatchEvent(new CustomEvent("cast:toggle"))
+    } else if (this.youtubeActive) {
       document.dispatchEvent(new CustomEvent("youtube:toggle"))
     } else {
       if (this.audio.paused) {

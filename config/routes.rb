@@ -68,6 +68,7 @@ Rails.application.routes.draw do
   get :stats, to: "stats#show"
   get :library, to: "library#show"
   resources :smart_playlists, only: [:index, :show], path: "smart-playlists"
+  resource :recommendations, only: [:show]
   draw :subsonic
 
   draw :madmin

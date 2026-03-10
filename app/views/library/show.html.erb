@@ -87,6 +87,24 @@
     <% end %>
   <% end %>
 
+  <%# AI DJ Recommendations %>
+  <% if Flipper.enabled?(:ai_dj, Current.user) %>
+    <div class="mb-8">
+      <%= link_to recommendations_path,
+          class: "block bg-gradient-to-r from-neon-pink/20 to-neon-purple/20 rounded-lg border border-neon-pink/30 p-5 hover:border-neon-pink/60 hover:shadow-lg transition-all group" do %>
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-neon-pink/20 flex items-center justify-center">
+            <svg class="w-6 h-6 text-neon-pink" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-white group-hover:text-neon-pink transition-colors">DJ Synth</h3>
+            <p class="text-sm text-gray-400">Get AI-powered music recommendations based on your listening history</p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
   <%# Browse %>
   <div class="mb-8">
     <h2 class="text-xl font-semibold text-white mb-4">Browse</h2>

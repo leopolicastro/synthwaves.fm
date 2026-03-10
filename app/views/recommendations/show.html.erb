@@ -1,0 +1,39 @@
+<div class="w-full">
+  <div class="flex items-center gap-3 mb-6">
+    <%= link_to library_path, class: "text-gray-400 hover:text-white transition-colors" do %>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    <% end %>
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-bold font-display text-white">DJ Synth</h1>
+      <p class="text-sm text-gray-400">Your AI-powered music recommendations</p>
+    </div>
+  </div>
+
+  <%= turbo_stream_from "chat_#{@chat.id}" %>
+
+  <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="w-10 h-10 rounded-full bg-neon-pink/20 flex items-center justify-center">
+        <svg class="w-5 h-5 text-neon-pink" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+      </div>
+      <div>
+        <div class="text-sm font-medium text-neon-pink">DJ Synth</div>
+        <div class="text-xs text-gray-500">Curating your set...</div>
+      </div>
+    </div>
+
+    <div id="messages" class="prose prose-invert prose-sm max-w-none">
+      <% @chat.messages.where.not(id: nil).each do |message| %>
+        <% next if message.role == "user" %>
+        <div id="message_<%= message.id %>_content" class="whitespace-pre-wrap"><%= message.content %></div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mt-4 text-center">
+    <%= link_to recommendations_path, class: "inline-flex items-center gap-2 px-4 py-2 bg-neon-pink/20 text-neon-pink rounded-lg text-sm font-medium hover:bg-neon-pink/30 transition-colors", data: { turbo_method: :get } do %>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      Get New Recommendations
+    <% end %>
+  </div>
+</div>

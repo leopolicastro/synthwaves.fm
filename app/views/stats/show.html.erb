@@ -1,0 +1,139 @@
+<div class="w-full">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold font-display text-white">Listening Stats</h1>
+    <!-- Time range selector -->
+    <div class="flex gap-2">
+      <% %i[week month year all_time].each do |range| %>
+        <%= link_to stats_path(range: range),
+            class: "px-3 py-1.5 rounded-full text-sm font-medium transition-colors #{@time_range == range ? 'bg-neon-pink text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}",
+            data: { turbo_frame: "stats-content" } do %>
+          <%= range.to_s.titleize %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <%= turbo_frame_tag "stats-content" do %>
+    <!-- Summary cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
+        <div class="text-2xl font-bold text-neon-cyan tabular-nums"><%= number_with_delimiter(@stats[:total_plays]) %></div>
+        <div class="text-sm text-gray-500">Total Plays</div>
+      </div>
+      <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
+        <div class="text-2xl font-bold text-neon-pink tabular-nums"><%= format_listening_time(@stats[:total_listening_time]) %></div>
+        <div class="text-sm text-gray-500">Listening Time</div>
+      </div>
+      <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
+        <div class="text-2xl font-bold text-laser-green tabular-nums"><%= @stats[:current_streak] %> days</div>
+        <div class="text-sm text-gray-500">Current Streak</div>
+      </div>
+      <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
+        <div class="text-2xl font-bold text-neon-purple tabular-nums"><%= @stats[:longest_streak] %> days</div>
+        <div class="text-sm text-gray-500">Longest Streak</div>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8 mb-8">
+      <!-- Top Tracks -->
+      <div>
+        <h2 class="text-lg font-semibold text-white mb-3">Top Tracks</h2>
+        <div class="bg-gray-800 rounded-lg border border-gray-700 divide-y divide-gray-700">
+          <% @stats[:top_tracks].each_with_index do |entry, i| %>
+            <div class="flex items-center gap-3 px-4 py-3">
+              <span class="text-gray-500 text-sm w-5 text-right"><%= i + 1 %></span>
+              <div class="min-w-0 flex-1">
+                <div class="text-sm text-white truncate"><%= entry.title %></div>
+                <div class="text-xs text-gray-500 truncate"><%= entry.artist_name %></div>
+              </div>
+              <span class="text-xs text-neon-cyan tabular-nums"><%= entry.play_count %> plays</span>
+            </div>
+          <% end %>
+          <% if @stats[:top_tracks].empty? %>
+            <div class="px-4 py-6 text-center text-gray-500 text-sm">No plays yet</div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Top Artists -->
+      <div>
+        <h2 class="text-lg font-semibold text-white mb-3">Top Artists</h2>
+        <div class="bg-gray-800 rounded-lg border border-gray-700 divide-y divide-gray-700">
+          <% @stats[:top_artists].each_with_index do |entry, i| %>
+            <div class="flex items-center gap-3 px-4 py-3">
+              <span class="text-gray-500 text-sm w-5 text-right"><%= i + 1 %></span>
+              <div class="min-w-0 flex-1">
+                <div class="text-sm text-white truncate"><%= entry.name %></div>
+              </div>
+              <span class="text-xs text-neon-pink tabular-nums"><%= entry.play_count %> plays</span>
+            </div>
+          <% end %>
+          <% if @stats[:top_artists].empty? %>
+            <div class="px-4 py-6 text-center text-gray-500 text-sm">No plays yet</div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Genres (bar chart) -->
+    <% if @stats[:top_genres].any? %>
+      <div class="mb-8">
+        <h2 class="text-lg font-semibold text-white mb-3">Top Genres</h2>
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4">
+          <% max_genre_count = @stats[:top_genres].map(&:play_count).max.to_f %>
+          <% @stats[:top_genres].each do |entry| %>
+            <div class="flex items-center gap-3 mb-2 last:mb-0">
+              <span class="text-xs text-gray-400 w-20 truncate text-right"><%= entry.genre %></span>
+              <div class="flex-1 bg-gray-700 rounded-full h-4 overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-neon-pink to-neon-cyan rounded-full transition-all" style="width: <%= (entry.play_count / max_genre_count * 100).round %>%"></div>
+              </div>
+              <span class="text-xs text-gray-500 tabular-nums w-10"><%= entry.play_count %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Listening Patterns -->
+    <div class="grid md:grid-cols-2 gap-8">
+      <!-- Hourly -->
+      <div>
+        <h2 class="text-lg font-semibold text-white mb-3">By Hour</h2>
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4">
+          <div class="flex items-end gap-[2px] h-24">
+            <% max_hourly = @stats[:hourly_distribution].max.to_f %>
+            <% @stats[:hourly_distribution].each_with_index do |count, hour| %>
+              <div class="flex-1 bg-neon-cyan/60 rounded-t transition-all"
+                   style="height: <%= max_hourly > 0 ? (count / max_hourly * 100).round : 0 %>%"
+                   title="<%= hour %>:00 — <%= count %> plays"></div>
+            <% end %>
+          </div>
+          <div class="flex justify-between mt-1">
+            <span class="text-[10px] text-gray-500">12am</span>
+            <span class="text-[10px] text-gray-500">6am</span>
+            <span class="text-[10px] text-gray-500">12pm</span>
+            <span class="text-[10px] text-gray-500">6pm</span>
+            <span class="text-[10px] text-gray-500">12am</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daily -->
+      <div>
+        <h2 class="text-lg font-semibold text-white mb-3">By Day</h2>
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4">
+          <div class="flex items-end gap-2 h-24">
+            <% max_daily = @stats[:daily_distribution].max.to_f %>
+            <% %w[Sun Mon Tue Wed Thu Fri Sat].each_with_index do |day, i| %>
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full bg-neon-pink/60 rounded-t transition-all"
+                     style="height: <%= max_daily > 0 ? (@stats[:daily_distribution][i] / max_daily * 100).round : 0 %>%"></div>
+                <span class="text-[10px] text-gray-500"><%= day %></span>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

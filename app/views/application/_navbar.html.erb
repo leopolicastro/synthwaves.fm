@@ -12,6 +12,7 @@
             <% if Flipper.enabled?(:iptv, Current.user) %>
               <%= link_to "Watch", tv_path, class: "text-white hover:text-neon-cyan transition-colors" %>
             <% end %>
+            <%= link_to "Stats", stats_path, class: "text-white hover:text-neon-cyan transition-colors" %>
           </nav>
         <% end %>
       </div>
@@ -49,6 +50,7 @@
                 <%= link_to "Watch", tv_path, class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
               <% end %>
               <%= link_to "Search", search_path, class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
+              <%= link_to "Stats", stats_path, class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
               <div class="border-t border-gray-700 my-1"></div>
             </div>
             <%= link_to "Profile", profile_path, class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>

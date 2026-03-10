@@ -65,6 +65,7 @@ Rails.application.routes.draw do
   resources :play_histories, only: [:index, :create]
   get "search/dropdown", to: "search#dropdown"
   get :search, to: "search#index"
+  get :stats, to: "stats#show"
   get :library, to: "library#show"
   resources :smart_playlists, only: [:index, :show], path: "smart-playlists"
   draw :subsonic

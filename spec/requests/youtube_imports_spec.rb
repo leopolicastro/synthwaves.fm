@@ -124,7 +124,7 @@ RSpec.describe "YoutubeImports", type: :request do
         expect(video.title).to eq("Test Video")
         expect(video.youtube_video_id).to eq("dQw4w9WgXcQ")
         expect(VideoDownloadJob).to have_been_enqueued.with(video.id, "https://www.youtube.com/watch?v=dQw4w9WgXcQ", user_id: user.id)
-        expect(response).to redirect_to(videos_path)
+        expect(response).to redirect_to(video_path(video))
       end
 
       it "rejects playlist URLs for video import" do

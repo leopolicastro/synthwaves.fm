@@ -62,7 +62,7 @@ class YoutubeImportsController < ApplicationController
     )
 
     VideoDownloadJob.perform_later(video.id, url, user_id: Current.user.id)
-    redirect_to videos_path, notice: "Video import started! It will be ready once the download completes."
+    redirect_to video_path(video), notice: "Video import started! It will be ready once the download completes."
   end
 
   def require_feature

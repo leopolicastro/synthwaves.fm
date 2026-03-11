@@ -1,6 +1,5 @@
 <div class="mx-auto md:w-2/3 w-full">
   <h1 class="font-bold font-display text-4xl">Edit Profile</h1>
-
   <%= form_with model: @user, url: profile_path, method: :patch, class: "contents" do |form| %>
     <% if @user.errors.any? %>
       <div class="py-2 px-3 bg-red-500/10 border border-red-500/20 mb-5 text-red-400 font-medium rounded-lg mt-5">
@@ -11,29 +10,24 @@
         </ul>
       </div>
     <% end %>
-
     <div class="my-5">
       <%= form.label :name, class: "block text-sm font-medium text-gray-400" %>
       <%= form.text_field :name, autofocus: true, autocomplete: "name", placeholder: "Enter your name", class: "block shadow-sm rounded-md border border-gray-700 bg-gray-800 text-white focus:outline-neon-cyan px-3 py-2 mt-2 w-full" %>
     </div>
-
     <div class="my-5">
       <%= form.label :email_address, "Email", class: "block text-sm font-medium text-gray-400" %>
       <%= form.email_field :email_address, required: true, autocomplete: "email", placeholder: "Enter your email address", class: "block shadow-sm rounded-md border border-gray-700 bg-gray-800 text-white focus:outline-neon-cyan px-3 py-2 mt-2 w-full" %>
     </div>
-
     <div class="my-5">
       <%= form.label :subsonic_password, "Subsonic Password", class: "block text-sm font-medium text-gray-400" %>
-      <%= form.password_field :subsonic_password, autocomplete: "off", placeholder: "Set a password for Subsonic clients", class: "block shadow-sm rounded-md border border-gray-700 bg-gray-800 text-white focus:outline-neon-cyan px-3 py-2 mt-2 w-full" %>
+      <%= form.text_field :subsonic_password, autocomplete: "off", placeholder: "Set a password for Subsonic clients", class: "block shadow-sm rounded-md border border-gray-700 bg-gray-800 text-white focus:outline-neon-cyan px-3 py-2 mt-2 w-full" %>
       <p class="mt-1 text-sm text-gray-400">Used by Subsonic-compatible music players (e.g. cliamp, DSub).</p>
     </div>
-
     <div class="my-5">
       <%= form.label :youtube_api_key, "YouTube API Key", class: "block text-sm font-medium text-gray-400" %>
       <%= form.text_field :youtube_api_key, autocomplete: "off", placeholder: "Enter your YouTube Data API v3 key", class: "block shadow-sm rounded-md border border-gray-700 bg-gray-800 text-white focus:outline-neon-cyan px-3 py-2 mt-2 w-full" %>
       <p class="mt-1 text-sm text-gray-400">Required for YouTube search and import. Get one from the Google Cloud Console.</p>
     </div>
-
     <div class="my-5">
       <span class="block text-sm font-medium text-gray-400 mb-3">Theme</span>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -43,19 +37,17 @@
             <input type="radio" name="user[theme]" value="<%= key %>"
                    class="sr-only"
                    data-action="change->theme#switch"
-                   <%= 'checked' if @user.theme == key %>>
+            <%= 'checked' if @user.theme == key %>>
             <span class="block text-sm font-semibold text-white"><%= config[:label] %></span>
             <span class="block text-xs text-gray-400 mt-1"><%= config[:font_family] %></span>
           </label>
         <% end %>
       </div>
     </div>
-
     <div class="col-span-6 sm:flex sm:items-center sm:gap-4">
       <div class="inline">
         <%= form.submit "Save Changes", class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-neon-pink hover:shadow-neon-pink text-white inline-block font-medium cursor-pointer" %>
       </div>
-
       <div class="mt-4 text-sm text-gray-500 sm:mt-0">
         <%= link_to "Cancel", profile_path, class: "text-neon-cyan underline hover:no-underline" %>
       </div>

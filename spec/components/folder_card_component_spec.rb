@@ -48,4 +48,9 @@ RSpec.describe FolderCardComponent, type: :component do
     html = render_component(folder: folder)
     expect(html.at_css("svg")).to be_present
   end
+
+  it "includes collection-card class for view toggle support" do
+    html = render_component(folder: folder)
+    expect(html.at_css(".collection-card")).to be_present
+  end
 end

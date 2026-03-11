@@ -1,20 +1,25 @@
-<div class="flex justify-end mb-4">
-  <%= link_to "Add Station", new_radio_station_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink text-sm font-medium", data: { turbo_frame: "_top" } %>
-</div>
+<div data-controller="view-toggle" data-view-toggle-page-key-value="music-radio">
+  <div class="flex justify-between items-center mb-4">
+    <%= link_to "Add Station", new_radio_station_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink text-sm font-medium", data: { turbo_frame: "_top" } %>
+    <%= render "shared/view_toggle" %>
+  </div>
 
-<% if @radio_stations.any? %>
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    <% @radio_stations.each do |station| %>
-      <%= render "radio_stations/radio_station", station: station %>
-    <% end %>
-  </div>
-<% else %>
-  <div class="text-center py-16 text-gray-400">
-    <svg class="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 14.828a4 4 0 010-5.656m5.656 0a4 4 0 010 5.656M12 12h.01"/>
-    </svg>
-    <p class="text-lg mb-2">No radio stations yet</p>
-    <p class="mb-4">Add a YouTube live stream or internet radio station to get started.</p>
-    <%= link_to "Add Station", new_radio_station_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink", data: { turbo_frame: "_top" } %>
-  </div>
-<% end %>
+  <% if @radio_stations.any? %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 collection-grid" data-view-toggle-target="container">
+      <% @radio_stations.each do |station| %>
+        <div class="collection-card">
+          <%= render "radio_stations/radio_station", station: station %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-16 text-gray-400">
+      <svg class="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 14.828a4 4 0 010-5.656m5.656 0a4 4 0 010 5.656M12 12h.01"/>
+      </svg>
+      <p class="text-lg mb-2">No radio stations yet</p>
+      <p class="mb-4">Add a YouTube live stream or internet radio station to get started.</p>
+      <%= link_to "Add Station", new_radio_station_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink", data: { turbo_frame: "_top" } %>
+    </div>
+  <% end %>
+</div>

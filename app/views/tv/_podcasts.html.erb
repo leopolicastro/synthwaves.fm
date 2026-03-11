@@ -1,39 +1,46 @@
-<div data-controller="search" class="mb-6">
-  <%= form_with url: tv_path, method: :get, data: { turbo_frame: "tv-content", search_target: "form", action: "input->search#submit" } do |f| %>
-    <input type="hidden" name="tab" value="podcasts">
-    <input type="text" name="q" value="<%= @query %>" placeholder="Search podcasts..."
-           class="flex-1 rounded-lg bg-gray-800 border-gray-700 text-white text-lg px-4 py-3 focus:outline-neon-cyan w-full"
-           data-search-target="input" autofocus>
-  <% end %>
-</div>
-
-<% if @podcasts.any? %>
-  <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-    <% @podcasts.each do |artist| %>
-      <%= link_to podcast_path(artist), class: "group", data: { turbo_frame: "_top" } do %>
-        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 hover:shadow-lg transition-shadow">
-          <% last_album = artist.albums.max_by(&:created_at) %>
-          <% if last_album&.cover_image&.attached? %>
-            <%= image_tag last_album.cover_image, class: "w-full aspect-square rounded-lg object-cover mb-3", loading: "lazy" %>
-          <% else %>
-            <div class="w-full aspect-square rounded-lg bg-gray-700 flex items-center justify-center mb-3">
-              <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clip-rule="evenodd"/>
-              </svg>
-            </div>
-          <% end %>
-          <div class="text-center">
-            <div class="font-medium text-white group-hover:text-neon-cyan truncate"><%= artist.name %></div>
-            <div class="text-sm text-gray-500"><%= pluralize(artist.tracks.size, "episode") %></div>
-          </div>
-        </div>
-      <% end %>
+<div data-controller="view-toggle" data-view-toggle-page-key-value="tv-podcasts">
+  <div data-controller="search" class="mb-6">
+    <%= form_with url: tv_path, method: :get, data: { turbo_frame: "tv-content", search_target: "form", action: "input->search#submit" } do |f| %>
+      <input type="hidden" name="tab" value="podcasts">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <input type="text" name="q" value="<%= @query %>" placeholder="Search podcasts..."
+               class="flex-1 rounded-lg bg-gray-800 border-gray-700 text-white text-lg px-4 py-3 focus:outline-neon-cyan"
+               data-search-target="input" autofocus>
+        <%= render "shared/view_toggle" %>
+      </div>
     <% end %>
   </div>
 
-  <div class="mt-6 flex justify-center">
-    <%== @pagy.series_nav %>
-  </div>
-<% else %>
-  <p class="text-gray-500">No podcasts found<%= " for \"#{@query}\"" if @query.present? %>.</p>
-<% end %>
+  <% if @podcasts.any? %>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 collection-grid" data-view-toggle-target="container">
+      <% @podcasts.each do |artist| %>
+        <%= link_to podcast_path(artist), class: "group collection-card", data: { turbo_frame: "_top" } do %>
+          <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 hover:shadow-lg transition-shadow collection-card-inner">
+            <div class="collection-card-image">
+              <% last_album = artist.albums.max_by(&:created_at) %>
+              <% if last_album&.cover_image&.attached? %>
+                <%= image_tag last_album.cover_image, class: "w-full aspect-square rounded-lg object-cover mb-3", loading: "lazy" %>
+              <% else %>
+                <div class="w-full aspect-square rounded-lg bg-gray-700 flex items-center justify-center mb-3">
+                  <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+              <% end %>
+            </div>
+            <div class="text-center collection-card-body">
+              <div class="font-medium text-white group-hover:text-neon-cyan truncate"><%= artist.name %></div>
+              <div class="text-sm text-gray-500"><%= pluralize(artist.tracks.size, "episode") %></div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="mt-6 flex justify-center">
+      <%== @pagy.series_nav %>
+    </div>
+  <% else %>
+    <p class="text-gray-500">No podcasts found<%= " for \"#{@query}\"" if @query.present? %>.</p>
+  <% end %>
+</div>

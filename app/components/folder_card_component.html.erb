@@ -1,5 +1,6 @@
-<%= link_to helpers.folder_path(folder), class: "group block bg-gray-800/60 border border-gray-700 rounded-xl overflow-hidden hover:border-neon-cyan/50 hover:bg-gray-800 transition-all duration-200", data: { turbo_frame: "_top" } do %>
-  <div class="relative aspect-video bg-gray-900">
+<%= link_to helpers.folder_path(folder), class: "group block bg-gray-800/60 border border-gray-700 rounded-xl overflow-hidden hover:border-neon-cyan/50 hover:bg-gray-800 transition-all duration-200 collection-card", data: { turbo_frame: "_top" } do %>
+  <div class="collection-card-inner">
+  <div class="relative aspect-video bg-gray-900 collection-card-image">
     <% if folder.cover_image.attached? %>
       <%= helpers.image_tag folder.cover_image, class: "w-full h-full object-cover", loading: "lazy" %>
     <% elsif (thumb_video = folder.videos.detect { |v| v.thumbnail.attached? }) %>
@@ -15,10 +16,11 @@
       <%= video_count %> video<%= "s" unless video_count == 1 %>
     </div>
   </div>
-  <div class="p-3">
+  <div class="p-3 collection-card-body">
     <h3 class="text-sm font-medium text-white truncate group-hover:text-neon-cyan transition-colors"><%= folder.name %></h3>
     <% if season_count > 0 %>
       <p class="text-xs text-gray-400 mt-0.5"><%= season_count %> season<%= "s" unless season_count == 1 %></p>
     <% end %>
+  </div>
   </div>
 <% end %>

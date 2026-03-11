@@ -42,6 +42,11 @@ RSpec.describe VideoCardComponent, type: :component do
     expect(link["href"]).to eq("/videos/#{video.id}")
   end
 
+  it "includes collection-card class for view toggle support" do
+    html = render_component(video: video)
+    expect(html.at_css(".collection-card")).to be_present
+  end
+
   context "with show_episode_number" do
     it "shows episode badge when episode_number is present" do
       video = create(:video, title: "The Pilot", episode_number: 3)

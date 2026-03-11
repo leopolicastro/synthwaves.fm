@@ -1,4 +1,4 @@
-<div class="w-full">
+<div class="w-full" data-controller="view-toggle" data-view-toggle-page-key-value="artists">
   <h1 class="text-3xl font-bold font-display mb-6">Artists</h1>
 
   <div data-controller="search" class="mb-6">
@@ -20,6 +20,7 @@
             <option value="asc" <%= "selected" if @direction == "asc" %>>Ascending</option>
             <option value="desc" <%= "selected" if @direction == "desc" %>>Descending</option>
           </select>
+          <%= render "shared/view_toggle" %>
         </div>
       </div>
     <% end %>
@@ -27,19 +28,21 @@
 
   <turbo-frame id="artists-list" data-turbo-action="replace">
     <% if @artists.any? %>
-      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 collection-grid" data-view-toggle-target="container">
         <% @artists.each do |artist| %>
-          <%= link_to artist_path(artist), class: "group", data: { turbo_frame: "_top" } do %>
-            <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 hover:shadow-lg transition-shadow">
-              <% last_album = artist.albums.max_by(&:created_at) %>
-              <% if last_album&.cover_image&.attached? %>
-                <%= image_tag last_album.cover_image, class: "w-full aspect-square rounded-full object-cover mb-3", loading: "lazy" %>
-              <% else %>
-                <div class="w-full aspect-square rounded-full bg-gray-700 flex items-center justify-center mb-3">
-                  <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
-                </div>
-              <% end %>
-              <div class="text-center">
+          <%= link_to artist_path(artist), class: "group collection-card", data: { turbo_frame: "_top" } do %>
+            <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 hover:shadow-lg transition-shadow collection-card-inner">
+              <div class="collection-card-image collection-card-image-round">
+                <% last_album = artist.albums.max_by(&:created_at) %>
+                <% if last_album&.cover_image&.attached? %>
+                  <%= image_tag last_album.cover_image, class: "w-full aspect-square rounded-full object-cover mb-3", loading: "lazy" %>
+                <% else %>
+                  <div class="w-full aspect-square rounded-full bg-gray-700 flex items-center justify-center mb-3">
+                    <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+                  </div>
+                <% end %>
+              </div>
+              <div class="text-center collection-card-body">
                 <div class="font-medium text-white group-hover:text-neon-cyan truncate"><%= artist.name %></div>
                 <div class="text-sm text-gray-500"><%= pluralize(artist.albums.size, "album") %></div>
               </div>

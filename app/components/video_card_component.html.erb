@@ -1,5 +1,6 @@
-<%= link_to helpers.url_for(video), class: "group block bg-gray-800/60 border border-gray-700 rounded-xl overflow-hidden hover:border-neon-cyan/50 hover:bg-gray-800 transition-all duration-200", data: { turbo_frame: "_top" } do %>
-  <div class="relative aspect-video bg-gray-900">
+<%= link_to helpers.url_for(video), class: "group block bg-gray-800/60 border border-gray-700 rounded-xl overflow-hidden hover:border-neon-cyan/50 hover:bg-gray-800 transition-all duration-200 collection-card", data: { turbo_frame: "_top" } do %>
+  <div class="collection-card-inner">
+  <div class="relative aspect-video bg-gray-900 collection-card-image">
     <% if video.thumbnail.attached? %>
       <%= image_tag video.thumbnail, class: "w-full h-full object-cover", loading: "lazy" %>
     <% else %>
@@ -29,12 +30,13 @@
       </div>
     <% end %>
   </div>
-  <div class="p-3">
+  <div class="p-3 collection-card-body">
     <h3 class="text-sm font-medium text-white truncate group-hover:text-neon-cyan transition-colors">
       <% if show_episode_number? %><span class="text-gray-400"><%= episode_label %></span> <% end %><%= video.title %>
     </h3>
     <% if video.description.present? %>
       <p class="text-xs text-gray-400 truncate mt-0.5"><%= video.description %></p>
     <% end %>
+  </div>
   </div>
 <% end %>

@@ -1,50 +1,55 @@
-<div data-controller="search" class="mb-6">
-  <%= form_with url: music_path, method: :get, data: { turbo_frame: "music-content", search_target: "form", action: "input->search#submit" } do |f| %>
-    <input type="hidden" name="tab" value="albums">
-    <div class="flex flex-col sm:flex-row gap-3">
-      <input type="text" name="q" value="<%= @query %>" placeholder="Search albums..."
-             class="flex-1 rounded-lg bg-gray-800 border-gray-700 text-white text-lg px-4 py-3 focus:outline-neon-cyan"
-             data-search-target="input" autofocus>
-      <div class="flex items-center gap-3">
-        <label for="sort" class="text-sm text-gray-400 font-medium">Sort by</label>
-        <select name="sort" id="sort" data-action="change->search#submit" class="text-sm rounded-lg border border-gray-600 bg-gray-700 text-white px-3 py-2 focus:outline-neon-cyan">
-          <% Album::SORT_OPTIONS.each do |value, label| %>
-            <option value="<%= value %>" <%= "selected" if value == @sort %>><%= label %></option>
-          <% end %>
-        </select>
-        <select name="direction" id="direction" data-action="change->search#submit" class="text-sm rounded-lg border border-gray-600 bg-gray-700 text-white px-3 py-2 focus:outline-neon-cyan">
-          <option value="asc" <%= "selected" if @direction == "asc" %>>Ascending</option>
-          <option value="desc" <%= "selected" if @direction == "desc" %>>Descending</option>
-        </select>
-      </div>
-    </div>
-  <% end %>
-</div>
-
-<% if @albums.any? %>
-  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-    <% @albums.each do |album| %>
-      <%= link_to album_path(album), class: "group", data: { turbo_frame: "_top" } do %>
-        <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden hover:shadow-lg transition-shadow">
-          <% if album.cover_image.attached? %>
-            <%= image_tag album.cover_image, class: "w-full aspect-square object-cover", loading: "lazy" %>
-          <% else %>
-            <div class="w-full aspect-square bg-gray-700 flex items-center justify-center">
-              <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
-            </div>
-          <% end %>
-          <div class="p-3">
-            <div class="font-medium text-white group-hover:text-neon-cyan truncate"><%= album.title %></div>
-            <div class="text-sm text-gray-500"><%= album.artist.name %></div>
-            <div class="text-xs text-gray-400"><%= album.year %></div>
-          </div>
+<div data-controller="view-toggle" data-view-toggle-page-key-value="music-albums">
+  <div data-controller="search" class="mb-6">
+    <%= form_with url: music_path, method: :get, data: { turbo_frame: "music-content", search_target: "form", action: "input->search#submit" } do |f| %>
+      <input type="hidden" name="tab" value="albums">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <input type="text" name="q" value="<%= @query %>" placeholder="Search albums..."
+               class="flex-1 rounded-lg bg-gray-800 border-gray-700 text-white text-lg px-4 py-3 focus:outline-neon-cyan"
+               data-search-target="input" autofocus>
+        <div class="flex items-center gap-3">
+          <label for="sort" class="text-sm text-gray-400 font-medium">Sort by</label>
+          <select name="sort" id="sort" data-action="change->search#submit" class="text-sm rounded-lg border border-gray-600 bg-gray-700 text-white px-3 py-2 focus:outline-neon-cyan">
+            <% Album::SORT_OPTIONS.each do |value, label| %>
+              <option value="<%= value %>" <%= "selected" if value == @sort %>><%= label %></option>
+            <% end %>
+          </select>
+          <select name="direction" id="direction" data-action="change->search#submit" class="text-sm rounded-lg border border-gray-600 bg-gray-700 text-white px-3 py-2 focus:outline-neon-cyan">
+            <option value="asc" <%= "selected" if @direction == "asc" %>>Ascending</option>
+            <option value="desc" <%= "selected" if @direction == "desc" %>>Descending</option>
+          </select>
+          <%= render "shared/view_toggle" %>
         </div>
-      <% end %>
+      </div>
     <% end %>
   </div>
-  <div class="mt-6 flex justify-center">
-    <%== @pagy.series_nav %>
-  </div>
-<% else %>
-  <p class="text-gray-500">No albums found<%= " for \"#{@query}\"" if @query.present? %>.</p>
-<% end %>
+
+  <% if @albums.any? %>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 collection-grid" data-view-toggle-target="container">
+      <% @albums.each do |album| %>
+        <%= link_to album_path(album), class: "group collection-card", data: { turbo_frame: "_top" } do %>
+          <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden hover:shadow-lg transition-shadow collection-card-inner">
+            <div class="collection-card-image">
+              <% if album.cover_image.attached? %>
+                <%= image_tag album.cover_image, class: "w-full aspect-square object-cover", loading: "lazy" %>
+              <% else %>
+                <div class="w-full aspect-square bg-gray-700 flex items-center justify-center">
+                  <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
+                </div>
+              <% end %>
+            </div>
+            <div class="p-3 collection-card-body">
+              <div class="font-medium text-white group-hover:text-neon-cyan truncate"><%= album.title %></div>
+              <div class="text-sm text-gray-500"><%= album.artist.name %></div>
+              <div class="text-xs text-gray-400"><%= album.year %></div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+    <div class="mt-6 flex justify-center">
+      <%== @pagy.series_nav %>
+    </div>
+  <% else %>
+    <p class="text-gray-500">No albums found<%= " for \"#{@query}\"" if @query.present? %>.</p>
+  <% end %>
+</div>

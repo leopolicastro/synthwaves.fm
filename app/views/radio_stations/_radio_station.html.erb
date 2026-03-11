@@ -1,5 +1,5 @@
-<div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden group">
-  <div class="relative aspect-video bg-gray-700">
+<div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden group collection-card-inner">
+  <div class="relative aspect-video bg-gray-700 collection-card-image">
     <% if station.thumbnail_url.present? %>
       <img src="<%= station.thumbnail_url %>" alt="<%= station.name %>" class="w-full h-full object-cover">
     <% else %>
@@ -28,7 +28,7 @@
       </div>
     </button>
   </div>
-  <div class="p-4">
+  <div class="p-4 collection-card-body">
     <div class="flex items-start justify-between gap-2">
       <div class="min-w-0">
         <h3 class="font-medium text-white truncate"><%= station.name %></h3>

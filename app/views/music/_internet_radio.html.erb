@@ -26,100 +26,105 @@
 </div>
 
 <!-- Filters -->
-<div class="flex flex-col sm:flex-row gap-3 mb-6">
-  <%= form_with url: music_path, method: :get, class: "flex flex-col sm:flex-row gap-3 flex-1", data: { turbo_frame: "music-content" } do |f| %>
-    <input type="hidden" name="tab" value="internet_radio">
-    <input type="text" name="q" placeholder="Search stations..." value="<%= params[:q] %>"
-           class="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-900 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neon-cyan">
-    <select name="country" class="px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan">
-      <option value="">All Countries</option>
-      <% @countries.each do |code| %>
-        <option value="<%= code %>" <%= "selected" if params[:country] == code %>><%= code %></option>
-      <% end %>
-    </select>
-    <select name="category" class="px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan">
-      <option value="">All Categories</option>
-      <% @categories.each do |cat| %>
-        <option value="<%= cat.slug %>" <%= "selected" if params[:category] == cat.slug %>><%= cat.name %></option>
-      <% end %>
-    </select>
-    <select name="sort" class="px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan">
-      <option value="name" <%= "selected" if params[:sort] == "name" %>>Name</option>
-      <option value="popular" <%= "selected" if params[:sort] == "popular" %>>Popular</option>
-    </select>
-    <label class="flex items-center gap-2 px-3 py-2 text-sm text-white cursor-pointer">
-      <input type="checkbox" name="favorites" value="1" <%= "checked" if params[:favorites] == "1" %>
-             class="rounded border-gray-600 bg-gray-900 text-neon-cyan focus:ring-neon-cyan">
-      Favorites
-    </label>
-    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-      Filter
-    </button>
-  <% end %>
-</div>
+<div data-controller="view-toggle" data-view-toggle-page-key-value="music-internet-radio">
+  <div class="flex flex-col sm:flex-row gap-3 mb-6">
+    <%= form_with url: music_path, method: :get, class: "flex flex-col sm:flex-row gap-3 flex-1", data: { turbo_frame: "music-content" } do |f| %>
+      <input type="hidden" name="tab" value="internet_radio">
+      <input type="text" name="q" placeholder="Search stations..." value="<%= params[:q] %>"
+             class="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-900 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neon-cyan">
+      <select name="country" class="px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan">
+        <option value="">All Countries</option>
+        <% @countries.each do |code| %>
+          <option value="<%= code %>" <%= "selected" if params[:country] == code %>><%= code %></option>
+        <% end %>
+      </select>
+      <select name="category" class="px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan">
+        <option value="">All Categories</option>
+        <% @categories.each do |cat| %>
+          <option value="<%= cat.slug %>" <%= "selected" if params[:category] == cat.slug %>><%= cat.name %></option>
+        <% end %>
+      </select>
+      <select name="sort" class="px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan">
+        <option value="name" <%= "selected" if params[:sort] == "name" %>>Name</option>
+        <option value="popular" <%= "selected" if params[:sort] == "popular" %>>Popular</option>
+      </select>
+      <label class="flex items-center gap-2 px-3 py-2 text-sm text-white cursor-pointer">
+        <input type="checkbox" name="favorites" value="1" <%= "checked" if params[:favorites] == "1" %>
+               class="rounded border-gray-600 bg-gray-900 text-neon-cyan focus:ring-neon-cyan">
+        Favorites
+      </label>
+      <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+        Filter
+      </button>
+    <% end %>
+    <%= render "shared/view_toggle" %>
+  </div>
 
-<!-- Station Grid -->
-<% if @stations.any? %>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-    <% @stations.each do |station| %>
-      <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden group">
-        <div class="relative aspect-square bg-gray-700">
-          <% if station.display_favicon_url.present? %>
-            <img src="<%= station.display_favicon_url %>" alt="<%= station.name %>"
-                 class="w-full h-full object-contain p-4" loading="lazy"
-                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <div class="w-full h-full items-center justify-center hidden">
-              <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 14.828a4 4 0 010-5.656m5.656 0a4 4 0 010 5.656M12 12h.01"/>
-              </svg>
+  <!-- Station Grid -->
+  <% if @stations.any? %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 collection-grid" data-view-toggle-target="container">
+      <% @stations.each do |station| %>
+        <div class="collection-card">
+          <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden group collection-card-inner">
+            <div class="relative aspect-square bg-gray-700 collection-card-image">
+              <% if station.display_favicon_url.present? %>
+                <img src="<%= station.display_favicon_url %>" alt="<%= station.name %>"
+                     class="w-full h-full object-contain p-4" loading="lazy"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                <div class="w-full h-full items-center justify-center hidden">
+                  <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 14.828a4 4 0 010-5.656m5.656 0a4 4 0 010 5.656M12 12h.01"/>
+                  </svg>
+                </div>
+              <% else %>
+                <div class="w-full h-full flex items-center justify-center">
+                  <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 14.828a4 4 0 010-5.656m5.656 0a4 4 0 010 5.656M12 12h.01"/>
+                  </svg>
+                </div>
+              <% end %>
+              <!-- Play button overlay -->
+              <button type="button"
+                      class="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition-colors"
+                      data-controller="song-row"
+                      data-song-row-track-id-value="0"
+                      data-song-row-title-value="<%= station.name %>"
+                      data-song-row-artist-value="Internet Radio"
+                      data-song-row-stream-url-value="<%= station.needs_proxy? ? internet_radio_station_stream_path(station) : station.stream_url %>"
+                      data-song-row-is-live-value="true"
+                      data-action="click->song-row#play">
+                <div class="w-14 h-14 rounded-full bg-neon-pink text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                  <svg class="w-7 h-7 ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+                </div>
+              </button>
             </div>
-          <% else %>
-            <div class="w-full h-full flex items-center justify-center">
-              <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 14.828a4 4 0 010-5.656m5.656 0a4 4 0 010 5.656M12 12h.01"/>
-              </svg>
-            </div>
-          <% end %>
-          <!-- Play button overlay -->
-          <button type="button"
-                  class="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition-colors"
-                  data-controller="song-row"
-                  data-song-row-track-id-value="0"
-                  data-song-row-title-value="<%= station.name %>"
-                  data-song-row-artist-value="Internet Radio"
-                  data-song-row-stream-url-value="<%= station.needs_proxy? ? internet_radio_station_stream_path(station) : station.stream_url %>"
-                  data-song-row-is-live-value="true"
-                  data-action="click->song-row#play">
-            <div class="w-14 h-14 rounded-full bg-neon-pink text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
-              <svg class="w-7 h-7 ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
-            </div>
-          </button>
-        </div>
-        <div class="p-4">
-          <div class="flex items-start justify-between gap-2">
-            <div class="min-w-0 flex-1">
-              <%= link_to station.name, internet_radio_station_path(station), class: "font-medium text-white truncate block hover:text-neon-cyan transition-colors", data: { turbo_frame: "_top" } %>
-              <div class="flex items-center gap-2 mt-1">
-                <% if station.country_code.present? %>
-                  <span class="text-xs text-gray-400"><%= station.country_code %></span>
-                <% end %>
-                <% if station.codec.present? %>
-                  <span class="text-xs text-gray-500"><%= station.codec %><%= "/#{station.bitrate}k" if station.bitrate&.positive? %></span>
-                <% end %>
+            <div class="p-4 collection-card-body">
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0 flex-1">
+                  <%= link_to station.name, internet_radio_station_path(station), class: "font-medium text-white truncate block hover:text-neon-cyan transition-colors", data: { turbo_frame: "_top" } %>
+                  <div class="flex items-center gap-2 mt-1">
+                    <% if station.country_code.present? %>
+                      <span class="text-xs text-gray-400"><%= station.country_code %></span>
+                    <% end %>
+                    <% if station.codec.present? %>
+                      <span class="text-xs text-gray-500"><%= station.codec %><%= "/#{station.bitrate}k" if station.bitrate&.positive? %></span>
+                    <% end %>
+                  </div>
+                </div>
+                <div id="favorite_internetradiostation_<%= station.id %>">
+                  <%= render partial: "favorites/button", locals: { favorable: station, favorited: @favorited_station_ids.include?(station.id) } %>
+                </div>
               </div>
-            </div>
-            <div id="favorite_internetradiostation_<%= station.id %>">
-              <%= render partial: "favorites/button", locals: { favorable: station, favorited: @favorited_station_ids.include?(station.id) } %>
             </div>
           </div>
         </div>
-      </div>
-    <% end %>
-  </div>
+      <% end %>
+    </div>
 
-  <div class="mt-6">
-    <%== @pagy.series_nav %>
-  </div>
-<% else %>
-  <p class="text-gray-500">No stations found. Try importing some stations using the form above.</p>
-<% end %>
+    <div class="mt-6">
+      <%== @pagy.series_nav %>
+    </div>
+  <% else %>
+    <p class="text-gray-500">No stations found. Try importing some stations using the form above.</p>
+  <% end %>
+</div>

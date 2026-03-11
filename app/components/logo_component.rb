@@ -14,7 +14,7 @@ class LogoComponent < ViewComponent::Base
     case size
     when :sm then "text-sm"
     when :md then "text-lg"
-    when :lg then "text-5xl md:text-6xl lg:text-7xl font-bold"
+    when :lg then "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold"
     end
   end
 

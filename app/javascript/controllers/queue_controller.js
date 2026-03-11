@@ -60,6 +60,7 @@ export default class extends Controller {
   playNow(track) {
     const index = this.queue.findIndex(t => t.trackId === track.trackId && t.trackId !== 0)
     if (index >= 0) {
+      this.queue[index] = track
       this.currentIndex = index
     } else {
       this.queue.push(track)

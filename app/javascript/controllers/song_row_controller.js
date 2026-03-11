@@ -33,10 +33,10 @@ export default class extends Controller {
       track.isPodcast = true
     }
 
-    if (this.youtubeVideoIdValue) {
-      track.youtubeVideoId = this.youtubeVideoIdValue
-    } else {
+    if (this.streamUrlValue) {
       track.streamUrl = this.streamUrlValue
+    } else if (this.youtubeVideoIdValue) {
+      track.youtubeVideoId = this.youtubeVideoIdValue
     }
 
     return track

@@ -15,9 +15,9 @@
 
   <div class="bg-gray-800 rounded-lg border border-gray-700">
     <% @playlist_tracks.each do |pt| %>
-      <%= render TrackRowComponent.new(track: pt.track, number: pt.position) do |c| %>
+      <%= render TrackRowComponent.new(track: pt.track, number: pt.position, link_title: true, link_subtitle: true) do |c| %>
         <% c.with_trailing do %>
-          <% if pt.track.audio_file.attached? && !pt.track.youtube? %>
+          <% if pt.track.audio_file.attached? %>
             <%= link_to download_track_path(pt.track), class: "text-gray-400 hover:text-neon-cyan", title: "Download" do %>
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
             <% end %>

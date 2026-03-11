@@ -83,7 +83,7 @@
         </div>
         <div class="bg-gray-800 rounded-lg border border-gray-700">
           <% @results[:tracks].each do |track| %>
-            <%= render TrackRowComponent.new(track: track) do |c| %>
+            <%= render TrackRowComponent.new(track: track, link_title: true, link_subtitle: true) do |c| %>
               <% c.with_trailing do %>
                 <%= render "favorites/button", favorable: track, favorited: @favorited_track_ids.include?(track.id) %>
                 <%= render "playlist_tracks/add_menu", track: track, playlists: current_user_playlists %>

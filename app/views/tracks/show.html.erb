@@ -1,3 +1,10 @@
+<% content_for :meta_title, "#{@track.title} by #{@track.artist.name} — synthwaves.fm" %>
+<% content_for :meta_description, "#{@track.title} from #{@track.album.title} by #{@track.artist.name}#{@track.duration ? " (#{format_duration(@track.duration)})" : ""}" %>
+<% if @track.album.cover_image.attached? %>
+  <% content_for :meta_image, og_image_url_for(@track.album.cover_image) %>
+<% end %>
+<% content_for :meta_type, "music.song" %>
+
 <div class="w-full flex flex-col lg:flex-row gap-6">
   <div class="flex-1 max-w-2xl">
     <div class="mb-6">

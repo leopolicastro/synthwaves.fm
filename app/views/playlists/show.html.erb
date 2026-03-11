@@ -1,3 +1,10 @@
+<% content_for :meta_title, "#{@playlist.name} — synthwaves.fm" %>
+<% content_for :meta_description, "#{pluralize(@playlist_tracks.size, 'track')} on synthwaves.fm" %>
+<% if (cover_track = @playlist_tracks.find { |pt| pt.track.album.cover_image.attached? }) %>
+  <% content_for :meta_image, og_image_url_for(cover_track.track.album.cover_image) %>
+<% end %>
+<% content_for :meta_type, "music.playlist" %>
+
 <div class="w-full">
   <div class="mb-6">
     <%= link_to "&larr; Playlists".html_safe, playlists_path, class: "text-neon-cyan hover:underline" %>

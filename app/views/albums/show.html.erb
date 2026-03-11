@@ -1,3 +1,10 @@
+<% content_for :meta_title, "#{@album.title} by #{@album.artist.name} — synthwaves.fm" %>
+<% content_for :meta_description, "#{@album.artist.name} · #{@album.year} · #{@album.genre} · #{pluralize(@total_tracks, 'track')}" %>
+<% if @album.cover_image.attached? %>
+  <% content_for :meta_image, og_image_url_for(@album.cover_image) %>
+<% end %>
+<% content_for :meta_type, "music.album" %>
+
 <div class="w-full">
   <div class="mb-6">
     <%= link_to "&larr; Albums".html_safe, albums_path, class: "text-neon-cyan hover:underline" %>

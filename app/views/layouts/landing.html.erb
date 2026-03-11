@@ -21,7 +21,7 @@
     <link id="theme-font" href="<%= current_theme_font_url %>" rel="stylesheet">
     <%= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
     <meta name="theme-color" content="<%= current_theme_meta_color %>">
-    <link rel="icon" href="/icon-512.png" type="image/png">
+    <%= favicon_link_tag "icon.svg", type: "image/svg+xml" %>
     <link rel="apple-touch-icon" href="/icon-512.png">
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>

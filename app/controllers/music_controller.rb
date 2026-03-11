@@ -37,7 +37,7 @@ class MusicController < ApplicationController
     scope = Artist.music.includes(albums: {cover_image_attachment: :blob})
       .search(@query)
       .order(@sort => @direction)
-    @pagy, @artists = pagy(:offset, scope, limit: 60)
+    @pagy, @artists = pagy(:offset, scope, limit: 24)
   end
 
   def load_albums
@@ -47,13 +47,13 @@ class MusicController < ApplicationController
     scope = Album.music.includes(:artist, cover_image_attachment: :blob)
       .search(@query)
       .order(@sort => @direction)
-    @pagy, @albums = pagy(:offset, scope)
+    @pagy, @albums = pagy(:offset, scope, limit: 24)
   end
 
   def load_tracks
     @query = params[:q]
     scope = Track.music.includes(:artist, :album).search(@query).order(:title)
-    @pagy, @tracks = pagy(:offset, scope)
+    @pagy, @tracks = pagy(:offset, scope, limit: 24)
     @favorited_track_ids = Current.user.favorites.where(favorable_type: "Track").pluck(:favorable_id).to_set
   end
 
@@ -62,7 +62,7 @@ class MusicController < ApplicationController
     @sort = sort_column(Playlist, default: "name")
     @direction = sort_direction
     scope = Current.user.playlists.search(@query).order(@sort => @direction)
-    @pagy, @playlists = pagy(:offset, scope)
+    @pagy, @playlists = pagy(:offset, scope, limit: 24)
   end
 
   def load_radio

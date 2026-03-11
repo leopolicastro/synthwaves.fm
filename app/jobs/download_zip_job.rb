@@ -10,7 +10,7 @@ class DownloadZipJob < ApplicationJob
     return if @download.cancelled?
 
     tracks = collect_tracks
-    tracks = tracks.select { |t| t.audio_file.attached? && !t.youtube? }
+    tracks = tracks.select { |t| t.audio_file.attached? }
 
     if tracks.empty?
       @download.update!(status: "failed", error_message: "No downloadable tracks found.")

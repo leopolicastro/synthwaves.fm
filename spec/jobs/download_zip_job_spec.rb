@@ -62,8 +62,8 @@ RSpec.describe DownloadZipJob, type: :job do
     end
   end
 
-  describe "skipping youtube-only tracks" do
-    it "skips tracks with youtube_video_id and no audio file" do
+  describe "skipping tracks without audio" do
+    it "skips tracks with no audio file attached" do
       album = create(:album)
       normal_track = create(:track, album: album, artist: album.artist, title: "Normal")
       attach_audio(normal_track)
@@ -75,6 +75,20 @@ RSpec.describe DownloadZipJob, type: :job do
       download.reload
       expect(download.status).to eq("ready")
       expect(download.total_tracks).to eq(1)
+    end
+
+    it "includes YouTube tracks that have downloaded audio files" do
+      album = create(:album)
+      yt_track = create(:track, album: album, artist: album.artist, title: "YouTube Downloaded", youtube_video_id: "yt456")
+      attach_audio(yt_track)
+      download = create(:download, user: user, downloadable: album, downloadable_type: "Album")
+
+      DownloadZipJob.perform_now(download.id)
+
+      download.reload
+      expect(download.status).to eq("ready")
+      expect(download.total_tracks).to eq(1)
+      expect(download.file).to be_attached
     end
   end
 

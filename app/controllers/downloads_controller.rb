@@ -44,6 +44,21 @@ class DownloadsController < ApplicationController
     @download = Current.user.downloads.find(params[:id])
   end
 
+  def destroy
+    download = Current.user.downloads.find(params[:id])
+
+    unless download.pending? || download.processing?
+      redirect_to downloads_path, alert: "Only pending or in-progress downloads can be cancelled."
+      return
+    end
+
+    download.update!(status: "cancelled")
+    download.file.purge if download.file.attached?
+    download.broadcast_status
+
+    redirect_to downloads_path, notice: "Download cancelled."
+  end
+
   def file
     download = Current.user.downloads.find(params[:id])
 

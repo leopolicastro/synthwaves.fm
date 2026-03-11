@@ -30,4 +30,20 @@
   <div class="mt-6">
     <%= link_to "Edit Profile", edit_profile_path, class: "rounded-md px-3.5 py-2.5 bg-neon-pink hover:shadow-neon-pink text-white inline-block font-medium" %>
   </div>
+
+  <h2 class="font-bold font-display text-2xl text-white mt-10">Data</h2>
+
+  <div class="mt-4 bg-gray-800 shadow-sm rounded-lg border border-gray-700 px-4 py-5 sm:px-6">
+    <p class="text-sm text-gray-400 mb-4">Export your entire music library as a ZIP archive.</p>
+    <div class="flex flex-wrap items-center gap-3">
+      <%= button_to downloads_path(downloadable_type: "Library"), class: "inline-flex items-center gap-1.5 px-3.5 py-2.5 bg-neon-purple/30 text-white rounded-md text-sm font-medium hover:bg-neon-purple/50 transition-colors" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Export Library
+      <% end %>
+      <%= link_to downloads_path, class: "inline-flex items-center gap-1.5 px-3.5 py-2.5 text-gray-400 hover:text-white text-sm font-medium transition-colors" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/></svg>
+        View Downloads
+      <% end %>
+    </div>
+  </div>
 </div>

@@ -19,9 +19,15 @@
         <% if download.error_message.present? %>
           <p class="text-xs text-gray-500 mt-1"><%= download.error_message %></p>
         <% end %>
+      <% elsif download.cancelled? %>
+        <span class="text-xs text-gray-400">Cancelled</span>
       <% end %>
     </div>
-    <% if download.ready? || download.failed? %>
+    <% if download.pending? || download.processing? %>
+      <%= button_to download_path(download), method: :delete, class: "text-gray-500 hover:text-red-400", title: "Cancel download" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      <% end %>
+    <% elsif download.ready? || download.failed? || download.cancelled? %>
       <button onclick="this.closest('[id^=download_]').remove()" class="text-gray-500 hover:text-white">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>

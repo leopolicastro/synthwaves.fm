@@ -1,5 +1,5 @@
 class Download < ApplicationRecord
-  STATUSES = %w[pending processing ready failed].freeze
+  STATUSES = %w[pending processing ready failed cancelled].freeze
   DOWNLOADABLE_TYPES = %w[Track Album Playlist Library].freeze
 
   belongs_to :user
@@ -26,6 +26,10 @@ class Download < ApplicationRecord
 
   def failed?
     status == "failed"
+  end
+
+  def cancelled?
+    status == "cancelled"
   end
 
   def progress_percentage

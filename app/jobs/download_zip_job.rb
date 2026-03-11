@@ -7,6 +7,8 @@ class DownloadZipJob < ApplicationJob
 
   def perform(download_id)
     @download = Download.find(download_id)
+    return if @download.cancelled?
+
     tracks = collect_tracks
     tracks = tracks.select { |t| t.audio_file.attached? && !t.youtube? }
 
@@ -68,6 +70,8 @@ class DownloadZipJob < ApplicationJob
 
     Zip::File.open(zip_path.to_s, create: true) do |zipfile|
       tracks.each_with_index do |track, idx|
+        break if download.reload.cancelled?
+
         track.audio_file.open do |tempfile|
           entry_name = zip_entry_name(track, download.downloadable_type)
           entry_name = deduplicate_name(entry_name, used_names)

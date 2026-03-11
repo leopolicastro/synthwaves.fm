@@ -17,9 +17,9 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         New Playlist
       <% end %>
-      <%= button_to downloads_path(downloadable_type: "Library"), class: "inline-flex items-center gap-1.5 px-3 py-1.5 bg-neon-purple/30 text-white rounded-full text-sm font-medium hover:bg-neon-purple/50 transition-colors" do %>
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-        Export Library
+      <%= link_to favorites_path, class: "inline-flex items-center gap-1.5 px-3 py-1.5 bg-neon-purple/30 text-white rounded-full text-sm font-medium hover:bg-neon-purple/50 transition-colors" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        Favorites
       <% end %>
       <%= link_to downloads_path, class: "inline-flex items-center gap-1.5 px-3 py-1.5 bg-neon-purple/30 text-white rounded-full text-sm font-medium hover:bg-neon-purple/50 transition-colors" do %>
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/></svg>

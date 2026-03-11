@@ -26,7 +26,7 @@ Rails.application.routes.draw do
       get :lyrics
     end
   end
-  resources :downloads, only: [:index, :create, :show] do
+  resources :downloads, only: [:index, :create, :show, :destroy] do
     member { get :file }
   end
   resources :playlists do

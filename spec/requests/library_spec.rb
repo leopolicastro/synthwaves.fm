@@ -87,9 +87,12 @@ RSpec.describe "Library", type: :request do
         expect(response.body).to include(track.title)
       end
 
-      it "is hidden when no favorites exist" do
+      it "does not show the favorites section when no favorites exist" do
         get library_path
-        expect(response.body).not_to include("Favorites")
+        # "Favorites" appears in the quick actions bar, but not as a section heading
+        doc = Nokogiri::HTML(response.body)
+        section_headings = doc.css("section h2").map(&:text)
+        expect(section_headings).not_to include("Favorites")
       end
     end
 

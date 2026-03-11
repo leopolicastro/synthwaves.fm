@@ -119,6 +119,61 @@ RSpec.describe "Downloads", type: :request do
     end
   end
 
+  describe "DELETE /downloads/:id" do
+    it "cancels a pending download" do
+      download = create(:download, user: user, status: "pending")
+
+      delete download_path(download)
+
+      expect(download.reload.status).to eq("cancelled")
+      expect(response).to redirect_to(downloads_path)
+      expect(flash[:notice]).to eq("Download cancelled.")
+    end
+
+    it "cancels a processing download" do
+      download = create(:download, :processing, user: user)
+
+      delete download_path(download)
+
+      expect(download.reload.status).to eq("cancelled")
+      expect(response).to redirect_to(downloads_path)
+    end
+
+    it "rejects cancelling a ready download" do
+      download = create(:download, :ready, user: user)
+
+      delete download_path(download)
+
+      expect(download.reload.status).to eq("ready")
+      expect(response).to redirect_to(downloads_path)
+      expect(flash[:alert]).to eq("Only pending or in-progress downloads can be cancelled.")
+    end
+
+    it "rejects cancelling a failed download" do
+      download = create(:download, :failed, user: user)
+
+      delete download_path(download)
+
+      expect(download.reload.status).to eq("failed")
+      expect(response).to redirect_to(downloads_path)
+    end
+
+    it "does not cancel another user's download" do
+      other_download = create(:download, status: "pending")
+
+      delete download_path(other_download)
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "requires authentication" do
+      download = create(:download, status: "pending")
+      reset!
+
+      delete download_path(download)
+      expect(response).to redirect_to(new_session_path)
+    end
+  end
+
   describe "GET /downloads/:id/file" do
     it "redirects to the file when ready" do
       download = create(:download, :ready, user: user)

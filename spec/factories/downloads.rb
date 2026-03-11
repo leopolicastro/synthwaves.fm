@@ -37,5 +37,9 @@ FactoryBot.define do
       status { "failed" }
       error_message { "Something went wrong" }
     end
+
+    trait :cancelled do
+      status { "cancelled" }
+    end
   end
 end

@@ -75,6 +75,7 @@ Rails.application.routes.draw do
   get :stats, to: "stats#show"
   get :library, to: "library#show"
   resources :smart_playlists, only: [:index, :show], path: "smart-playlists"
+  get "turbo-native/path-configuration", to: "turbo_native#path_configuration"
   draw :subsonic
 
   draw :madmin

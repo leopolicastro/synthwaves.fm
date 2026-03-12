@@ -34,7 +34,7 @@
       <meta name="turbo:native" content="true">
     <% end %>
   </head>
-  <body class="bg-gray-900 synthwave-bg text-white <%= 'pb-24' unless turbo_native_app? %> scanlines" data-controller="youtube-player keyboard-shortcuts<%= ' turbo-native-bridge' if turbo_native_app? %>">
+  <body class="bg-gray-900 synthwave-bg text-white <%= 'pb-24' unless turbo_native_app? %> scanlines" data-controller="youtube-player keyboard-shortcuts<%= ' bridge--playback' if turbo_native_app? %>">
     <% if authenticated? %>
       <%= turbo_stream_from "downloads_#{Current.user.id}" %>
       <%= turbo_stream_from "recordings_#{Current.user.id}" %>

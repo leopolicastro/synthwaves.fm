@@ -10,10 +10,16 @@
      <% if track.artist.podcast? %>
      data-song-row-is-podcast-value="true"
      <% end %>
+     data-song-row-album-title-value="<%= track.album.title %>"
+     data-song-row-duration-value="<%= (track.duration || 0).to_i %>"
      <% if track.audio_file.attached? %>
      data-song-row-stream-url-value="<%= stream_track_path(track) %>"
      <% elsif track.youtube? %>
      data-song-row-youtube-video-id-value="<%= track.youtube_video_id %>"
+     <% end %>
+     <% if helpers.native_url_builder %>
+     data-song-row-native-stream-url-value="<%= helpers.native_url_builder.stream_url(track) %>"
+     data-song-row-native-cover-art-url-value="<%= helpers.native_url_builder.cover_art_url(track.album) %>"
      <% end %>>
   <div class="flex items-center gap-3 min-w-0 flex-1">
     <button type="button" data-action="song-row#play" class="w-8 text-center text-gray-400 hover:text-neon-pink group/play">

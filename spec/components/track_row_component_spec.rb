@@ -65,6 +65,25 @@ RSpec.describe TrackRowComponent, type: :component do
       expect(row["data-song-row-cover-url-value"]).to be_nil
       expect(row["data-song-row-is-podcast-value"]).to be_nil
     end
+
+    it "sets album title data attribute" do
+      html = render_component
+      row = html.at_css("[data-controller]")
+      expect(row["data-song-row-album-title-value"]).to eq("Test Album")
+    end
+
+    it "sets duration data attribute" do
+      html = render_component
+      row = html.at_css("[data-controller]")
+      expect(row["data-song-row-duration-value"]).to eq("245")
+    end
+
+    it "omits native URL attributes when not in turbo native context" do
+      html = render_component
+      row = html.at_css("[data-controller]")
+      expect(row["data-song-row-native-stream-url-value"]).to be_nil
+      expect(row["data-song-row-native-cover-art-url-value"]).to be_nil
+    end
   end
 
   describe "now-playing wiring" do

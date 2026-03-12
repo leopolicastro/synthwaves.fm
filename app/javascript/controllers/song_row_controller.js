@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static values = { trackId: Number, title: String, artist: String, streamUrl: String, youtubeVideoId: String, isLive: Boolean, coverUrl: String, isPodcast: Boolean }
+  static values = { trackId: Number, title: String, artist: String, streamUrl: String, youtubeVideoId: String, isLive: Boolean, coverUrl: String, isPodcast: Boolean, albumTitle: String, duration: Number, nativeStreamUrl: String, nativeCoverArtUrl: String }
 
   play(event) {
     event.preventDefault()
@@ -22,6 +22,14 @@ export default class extends Controller {
       artist: this.artistValue
     }
 
+    if (this.albumTitleValue) {
+      track.albumTitle = this.albumTitleValue
+    }
+
+    if (this.durationValue) {
+      track.duration = this.durationValue
+    }
+
     if (this.isLiveValue) {
       track.isLive = true
     }
@@ -37,6 +45,14 @@ export default class extends Controller {
       track.streamUrl = this.streamUrlValue
     } else if (this.youtubeVideoIdValue) {
       track.youtubeVideoId = this.youtubeVideoIdValue
+    }
+
+    if (this.nativeStreamUrlValue) {
+      track.nativeStreamUrl = this.nativeStreamUrlValue
+    }
+
+    if (this.nativeCoverArtUrlValue) {
+      track.nativeCoverArtUrl = this.nativeCoverArtUrlValue
     }
 
     return track

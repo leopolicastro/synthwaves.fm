@@ -3,7 +3,7 @@
     <p class="py-2 px-3 bg-red-500/10 border border-red-500/20 mb-5 text-red-400 font-medium rounded-lg inline-block" id="alert"><%= alert %></p>
   <% end %>
 
-<div class="mt-6 text-sm text-gray-500">
+<div class="mt-6 text-sm text-gray-400">
   Don't have an account?
   <%= link_to "Sign up", new_registration_path, class: "text-neon-cyan underline hover:no-underline" %>
 </div>
@@ -28,7 +28,7 @@
         <%= form.submit "Sign in", class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-neon-pink hover:shadow-neon-pink text-white inline-block font-medium cursor-pointer" %>
       </div>
 
-      <div class="mt-4 text-sm text-gray-500 sm:mt-0">
+      <div class="mt-4 text-sm text-gray-400 sm:mt-0">
         <%= link_to "Forgot password?", new_password_path, class: "text-gray-400 underline hover:no-underline" %>
       </div>
     </div>

@@ -15,7 +15,7 @@
     <div class="mt-1 text-sm text-gray-400">
       <span class="font-mono"><%= api_key.client_id %></span>
     </div>
-    <div class="mt-1 text-xs text-gray-500 space-x-4">
+    <div class="mt-1 text-xs text-gray-400 space-x-4">
       <span>Created <%= time_ago_in_words(api_key.created_at) %> ago</span>
       <% if api_key.last_used_at %>
         <span>Last used <%= time_ago_in_words(api_key.last_used_at) %> ago<%= " from #{api_key.last_used_ip}" if api_key.last_used_ip %></span>

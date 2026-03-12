@@ -3,7 +3,7 @@
     <div class="min-w-0 flex-1">
       <p class="text-sm font-medium text-white truncate"><%= recording.title %></p>
       <p class="text-xs text-gray-400 mt-0.5"><%= recording.iptv_channel.name %></p>
-      <p class="text-xs text-gray-500 mt-0.5">
+      <p class="text-xs text-gray-400 mt-0.5">
         <%= recording.starts_at.strftime("%-I:%M %p") %> &ndash; <%= recording.ends_at.strftime("%-I:%M %p, %b %-d") %>
       </p>
 
@@ -26,15 +26,15 @@
         <% elsif recording.ready? %>
           <span class="text-xs text-green-400">Ready</span>
           <% if recording.duration %>
-            <span class="text-xs text-gray-500 ml-2"><%= (recording.duration / 60).round %> min</span>
+            <span class="text-xs text-gray-400 ml-2"><%= (recording.duration / 60).round %> min</span>
           <% end %>
         <% elsif recording.failed? %>
           <span class="text-xs text-red-400">Failed</span>
           <% if recording.error_message.present? %>
-            <p class="text-xs text-gray-500 mt-1"><%= recording.error_message %></p>
+            <p class="text-xs text-gray-400 mt-1"><%= recording.error_message %></p>
           <% end %>
         <% elsif recording.cancelled? %>
-          <span class="text-xs text-gray-500">Cancelled</span>
+          <span class="text-xs text-gray-400">Cancelled</span>
         <% end %>
       </div>
     </div>
@@ -54,7 +54,7 @@
         <% end %>
       <% end %>
       <% unless recording.recording? %>
-        <%= button_to recording_path(recording), method: :delete, class: "p-1.5 text-gray-500 hover:text-red-400 transition-colors cursor-pointer", title: "Delete", data: { turbo_confirm: "Delete this recording?" } do %>
+        <%= button_to recording_path(recording), method: :delete, class: "p-1.5 text-gray-400 hover:text-red-400 transition-colors cursor-pointer", title: "Delete", data: { turbo_confirm: "Delete this recording?" } do %>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
         <% end %>
       <% end %>

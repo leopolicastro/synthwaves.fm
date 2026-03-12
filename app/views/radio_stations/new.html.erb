@@ -37,7 +37,7 @@
         <div>
           <%= f.label :youtube_url, "YouTube URL", class: "block text-sm font-medium text-gray-400 mb-1" %>
           <%= f.text_field :youtube_url, placeholder: "https://youtube.com/watch?v=...", class: "w-full rounded-lg bg-gray-800 border-gray-700 text-white focus:outline-neon-cyan" %>
-          <p class="mt-1 text-xs text-gray-500">Paste a YouTube live stream URL (e.g., lo-fi radio channels).</p>
+          <p class="mt-1 text-xs text-gray-400">Paste a YouTube live stream URL (e.g., lo-fi radio channels).</p>
         </div>
       </div>
 
@@ -45,14 +45,14 @@
         <div>
           <%= f.label :stream_url, "Stream URL", class: "block text-sm font-medium text-gray-400 mb-1" %>
           <%= f.text_field :stream_url, placeholder: "https://radio.example.com/stream or .pls/.m3u URL", class: "w-full rounded-lg bg-gray-800 border-gray-700 text-white focus:outline-neon-cyan" %>
-          <p class="mt-1 text-xs text-gray-500">Direct stream URL or a .pls/.m3u playlist file URL.</p>
+          <p class="mt-1 text-xs text-gray-400">Direct stream URL or a .pls/.m3u playlist file URL.</p>
         </div>
       </div>
 
       <div>
         <%= f.label :name, class: "block text-sm font-medium text-gray-400 mb-1" %>
         <%= f.text_field :name, placeholder: "Station name (auto-filled if available)", class: "w-full rounded-lg bg-gray-800 border-gray-700 text-white focus:outline-neon-cyan" %>
-        <p class="mt-1 text-xs text-gray-500">Leave blank to auto-detect from the source.</p>
+        <p class="mt-1 text-xs text-gray-400">Leave blank to auto-detect from the source.</p>
       </div>
 
       <div class="pt-2">

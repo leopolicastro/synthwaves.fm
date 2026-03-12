@@ -37,11 +37,11 @@
   <div class="mt-8 bg-gray-900 rounded-lg p-6 border border-gray-700">
     <h2 class="font-semibold font-display text-lg text-white mb-3">API Usage</h2>
     <p class="text-sm text-gray-400 mb-4">Use your API key to obtain a JWT token:</p>
-    <pre class="bg-gray-800 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto"><code>curl -X POST <%= request.base_url %>/api/v1/auth/token \
+    <pre class="bg-gray-800 text-gray-400 p-4 rounded-lg text-sm overflow-x-auto"><code>curl -X POST <%= request.base_url %>/api/v1/auth/token \
   -H "Content-Type: application/json" \
   -d '{"client_id": "your_client_id", "secret_key": "your_secret_key"}'</code></pre>
     <p class="text-sm text-gray-400 mt-4">Then use the returned token for authenticated requests:</p>
-    <pre class="bg-gray-800 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto"><code>curl <%= request.base_url %>/api/v1/your_endpoint \
+    <pre class="bg-gray-800 text-gray-400 p-4 rounded-lg text-sm overflow-x-auto"><code>curl <%= request.base_url %>/api/v1/your_endpoint \
   -H "Authorization: Bearer your_jwt_token"</code></pre>
   </div>
 </div>

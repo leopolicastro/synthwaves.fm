@@ -20,7 +20,7 @@ export default class extends Controller {
       li.className = "flex items-center justify-between gap-2"
       li.innerHTML = `
         <span class="truncate">${file.name} (${this.formatSize(file.size)})</span>
-        <span class="text-gray-500 text-xs shrink-0" data-status>Pending</span>
+        <span class="text-gray-400 text-xs shrink-0" data-status>Pending</span>
       `
       this.listTarget.appendChild(li)
     })

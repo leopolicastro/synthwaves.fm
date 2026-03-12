@@ -25,7 +25,7 @@
       <div class="text-center">
         <div class="w-10 h-10 border-2 border-neon-cyan border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
         <p class="text-gray-400">Processing video...</p>
-        <p class="text-xs text-gray-500 mt-1">This may take a few minutes.</p>
+        <p class="text-xs text-gray-400 mt-1">This may take a few minutes.</p>
       </div>
     </div>
   <% elsif @video.status == "failed" %>
@@ -36,7 +36,7 @@
         </svg>
         <p class="text-red-400">Processing failed</p>
         <% if @video.error_message.present? %>
-          <p class="text-xs text-gray-500 mt-1"><%= @video.error_message %></p>
+          <p class="text-xs text-gray-400 mt-1"><%= @video.error_message %></p>
         <% end %>
       </div>
     </div>
@@ -51,18 +51,18 @@
     <% if @video.folder || @video.season_number || @video.episode_number %>
       <div class="mt-3 flex flex-wrap gap-2 text-xs">
         <% if @video.folder %>
-          <%= link_to @video.folder.name, folder_path(@video.folder), class: "px-2 py-1 bg-gray-700 text-gray-500 rounded hover:text-neon-cyan" %>
+          <%= link_to @video.folder.name, folder_path(@video.folder), class: "px-2 py-1 bg-gray-700 text-gray-400 rounded hover:text-neon-cyan" %>
         <% end %>
         <% if @video.season_number %>
-          <span class="px-2 py-1 bg-gray-700 text-gray-500 rounded">Season <%= @video.season_number %></span>
+          <span class="px-2 py-1 bg-gray-700 text-gray-400 rounded">Season <%= @video.season_number %></span>
         <% end %>
         <% if @video.episode_number %>
-          <span class="px-2 py-1 bg-gray-700 text-gray-500 rounded">Episode <%= @video.episode_number %></span>
+          <span class="px-2 py-1 bg-gray-700 text-gray-400 rounded">Episode <%= @video.episode_number %></span>
         <% end %>
       </div>
     <% end %>
 
-    <div class="mt-4 text-sm text-gray-500 space-y-1">
+    <div class="mt-4 text-sm text-gray-400 space-y-1">
       <% if @video.duration %><p>Duration: <%= format_duration(@video.duration) %></p><% end %>
       <% if @video.width && @video.height %><p>Resolution: <%= @video.width %>x<%= @video.height %></p><% end %>
       <% if @video.video_codec %><p>Codec: <%= @video.video_codec.upcase %></p><% end %>

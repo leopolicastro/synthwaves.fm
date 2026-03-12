@@ -26,10 +26,10 @@ export default class extends Controller {
       // Update button styling
       if (this.hasButtonTarget) {
         if (active) {
-          this.buttonTarget.classList.remove("text-gray-500")
+          this.buttonTarget.classList.remove("text-gray-400")
           this.buttonTarget.classList.add("text-neon-cyan")
         } else {
-          this.buttonTarget.classList.add("text-gray-500")
+          this.buttonTarget.classList.add("text-gray-400")
           this.buttonTarget.classList.remove("text-neon-cyan")
         }
       }

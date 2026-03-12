@@ -10,7 +10,7 @@
   <%% if @<%= plural_table_name %>.any? %>
     <!-- Sort Links -->
     <div class="mb-6">
-      <p class="text-sm text-gray-500 mb-3">Sort by:</p>
+      <p class="text-sm text-gray-400 mb-3">Sort by:</p>
       <div class="flex flex-wrap gap-2">
 <% attributes.reject{|attr| attr.password_digest?}.each do |attribute| -%>
         <%%= sort_link(@<%= plural_table_name %>, :<%= attribute.name %>, "<%= attribute.human_name %>", class: "inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-full border border-gray-700 bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-neon-cyan transition-colors") %>

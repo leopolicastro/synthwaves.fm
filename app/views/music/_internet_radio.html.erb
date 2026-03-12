@@ -107,7 +107,7 @@
                       <span class="text-xs text-gray-400"><%= station.country_code %></span>
                     <% end %>
                     <% if station.codec.present? %>
-                      <span class="text-xs text-gray-500"><%= station.codec %><%= "/#{station.bitrate}k" if station.bitrate&.positive? %></span>
+                      <span class="text-xs text-gray-400"><%= station.codec %><%= "/#{station.bitrate}k" if station.bitrate&.positive? %></span>
                     <% end %>
                   </div>
                 </div>
@@ -125,6 +125,6 @@
       <%== @pagy.series_nav %>
     </div>
   <% else %>
-    <p class="text-gray-500">No stations found. Try importing some stations using the form above.</p>
+    <p class="text-gray-400">No stations found. Try importing some stations using the form above.</p>
   <% end %>
 </div>

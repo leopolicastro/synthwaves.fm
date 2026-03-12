@@ -33,7 +33,7 @@
       <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 flex items-center justify-between hover:shadow transition-shadow">
         <%= link_to playlist_path(playlist), class: "flex-1 min-w-0", data: { turbo_frame: "_top" } do %>
           <div class="font-medium text-white hover:text-neon-cyan truncate"><%= playlist.name %></div>
-          <div class="text-sm text-gray-500"><%= pluralize(playlist.playlist_tracks_count, "track") %></div>
+          <div class="text-sm text-gray-400"><%= pluralize(playlist.playlist_tracks_count, "track") %></div>
         <% end %>
         <div class="flex items-center gap-3 flex-shrink-0 ml-4">
           <%= link_to edit_playlist_path(playlist), class: "text-gray-400 hover:text-neon-cyan", title: "Edit", data: { turbo_frame: "_top" } do %>
@@ -51,5 +51,5 @@
     <%== @pagy.series_nav %>
   </div>
 <% else %>
-  <p class="text-gray-500">No playlists found<%= " for \"#{@query}\"" if @query.present? %>.</p>
+  <p class="text-gray-400">No playlists found<%= " for \"#{@query}\"" if @query.present? %>.</p>
 <% end %>

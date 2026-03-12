@@ -18,19 +18,19 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
       <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
         <div class="text-2xl font-bold text-neon-cyan tabular-nums"><%= number_with_delimiter(@stats[:total_plays]) %></div>
-        <div class="text-sm text-gray-500">Total Plays</div>
+        <div class="text-sm text-gray-400">Total Plays</div>
       </div>
       <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
         <div class="text-2xl font-bold text-neon-pink tabular-nums"><%= format_listening_time(@stats[:total_listening_time]) %></div>
-        <div class="text-sm text-gray-500">Listening Time</div>
+        <div class="text-sm text-gray-400">Listening Time</div>
       </div>
       <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
         <div class="text-2xl font-bold text-laser-green tabular-nums"><%= @stats[:current_streak] %> days</div>
-        <div class="text-sm text-gray-500">Current Streak</div>
+        <div class="text-sm text-gray-400">Current Streak</div>
       </div>
       <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
         <div class="text-2xl font-bold text-neon-purple tabular-nums"><%= @stats[:longest_streak] %> days</div>
-        <div class="text-sm text-gray-500">Longest Streak</div>
+        <div class="text-sm text-gray-400">Longest Streak</div>
       </div>
     </div>
 
@@ -41,16 +41,16 @@
         <div class="bg-gray-800 rounded-lg border border-gray-700 divide-y divide-gray-700">
           <% @stats[:top_tracks].each_with_index do |entry, i| %>
             <div class="flex items-center gap-3 px-4 py-3">
-              <span class="text-gray-500 text-sm w-5 text-right"><%= i + 1 %></span>
+              <span class="text-gray-400 text-sm w-5 text-right"><%= i + 1 %></span>
               <div class="min-w-0 flex-1">
                 <div class="text-sm text-white truncate"><%= entry.title %></div>
-                <div class="text-xs text-gray-500 truncate"><%= entry.artist_name %></div>
+                <div class="text-xs text-gray-400 truncate"><%= entry.artist_name %></div>
               </div>
               <span class="text-xs text-neon-cyan tabular-nums"><%= entry.play_count %> plays</span>
             </div>
           <% end %>
           <% if @stats[:top_tracks].empty? %>
-            <div class="px-4 py-6 text-center text-gray-500 text-sm">No plays yet</div>
+            <div class="px-4 py-6 text-center text-gray-400 text-sm">No plays yet</div>
           <% end %>
         </div>
       </div>
@@ -61,7 +61,7 @@
         <div class="bg-gray-800 rounded-lg border border-gray-700 divide-y divide-gray-700">
           <% @stats[:top_artists].each_with_index do |entry, i| %>
             <div class="flex items-center gap-3 px-4 py-3">
-              <span class="text-gray-500 text-sm w-5 text-right"><%= i + 1 %></span>
+              <span class="text-gray-400 text-sm w-5 text-right"><%= i + 1 %></span>
               <div class="min-w-0 flex-1">
                 <div class="text-sm text-white truncate"><%= entry.name %></div>
               </div>
@@ -69,7 +69,7 @@
             </div>
           <% end %>
           <% if @stats[:top_artists].empty? %>
-            <div class="px-4 py-6 text-center text-gray-500 text-sm">No plays yet</div>
+            <div class="px-4 py-6 text-center text-gray-400 text-sm">No plays yet</div>
           <% end %>
         </div>
       </div>
@@ -87,7 +87,7 @@
               <div class="flex-1 bg-gray-700 rounded-full h-4 overflow-hidden">
                 <div class="h-full bg-gradient-to-r from-neon-pink to-neon-cyan rounded-full transition-all" style="width: <%= (entry.play_count / max_genre_count * 100).round %>%"></div>
               </div>
-              <span class="text-xs text-gray-500 tabular-nums w-10"><%= entry.play_count %></span>
+              <span class="text-xs text-gray-400 tabular-nums w-10"><%= entry.play_count %></span>
             </div>
           <% end %>
         </div>
@@ -109,11 +109,11 @@
             <% end %>
           </div>
           <div class="flex justify-between mt-1">
-            <span class="text-[10px] text-gray-500">12am</span>
-            <span class="text-[10px] text-gray-500">6am</span>
-            <span class="text-[10px] text-gray-500">12pm</span>
-            <span class="text-[10px] text-gray-500">6pm</span>
-            <span class="text-[10px] text-gray-500">12am</span>
+            <span class="text-[10px] text-gray-400">12am</span>
+            <span class="text-[10px] text-gray-400">6am</span>
+            <span class="text-[10px] text-gray-400">12pm</span>
+            <span class="text-[10px] text-gray-400">6pm</span>
+            <span class="text-[10px] text-gray-400">12am</span>
           </div>
         </div>
       </div>
@@ -128,7 +128,7 @@
               <div class="flex-1 flex flex-col items-center gap-1">
                 <div class="w-full bg-neon-pink/60 rounded-t transition-all"
                      style="height: <%= max_daily > 0 ? (@stats[:daily_distribution][i] / max_daily * 100).round : 0 %>%"></div>
-                <span class="text-[10px] text-gray-500"><%= day %></span>
+                <span class="text-[10px] text-gray-400"><%= day %></span>
               </div>
             <% end %>
           </div>

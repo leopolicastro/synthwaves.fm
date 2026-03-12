@@ -9,7 +9,7 @@
 
       <div class="flex flex-wrap items-end gap-4 mt-4">
         <div class="flex flex-col">
-          <label for="genre" class="text-sm text-gray-500 mb-1">Genre</label>
+          <label for="genre" class="text-sm text-gray-400 mb-1">Genre</label>
           <select name="genre" id="genre"
                   class="rounded-lg bg-gray-800 border-gray-700 text-white focus:outline-neon-cyan px-3 py-2 text-sm"
                   data-action="change->search#submit">
@@ -21,7 +21,7 @@
         </div>
 
         <div class="flex flex-col">
-          <label for="year_from" class="text-sm text-gray-500 mb-1">Year From</label>
+          <label for="year_from" class="text-sm text-gray-400 mb-1">Year From</label>
           <input type="number" name="year_from" id="year_from" value="<%= @year_from %>"
                  placeholder="e.g. 2010" min="1900" max="2099"
                  class="rounded-lg bg-gray-800 border-gray-700 text-white focus:outline-neon-cyan px-3 py-2 text-sm w-full sm:w-28"
@@ -29,7 +29,7 @@
         </div>
 
         <div class="flex flex-col">
-          <label for="year_to" class="text-sm text-gray-500 mb-1">Year To</label>
+          <label for="year_to" class="text-sm text-gray-400 mb-1">Year To</label>
           <input type="number" name="year_to" id="year_to" value="<%= @year_to %>"
                  placeholder="e.g. 2025" min="1900" max="2099"
                  class="rounded-lg bg-gray-800 border-gray-700 text-white focus:outline-neon-cyan px-3 py-2 text-sm w-full sm:w-28"
@@ -41,7 +41,7 @@
                  <%= "checked" if @favorites_only %>
                  class="rounded border-gray-700 text-neon-pink"
                  data-action="change->search#submit">
-          <label for="favorites_only" class="text-sm text-gray-500">Favorites only</label>
+          <label for="favorites_only" class="text-sm text-gray-400">Favorites only</label>
         </div>
       </div>
     <% end %>
@@ -66,7 +66,7 @@
           <% @results[:albums].each do |album| %>
             <div class="bg-gray-800 rounded-lg border border-gray-700 p-3">
               <%= link_to album.title, album_path(album), data: { turbo_frame: "_top" }, class: "font-medium text-white hover:text-neon-cyan" %>
-              <span class="text-sm text-gray-500">by <%= album.artist.name %></span>
+              <span class="text-sm text-gray-400">by <%= album.artist.name %></span>
             </div>
           <% end %>
         </div>
@@ -94,7 +94,7 @@
       <% end %>
 
       <% if @results[:artists].empty? && @results[:albums].empty? && @results[:tracks].empty? %>
-        <p class="text-gray-500">No results found for "<%= @query %>".</p>
+        <p class="text-gray-400">No results found for "<%= @query %>".</p>
       <% end %>
     <% end %>
   </turbo-frame>

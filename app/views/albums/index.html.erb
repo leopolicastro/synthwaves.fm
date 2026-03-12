@@ -39,7 +39,7 @@
                             </div>
                             <div class="p-3 collection-card-body">
                               <div class="font-medium text-white group-hover:text-neon-cyan truncate"><%= album.title %></div>
-                              <div class="text-sm text-gray-500"><%= album.artist.name %></div>
+                              <div class="text-sm text-gray-400"><%= album.artist.name %></div>
                               <div class="text-xs text-gray-400"><%= album.year %></div>
                             </div>
                           </div>
@@ -50,7 +50,7 @@
                       <%== @pagy.series_nav %>
                     </div>
                   <% else %>
-                    <p class="text-gray-500">No albums found<%= " for \"#{@query}\"" if @query.present? %>.</p>
+                    <p class="text-gray-400">No albums found<%= " for \"#{@query}\"" if @query.present? %>.</p>
                   <% end %>
                 </turbo-frame>
               </div>

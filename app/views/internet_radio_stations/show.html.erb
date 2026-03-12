@@ -35,7 +35,7 @@
           <% if @station.tags.present? %>
             <div class="flex flex-wrap gap-1 mt-2">
               <% @station.tags.split(",").first(10).each do |tag| %>
-                <%= link_to tag.strip, internet_radio_stations_path(tag: tag.strip), class: "inline-block px-2 py-0.5 text-xs rounded-full bg-gray-700 text-gray-500 hover:bg-gray-600 transition-colors" %>
+                <%= link_to tag.strip, internet_radio_stations_path(tag: tag.strip), class: "inline-block px-2 py-0.5 text-xs rounded-full bg-gray-700 text-gray-400 hover:bg-gray-600 transition-colors" %>
               <% end %>
             </div>
           <% end %>

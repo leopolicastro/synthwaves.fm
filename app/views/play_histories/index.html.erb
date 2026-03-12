@@ -16,7 +16,7 @@
             <% end %>
             <div>
               <div class="font-semibold text-white"><%= album.title %></div>
-              <div class="text-sm text-gray-500"><%= album.artist.name %></div>
+              <div class="text-sm text-gray-400"><%= album.artist.name %></div>
             </div>
           <% end %>
 
@@ -25,7 +25,7 @@
             <% play_histories.each do |ph| %>
               <%= render TrackRowComponent.new(track: ph.track, link_title: true, show_duration: false) do |c| %>
                 <% c.with_trailing do %>
-                  <span class="text-sm text-gray-500"><%= time_ago_in_words(ph.played_at) %> ago</span>
+                  <span class="text-sm text-gray-400"><%= time_ago_in_words(ph.played_at) %> ago</span>
                 <% end %>
               <% end %>
             <% end %>
@@ -34,6 +34,6 @@
       <% end %>
     </div>
   <% else %>
-    <p class="text-gray-500">No play history yet.</p>
+    <p class="text-gray-400">No play history yet.</p>
   <% end %>
 </div>

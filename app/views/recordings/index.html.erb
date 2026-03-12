@@ -47,7 +47,7 @@
         <%== @pagy.series_nav %>
       </div>
     <% else %>
-      <p class="text-gray-500">No recordings found<%= " for \"#{@query}\"" if @query.present? %>.</p>
+      <p class="text-gray-400">No recordings found<%= " for \"#{@query}\"" if @query.present? %>.</p>
     <% end %>
   </turbo-frame>
 </div>

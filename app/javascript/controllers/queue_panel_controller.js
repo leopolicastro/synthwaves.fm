@@ -40,7 +40,7 @@ export default class extends Controller {
 
     if (queue.length === 0) {
       this.listTarget.innerHTML = `
-        <div class="p-8 text-center text-gray-500 text-sm">
+        <div class="p-8 text-center text-gray-400 text-sm">
           Queue is empty
         </div>
       `
@@ -57,7 +57,7 @@ export default class extends Controller {
           <button type="button" data-action="click->queue-panel#playAt" data-index="${index}"
                   class="flex-1 min-w-0 text-left cursor-pointer">
             <div class="text-sm ${titleClass} truncate">${this.escapeHtml(track.title || "Unknown")}</div>
-            <div class="text-xs text-gray-500 truncate">${this.escapeHtml(track.artist || "")}</div>
+            <div class="text-xs text-gray-400 truncate">${this.escapeHtml(track.artist || "")}</div>
           </button>
           <div class="flex items-center gap-0.5 flex-shrink-0">
             ${index > 0 ? `

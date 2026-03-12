@@ -69,7 +69,7 @@ export default class extends Controller {
       if (!response.ok) return
       const data = await response.json()
       if (!data.lyrics) {
-        this.contentTarget.innerHTML = '<span class="text-gray-600">No lyrics available</span>'
+        this.contentTarget.innerHTML = '<span class="text-gray-400">No lyrics available</span>'
         return
       }
 
@@ -82,7 +82,7 @@ export default class extends Controller {
         this.contentTarget.classList.add("whitespace-pre-line", "text-gray-400")
       }
     } catch (e) {
-      this.contentTarget.innerHTML = '<span class="text-gray-600">No lyrics available</span>'
+      this.contentTarget.innerHTML = '<span class="text-gray-400">No lyrics available</span>'
     }
   }
 
@@ -109,7 +109,7 @@ export default class extends Controller {
     for (const line of this._syncedLines) {
       const el = document.createElement("p")
       el.textContent = line.text || "\u00A0"
-      el.className = "py-1 transition-all duration-300 text-gray-600"
+      el.className = "py-1 transition-all duration-300 text-gray-400"
       this.contentTarget.appendChild(el)
     }
   }
@@ -135,7 +135,7 @@ export default class extends Controller {
       if (i === activeIndex) {
         children[i].className = "py-1 transition-all duration-300 text-white font-semibold scale-105"
       } else {
-        children[i].className = "py-1 transition-all duration-300 text-gray-600"
+        children[i].className = "py-1 transition-all duration-300 text-gray-400"
       }
     }
 

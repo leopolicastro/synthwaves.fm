@@ -5,7 +5,7 @@
     <% if has_results %>
       <% if @results[:artists].any? %>
         <div class="px-3 py-2">
-          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Artists</h3>
+          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Artists</h3>
           <% @results[:artists].each do |artist| %>
             <%= link_to artist_path(artist), data: { turbo_frame: "_top" }, class: "block px-2 py-1.5 text-sm text-white hover:bg-gray-700 rounded" do %>
               <%= artist.name %>
@@ -16,7 +16,7 @@
 
       <% if @results[:albums].any? %>
         <div class="px-3 py-2 border-t border-gray-700">
-          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Albums</h3>
+          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Albums</h3>
           <% @results[:albums].each do |album| %>
             <%= link_to album_path(album), data: { turbo_frame: "_top" }, class: "block px-2 py-1.5 text-sm text-white hover:bg-gray-700 rounded" do %>
               <span><%= album.title %></span>
@@ -28,7 +28,7 @@
 
       <% if @results[:tracks].any? %>
         <div class="px-3 py-2 border-t border-gray-700">
-          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Tracks</h3>
+          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Tracks</h3>
           <% @results[:tracks].each do |track| %>
             <%= link_to track_path(track), data: { turbo_frame: "_top" }, class: "block px-2 py-1.5 text-sm text-white hover:bg-gray-700 rounded" do %>
               <span><%= track.title %></span>
@@ -42,7 +42,7 @@
         <%= link_to "See all results", search_path(q: @query), data: { turbo_frame: "_top" }, class: "block text-center text-sm text-neon-cyan hover:text-neon-cyan py-1" %>
       </div>
     <% else %>
-      <div class="px-3 py-4 text-sm text-gray-500 text-center">
+      <div class="px-3 py-4 text-sm text-gray-400 text-center">
         No results found for "<%= @query %>"
       </div>
     <% end %>

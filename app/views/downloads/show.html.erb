@@ -16,7 +16,7 @@
         <div class="mt-3 w-full bg-gray-700 rounded-full h-2.5">
           <div class="bg-neon-cyan h-2.5 rounded-full transition-all duration-300" style="width: <%= @download.progress_percentage %>%"></div>
         </div>
-        <p class="text-sm text-gray-500 mt-2"><%= @download.processed_tracks %>/<%= @download.total_tracks %> tracks processed</p>
+        <p class="text-sm text-gray-400 mt-2"><%= @download.processed_tracks %>/<%= @download.total_tracks %> tracks processed</p>
       <% elsif @download.ready? %>
         <p class="text-green-400 mb-4">Your download is ready!</p>
         <%= link_to "Download File", file_download_path(@download),
@@ -24,7 +24,7 @@
       <% elsif @download.failed? %>
         <p class="text-red-400">Download failed.</p>
         <% if @download.error_message.present? %>
-          <p class="text-sm text-gray-500 mt-2"><%= @download.error_message %></p>
+          <p class="text-sm text-gray-400 mt-2"><%= @download.error_message %></p>
         <% end %>
       <% end %>
     </div>

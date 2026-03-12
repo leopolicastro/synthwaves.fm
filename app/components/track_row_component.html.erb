@@ -31,7 +31,7 @@
         <% end %>
       </div>
       <% if show_subtitle? %>
-        <div class="text-sm text-gray-500">
+        <div class="text-sm text-gray-400">
           <% parts = [] %>
           <% if show_artist? %>
             <% if link_subtitle? %>
@@ -54,7 +54,7 @@
   </div>
   <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
     <% if show_duration? %>
-      <span class="hidden sm:inline text-sm text-gray-500"><%= format_duration(track.duration || 0) %></span>
+      <span class="hidden sm:inline text-sm text-gray-400"><%= format_duration(track.duration || 0) %></span>
     <% end %>
     <%= trailing if trailing? %>
   </div>

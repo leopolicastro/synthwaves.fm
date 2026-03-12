@@ -122,14 +122,14 @@ RSpec.describe TrackRowComponent, type: :component do
   describe "subtitle" do
     it "shows artist and album by default" do
       html = render_component
-      subtitle = html.at_css(".text-sm.text-gray-500")
+      subtitle = html.at_css(".text-sm.text-gray-400")
       expect(subtitle.text).to include("Test Artist")
       expect(subtitle.text).to include("Test Album")
     end
 
     it "links artist and album when link_subtitle is true" do
       html = render_component(link_subtitle: true)
-      links = html.css(".text-sm.text-gray-500 a")
+      links = html.css(".text-sm.text-gray-400 a")
       expect(links.size).to eq(2)
       expect(links[0].text.strip).to eq("Test Artist")
       expect(links[1].text.strip).to eq("Test Album")
@@ -137,14 +137,14 @@ RSpec.describe TrackRowComponent, type: :component do
 
     it "hides album when show_album is false" do
       html = render_component(show_album: false)
-      subtitle = html.at_css(".text-sm.text-gray-500")
+      subtitle = html.at_css(".text-sm.text-gray-400")
       expect(subtitle.text).to include("Test Artist")
       expect(subtitle.text).not_to include("Test Album")
     end
 
     it "hides artist when it matches hide_artist_if" do
       html = render_component(hide_artist_if: artist, show_album: false)
-      subtitle = html.at_css(".font-medium").parent.css(".text-sm.text-gray-500")
+      subtitle = html.at_css(".font-medium").parent.css(".text-sm.text-gray-400")
       expect(subtitle).to be_empty
     end
 
@@ -152,7 +152,7 @@ RSpec.describe TrackRowComponent, type: :component do
       other_artist = create(:artist, name: "Other Artist")
       other_track = create(:track, title: "Other Song", artist: other_artist, album: album, duration: 100)
       html = render_inline(described_class.new(track: other_track, hide_artist_if: artist, show_album: false))
-      subtitle = html.at_css(".text-sm.text-gray-500")
+      subtitle = html.at_css(".text-sm.text-gray-400")
       expect(subtitle.text).to include("Other Artist")
     end
   end

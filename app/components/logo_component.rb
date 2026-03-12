@@ -22,9 +22,9 @@ class LogoComponent < ViewComponent::Base
 
   def icon_wrapper_classes
     case size
-    when :sm then "w-7 h-7 rounded-md"
-    when :md then "w-9 h-9 rounded-lg"
-    when :lg then "w-16 h-16 rounded-2xl"
+    when :sm then "w-7 h-7 rounded-md border border-neon-purple/30"
+    when :md then "w-9 h-9 rounded-lg border border-neon-purple/30"
+    when :lg then "w-16 h-16 rounded-2xl border border-neon-purple/30"
     end
   end
 end

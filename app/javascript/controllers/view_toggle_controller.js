@@ -44,11 +44,11 @@ export default class extends Controller {
     if (this.hasGridBtnTarget && this.hasListBtnTarget) {
       this.gridBtnTarget.classList.toggle("bg-gray-700", mode === "grid")
       this.gridBtnTarget.classList.toggle("text-neon-cyan", mode === "grid")
-      this.gridBtnTarget.classList.toggle("text-gray-500", mode !== "grid")
+      this.gridBtnTarget.classList.toggle("text-gray-400", mode !== "grid")
 
       this.listBtnTarget.classList.toggle("bg-gray-700", mode === "list")
       this.listBtnTarget.classList.toggle("text-neon-cyan", mode === "list")
-      this.listBtnTarget.classList.toggle("text-gray-500", mode !== "list")
+      this.listBtnTarget.classList.toggle("text-gray-400", mode !== "list")
     }
   }
 }

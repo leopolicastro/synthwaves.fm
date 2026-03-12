@@ -27,7 +27,7 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-gray-400 mb-1">Season Number <span class="text-gray-500">(optional)</span></label>
+      <label class="block text-sm font-medium text-gray-400 mb-1">Season Number <span class="text-gray-400">(optional)</span></label>
       <input type="number" name="season_number" value="<%= params[:season_number] %>" min="1"
              placeholder="e.g. 1"
              class="w-full rounded-lg bg-gray-800 border-gray-700 text-white focus:outline-neon-cyan px-3 py-2 text-sm border">
@@ -38,8 +38,8 @@
       <input type="file" name="video_files[]" accept="video/*,.mkv" multiple required
              data-bulk-upload-target="input"
              data-action="change->bulk-upload#filesChanged"
-             class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-neon-cyan/10 file:text-neon-cyan hover:file:bg-neon-cyan/20">
-      <p class="mt-1 text-sm text-gray-500">Select multiple video files. Episode numbers will be parsed from filenames (e.g. S01E03, E03, 03 - Title).</p>
+             class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-neon-cyan/10 file:text-neon-cyan hover:file:bg-neon-cyan/20">
+      <p class="mt-1 text-sm text-gray-400">Select multiple video files. Episode numbers will be parsed from filenames (e.g. S01E03, E03, 03 - Title).</p>
     </div>
 
     <div data-bulk-upload-target="preview" class="hidden">

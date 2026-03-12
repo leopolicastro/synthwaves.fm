@@ -1,0 +1,10 @@
+<nav class="fixed bottom-16 left-0 right-0 z-50 md:hidden bg-gray-800 border-t border-neon-cyan/30">
+  <div class="flex justify-around items-center py-2">
+    <% tabs.each do |tab| %>
+      <%= link_to tab.path, class: "flex flex-col items-center gap-1 px-4 py-1.5 #{tab_classes(tab)}" do %>
+        <%= icon_svg(tab).html_safe %>
+        <span class="text-[11px] font-semibold"><%= tab.label %></span>
+      <% end %>
+    <% end %>
+  </div>
+</nav>

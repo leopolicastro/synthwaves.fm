@@ -9,7 +9,7 @@
 
     <% if @recording.ready? && @recording.file.attached? %>
       <div class="mb-4 rounded-xl overflow-hidden bg-black aspect-video">
-        <video controls class="w-full h-full" preload="metadata" airplay="allow" x-webkit-airplay="allow">
+        <video controls playsinline class="w-full h-full" preload="metadata" airplay="allow" x-webkit-airplay="allow">
           <source src="<%= rails_blob_path(@recording.file) %>" type="video/mp4">
           Your browser does not support the video tag.
         </video>

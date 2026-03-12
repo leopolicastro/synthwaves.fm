@@ -34,7 +34,7 @@
       <meta name="turbo:native" content="true">
     <% end %>
   </head>
-  <body class="bg-gray-900 synthwave-bg text-white <%= 'pb-24' unless turbo_native_app? %> scanlines" data-controller="youtube-player keyboard-shortcuts<%= ' bridge--playback' if turbo_native_app? %>">
+  <body class="bg-gray-900 synthwave-bg text-white <%= 'pb-40 md:pb-24' unless turbo_native_app? %> scanlines" data-controller="youtube-player keyboard-shortcuts<%= ' bridge--playback' if turbo_native_app? %>">
     <% if authenticated? %>
       <%= turbo_stream_from "downloads_#{Current.user.id}" %>
       <%= turbo_stream_from "recordings_#{Current.user.id}" %>
@@ -52,10 +52,13 @@
       <%= yield %>
     </main>
     <% unless turbo_native_app? %>
+    <% if authenticated? %>
+      <%= render BottomTabBarComponent.new(current_path: request.path, user: Current.user) %>
+    <% end %>
     <!-- Queue panel (slide-out) -->
     <div id="queue-panel-container" data-turbo-permanent data-controller="queue-panel">
       <div data-queue-panel-target="panel"
-           class="fixed right-0 bottom-16 w-full sm:w-80 left-0 sm:left-auto max-h-[60vh] bg-gray-800 border border-neon-purple/30 rounded-tl-lg rounded-bl-lg shadow-xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+           class="fixed right-0 bottom-30 md:bottom-16 w-full sm:w-80 left-0 sm:left-auto max-h-[60vh] bg-gray-800 border border-neon-purple/30 rounded-tl-lg rounded-bl-lg shadow-xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
         <div class="flex items-center justify-between px-4 py-3 border-b border-gray-700">
           <h3 class="text-sm font-semibold text-white">Queue</h3>
           <button type="button" data-action="queue-panel#clear" class="text-xs text-red-500 hover:text-red-400">Clear</button>
@@ -66,7 +69,7 @@
     <!-- Visualizer drawer (slides up from player bar) -->
     <div id="visualizer-panel-container" data-turbo-permanent data-controller="visualizer-panel">
       <div data-visualizer-panel-target="panel"
-           class="fixed left-0 right-0 bottom-16 h-[40vh] bg-gray-900/95 border-t border-neon-purple/30 shadow-xl z-40 transform translate-y-full transition-transform duration-300"
+           class="fixed left-0 right-0 bottom-30 md:bottom-16 h-[40vh] bg-gray-900/95 border-t border-neon-purple/30 shadow-xl z-40 transform translate-y-full transition-transform duration-300"
            data-controller="visualizer">
         <button type="button" data-action="visualizer-panel#close"
                 class="absolute top-2 right-2 z-10 text-gray-400 hover:text-white p-1">

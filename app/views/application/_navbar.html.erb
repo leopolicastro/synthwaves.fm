@@ -45,11 +45,6 @@
           </summary>
           <div class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg border border-gray-700 py-1 z-50">
             <div class="md:hidden">
-              <%= link_to "Listen", music_path, class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
-              <% if Flipper.enabled?(:iptv, Current.user) %>
-                <%= link_to "Watch", tv_path, class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
-              <% end %>
-              <%= link_to "Search", search_path, class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
               <%= link_to "Stats", stats_path, class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
               <div class="border-t border-gray-700 my-1"></div>
             </div>

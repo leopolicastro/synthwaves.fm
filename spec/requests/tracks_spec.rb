@@ -79,6 +79,29 @@ RSpec.describe "Tracks", type: :request do
       expect(response.body).to include('data-playlist-menu-target="input"')
       expect(response.body).to include("Search playlists")
     end
+
+    it "renders icon buttons with title attributes" do
+      get track_path(track)
+
+      doc = Nokogiri::HTML(response.body)
+      play_btn = doc.at_css('button[title="Play"]')
+      expect(play_btn).to be_present
+      expect(play_btn["data-action"]).to eq("song-row#play")
+
+      expect(doc.at_css('a[title="Edit"]')).to be_present
+      expect(doc.at_css('button[title="Delete"]')).to be_present
+    end
+
+    it "renders download icon button only when audio file is attached" do
+      youtube_track = create(:track, :youtube)
+      get track_path(youtube_track)
+      doc = Nokogiri::HTML(response.body)
+      expect(doc.at_css('a[title="Download"]')).to be_nil
+
+      get track_path(track)
+      doc = Nokogiri::HTML(response.body)
+      expect(doc.at_css('a[title="Download"]')).to be_present
+    end
   end
 
   describe "GET /tracks/new" do

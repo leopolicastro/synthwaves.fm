@@ -37,9 +37,9 @@
             <%= render "taggings/tags", taggable: @track %>
           </div>
 
-          <div class="mt-4 flex flex-wrap items-center gap-2">
-            <%= render "favorites/button", favorable: @track, favorited: Current.user.favorites.exists?(favorable: @track) %>
-            <button class="px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink"
+          <div class="mt-4 flex items-center gap-3">
+            <button class="w-10 h-10 rounded-full bg-neon-pink text-white flex items-center justify-center hover:shadow-neon-pink"
+                    title="Play"
                     data-controller="song-row"
                     data-song-row-track-id-value="<%= @track.id %>"
                     data-song-row-title-value="<%= @track.title %>"
@@ -50,14 +50,22 @@
                     data-song-row-youtube-video-id-value="<%= @track.youtube_video_id %>"
                     <% end %>
                     data-action="song-row#play">
-              Play
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
             </button>
-            <% if @track.audio_file.attached? %>
-              <%= link_to "Download", download_track_path(@track), class: "px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600" %>
-            <% end %>
-            <%= link_to "Edit", edit_track_path(@track), class: "px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600" %>
-            <%= button_to "Delete", track_path(@track), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700" %>
+            <%= render "favorites/button", favorable: @track, favorited: Current.user.favorites.exists?(favorable: @track) %>
             <%= render "playlist_tracks/add_menu", track: @track, playlists: current_user_playlists, menu_class: "left-0" %>
+            <div class="w-px h-6 bg-gray-600"></div>
+            <% if @track.audio_file.attached? %>
+              <%= link_to download_track_path(@track), class: "p-1.5 text-gray-400 hover:text-neon-cyan", title: "Download" do %>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <% end %>
+            <% end %>
+            <%= link_to edit_track_path(@track), class: "p-1.5 text-gray-400 hover:text-neon-cyan", title: "Edit" do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            <% end %>
+            <%= button_to track_path(@track), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "p-1.5 text-gray-400 hover:text-red-500", title: "Delete" do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            <% end %>
           </div>
         </div>
       </div>

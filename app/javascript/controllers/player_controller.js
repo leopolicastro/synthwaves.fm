@@ -234,7 +234,16 @@ export default class extends Controller {
   }
 
   onAirplayStateChanged({ active }) {
+    const wasActive = this.airplayActive
     this.airplayActive = active
+
+    // AirPlay just became active mid-playback — swap to direct URL
+    if (active && !wasActive && !this.audio.paused && this._resolvedDirectUrl) {
+      const currentTime = this.audio.currentTime
+      this.audio.src = this._resolvedDirectUrl
+      this.audio.currentTime = currentTime
+      this.audio.play()
+    }
   }
 
   // Playback
@@ -273,9 +282,11 @@ export default class extends Controller {
       document.dispatchEvent(new CustomEvent("player:sourceChanged", {
         detail: { streamUrl }
       }))
+    } else if (this.airplayActive) {
+      // AirPlay is already active — must resolve first so Apple TV gets the direct URL
+      this._resolveAndPlayForAirplay(streamUrl)
     } else {
-      // Resolve the redirect to get the direct URL (e.g. presigned S3 URL)
-      // so AirPlay sends the resolved URL to the Apple TV, not the app URL
+      // Fast path: play immediately via the app URL, resolve in background for AirPlay
       this._resolveAndPlay(streamUrl)
     }
 
@@ -600,11 +611,25 @@ export default class extends Controller {
     }
   }
 
-  async _resolveAndPlay(streamUrl) {
+  _resolveAndPlay(streamUrl) {
+    // Play immediately via the app URL — the browser follows the 302 redirect
+    // at the network level, which is faster than a JS fetch roundtrip
+    this._resolvedDirectUrl = null
+    this.audio.src = streamUrl
+    this.audio.dataset.appStreamUrl = streamUrl
+    this.audio.play()
+    document.dispatchEvent(new CustomEvent("player:sourceChanged", {
+      detail: { streamUrl }
+    }))
+
+    // Background resolve for AirPlay — if AirPlay activates mid-song,
+    // onAirplayStateChanged will swap to the direct URL
+    this._backgroundResolve(streamUrl)
+  }
+
+  async _resolveAndPlayForAirplay(streamUrl) {
     let resolvedUrl = streamUrl
     try {
-      // Ask the server for the direct S3 URL so audio.src points directly
-      // to S3 — required for AirPlay (Apple TV fetches audio.src directly)
       const separator = streamUrl.includes("?") ? "&" : "?"
       const response = await fetch(`${streamUrl}${separator}resolve=1`, {
         headers: { "Accept": "application/json" }
@@ -616,11 +641,37 @@ export default class extends Controller {
     } catch (e) {
       // Fall back to original stream URL
     }
+    this._resolvedDirectUrl = resolvedUrl
     this.audio.src = resolvedUrl
+    this.audio.dataset.appStreamUrl = streamUrl
     this.audio.play()
     document.dispatchEvent(new CustomEvent("player:sourceChanged", {
-      detail: { streamUrl: resolvedUrl }
+      detail: { streamUrl }
     }))
+  }
+
+  async _backgroundResolve(streamUrl) {
+    try {
+      const separator = streamUrl.includes("?") ? "&" : "?"
+      const response = await fetch(`${streamUrl}${separator}resolve=1`, {
+        headers: { "Accept": "application/json" }
+      })
+      if (response.ok) {
+        const data = await response.json()
+        if (data.url) {
+          this._resolvedDirectUrl = data.url
+          // If AirPlay became active while we were resolving, swap now
+          if (this.airplayActive && !this.audio.paused) {
+            const currentTime = this.audio.currentTime
+            this.audio.src = this._resolvedDirectUrl
+            this.audio.currentTime = currentTime
+            this.audio.play()
+          }
+        }
+      }
+    } catch (e) {
+      // Non-critical — AirPlay will use the app URL which still works via redirect
+    }
   }
 
   recordPlay(trackId) {
@@ -646,6 +697,7 @@ export default class extends Controller {
     this._pendingPreload = track
     // Preload next track for gapless/crossfade
     const preload = this._ensurePreloadAudio()
+    preload.dataset.appStreamUrl = track.streamUrl
     if (preload.src !== track.streamUrl) {
       preload.src = track.streamUrl
       preload.load()
@@ -700,7 +752,7 @@ export default class extends Controller {
         this._crossfading = false
 
         document.dispatchEvent(new CustomEvent("player:sourceChanged", {
-          detail: { streamUrl: preload.src }
+          detail: { streamUrl: preload.dataset.appStreamUrl || preload.src }
         }))
         // Trigger queue advance (without playing since we already started)
         document.dispatchEvent(new CustomEvent("queue:next"))

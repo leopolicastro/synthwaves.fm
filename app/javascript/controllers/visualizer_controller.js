@@ -98,7 +98,7 @@ export default class extends Controller {
 
     try {
       const shadow = this._ensureShadowAudio()
-      this._updateShadowSrc(this.audio.src)
+      this._updateShadowSrc(this.audio.dataset.appStreamUrl || this.audio.src)
 
       const ctx = new (window.AudioContext || window.webkitAudioContext)()
       const source = ctx.createMediaElementSource(shadow)

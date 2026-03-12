@@ -10,6 +10,7 @@ class MediaDownloadService
   end
 
   def download_audio(url, output_dir:)
+    reject_live_stream!(url)
     output_template = File.join(output_dir, "%(id)s.%(ext)s")
 
     run_yt_dlp(
@@ -23,6 +24,7 @@ class MediaDownloadService
   end
 
   def download_video(url, output_dir:)
+    reject_live_stream!(url)
     output_template = File.join(output_dir, "%(id)s.%(ext)s")
 
     run_yt_dlp(
@@ -37,6 +39,16 @@ class MediaDownloadService
   end
 
   private
+
+  def reject_live_stream!(url)
+    metadata_json, status = Open3.capture2e("yt-dlp", "--dump-json", "--no-download", url)
+    return unless status.success?
+
+    metadata = JSON.parse(metadata_json)
+    raise Error, "Cannot download a live stream" if metadata["is_live"] == true
+  rescue JSON::ParserError
+    # If we can't parse metadata, let the download attempt proceed
+  end
 
   def run_yt_dlp(*args)
     stdout_stderr, status = Open3.capture2e("yt-dlp", *args)

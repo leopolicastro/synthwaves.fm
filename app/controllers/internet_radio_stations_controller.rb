@@ -1,5 +1,6 @@
 class InternetRadioStationsController < ApplicationController
-  before_action :require_feature
+  include FeatureFlagged
+  require_feature :internet_radio
 
   def index
     @categories = InternetRadioCategory.with_stations.order(:name)
@@ -11,7 +12,7 @@ class InternetRadioStationsController < ApplicationController
     end
 
     if params[:favorites] == "1"
-      favorite_ids = Current.user.favorites.where(favorable_type: "InternetRadioStation").pluck(:favorable_id)
+      favorite_ids = Current.user.favorited_ids_for("InternetRadioStation")
       scope = scope.where(id: favorite_ids)
     end
 
@@ -26,7 +27,7 @@ class InternetRadioStationsController < ApplicationController
 
     @pagy, @stations = pagy(scope, limit: 24)
 
-    @favorited_station_ids = Current.user.favorites.where(favorable_type: "InternetRadioStation").pluck(:favorable_id).to_set
+    @favorited_station_ids = Current.user.favorited_ids_for("InternetRadioStation")
 
     @countries = InternetRadioStation.active.where.not(country_code: [nil, ""]).distinct.pluck(:country_code).sort
   end
@@ -93,10 +94,6 @@ class InternetRadioStationsController < ApplicationController
   end
 
   private
-
-  def require_feature
-    redirect_to root_path, alert: "This feature is not available." unless Flipper.enabled?(:internet_radio, Current.user)
-  end
 
   def station_params
     params.require(:internet_radio_station).permit(:name, :stream_url, :homepage_url, :favicon_url, :country, :country_code, :language, :tags, :codec, :bitrate)

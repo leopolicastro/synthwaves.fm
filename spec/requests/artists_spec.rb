@@ -132,7 +132,7 @@ RSpec.describe "Artists", type: :request do
       login_user(user)
       artist = create(:artist)
       get edit_artist_path(artist)
-      expect(response).to redirect_to(artists_path)
+      expect(response).to redirect_to(root_path)
     end
   end
 
@@ -169,7 +169,7 @@ RSpec.describe "Artists", type: :request do
       login_user(user)
       artist = create(:artist, name: "Original")
       patch artist_path(artist), params: {artist: {name: "Hacked"}}
-      expect(response).to redirect_to(artists_path)
+      expect(response).to redirect_to(root_path)
       expect(artist.reload.name).to eq("Original")
     end
   end
@@ -197,7 +197,7 @@ RSpec.describe "Artists", type: :request do
       login_user(user)
       artist = create(:artist)
       delete artist_path(artist)
-      expect(response).to redirect_to(artists_path)
+      expect(response).to redirect_to(root_path)
       expect(Artist.exists?(artist.id)).to be true
     end
   end

@@ -1,7 +1,7 @@
 class RadioStreamsController < ApplicationController
   include ActionController::Live
-
-  before_action :require_feature
+  include FeatureFlagged
+  require_feature :youtube_radio
 
   def show
     station = RadioStation.find(params[:radio_station_id])
@@ -33,9 +33,4 @@ class RadioStreamsController < ApplicationController
     response.stream.close
   end
 
-  private
-
-  def require_feature
-    redirect_to root_path, alert: "This feature is not available." unless Flipper.enabled?(:youtube_radio, Current.user)
-  end
 end

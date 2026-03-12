@@ -230,18 +230,18 @@ RSpec.describe "Tracks", type: :request do
 
     it "redirects non-admin from edit" do
       get edit_track_path(track)
-      expect(response).to redirect_to(tracks_path)
+      expect(response).to redirect_to(root_path)
     end
 
     it "redirects non-admin from update" do
       patch track_path(track), params: {track: {title: "Hacked"}}
-      expect(response).to redirect_to(tracks_path)
+      expect(response).to redirect_to(root_path)
       expect(track.reload.title).not_to eq("Hacked")
     end
 
     it "redirects non-admin from destroy" do
       delete track_path(track)
-      expect(response).to redirect_to(tracks_path)
+      expect(response).to redirect_to(root_path)
       expect(Track.exists?(track.id)).to be true
     end
   end

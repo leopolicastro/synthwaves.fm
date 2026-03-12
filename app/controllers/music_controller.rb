@@ -54,7 +54,7 @@ class MusicController < ApplicationController
     @query = params[:q]
     scope = Track.music.includes(:artist, :album).search(@query).order(:title)
     @pagy, @tracks = pagy(:offset, scope, limit: 24)
-    @favorited_track_ids = Current.user.favorites.where(favorable_type: "Track").pluck(:favorable_id).to_set
+    @favorited_track_ids = Current.user.favorited_ids_for("Track")
   end
 
   def load_playlists
@@ -80,7 +80,7 @@ class MusicController < ApplicationController
     end
 
     if params[:favorites] == "1"
-      favorite_ids = Current.user.favorites.where(favorable_type: "InternetRadioStation").pluck(:favorable_id)
+      favorite_ids = Current.user.favorited_ids_for("InternetRadioStation")
       scope = scope.where(id: favorite_ids)
     end
 
@@ -95,7 +95,7 @@ class MusicController < ApplicationController
 
     @pagy, @stations = pagy(scope, limit: 24)
 
-    @favorited_station_ids = Current.user.favorites.where(favorable_type: "InternetRadioStation").pluck(:favorable_id).to_set
+    @favorited_station_ids = Current.user.favorited_ids_for("InternetRadioStation")
 
     @countries = InternetRadioStation.active.where.not(country_code: [nil, ""]).distinct.pluck(:country_code).sort
   end

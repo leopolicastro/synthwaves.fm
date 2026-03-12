@@ -18,9 +18,7 @@ class VideoCardComponent < ViewComponent::Base
 
   def formatted_duration
     return nil unless video.duration
-    minutes = (video.duration / 60).floor
-    seconds = (video.duration % 60).floor
-    format("%d:%02d", minutes, seconds)
+    helpers.format_duration(video.duration)
   end
 
   def resolution_label

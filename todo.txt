@@ -1,4 +1,3 @@
 # To Do
 
-- [ ] Block all endpoints from bots.
-- [ ] Backup database
+- [ ] Offer mux for videos alternative

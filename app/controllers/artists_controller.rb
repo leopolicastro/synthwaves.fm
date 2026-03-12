@@ -1,5 +1,6 @@
 class ArtistsController < ApplicationController
   include Orderable
+  include AdminAuthorization
 
   before_action :require_admin, only: [:edit, :update, :destroy]
 
@@ -38,10 +39,6 @@ class ArtistsController < ApplicationController
   end
 
   private
-
-  def require_admin
-    redirect_to artists_path, alert: "Not authorized." unless Current.user.admin?
-  end
 
   def artist_params
     params.require(:artist).permit(:name, :category)

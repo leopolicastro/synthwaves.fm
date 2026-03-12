@@ -15,7 +15,7 @@ class PlaylistsController < ApplicationController
   def show
     @playlist_tracks = @playlist.playlist_tracks.includes(track: [:artist, :album])
     @total_duration = @playlist_tracks.sum { |pt| pt.track.duration || 0 }
-    @favorited_track_ids = Current.user.favorites.where(favorable_type: "Track").pluck(:favorable_id).to_set
+    @favorited_track_ids = Current.user.favorited_ids_for("Track")
   end
 
   def new

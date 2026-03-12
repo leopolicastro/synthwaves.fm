@@ -1,4 +1,6 @@
 class Artist < ApplicationRecord
+  include SearchIndexable
+
   has_many :albums, dependent: :destroy
   has_many :tracks, dependent: :destroy
   has_many :favorites, as: :favorable, dependent: :destroy
@@ -22,9 +24,4 @@ class Artist < ApplicationRecord
 
   private
 
-  def reindex_tracks_search
-    tracks.find_each do |track|
-      track.send(:update_search_index)
-    end
-  end
 end

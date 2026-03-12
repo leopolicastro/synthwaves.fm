@@ -1,4 +1,6 @@
 class Video < ApplicationRecord
+  include Downloadable
+
   FOLDER_SORT_OPTIONS = {
     "episode_number" => "Episode Number",
     "title" => "Title",
@@ -20,18 +22,6 @@ class Video < ApplicationRecord
   scope :ordered, -> { order(:season_number, :episode_number) }
 
   after_create_commit :convert_video
-
-  def downloading?
-    download_status == "downloading"
-  end
-
-  def download_failed?
-    download_status == "failed"
-  end
-
-  def download_completed?
-    download_status == "completed"
-  end
 
   private
 

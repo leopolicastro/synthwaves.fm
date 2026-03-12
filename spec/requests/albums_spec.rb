@@ -370,7 +370,7 @@ RSpec.describe "Albums", type: :request do
       login_user(user)
       album = create(:album)
       get edit_album_path(album)
-      expect(response).to redirect_to(albums_path)
+      expect(response).to redirect_to(root_path)
     end
   end
 
@@ -430,7 +430,7 @@ RSpec.describe "Albums", type: :request do
       login_user(user)
       album = create(:album)
       delete album_path(album)
-      expect(response).to redirect_to(albums_path)
+      expect(response).to redirect_to(root_path)
       expect(Album.exists?(album.id)).to be true
     end
   end
@@ -466,7 +466,7 @@ RSpec.describe "Albums", type: :request do
       album = create(:album)
       source = create(:album)
       post merge_album_path(album), params: {source_album_id: source.id}
-      expect(response).to redirect_to(albums_path)
+      expect(response).to redirect_to(root_path)
     end
   end
 

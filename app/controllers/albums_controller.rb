@@ -1,5 +1,6 @@
 class AlbumsController < ApplicationController
   include Orderable
+  include AdminAuthorization
 
   before_action :require_admin, only: [:edit, :destroy, :merge]
 
@@ -28,7 +29,7 @@ class AlbumsController < ApplicationController
     @total_duration = @album.tracks.sum(:duration)
     @all_tracks = @album.tracks
     @pagy, @tracks = pagy(:offset, scope)
-    @favorited_track_ids = Current.user.favorites.where(favorable_type: "Track").pluck(:favorable_id).to_set
+    @favorited_track_ids = Current.user.favorited_ids_for("Track")
   end
 
   def edit
@@ -141,10 +142,6 @@ class AlbumsController < ApplicationController
   end
 
   private
-
-  def require_admin
-    redirect_to albums_path, alert: "Not authorized." unless Current.user.admin?
-  end
 
   def album_params
     params.require(:album).permit(:title, :year, :genre, :artist_id, :youtube_playlist_url)

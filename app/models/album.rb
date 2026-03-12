@@ -1,4 +1,6 @@
 class Album < ApplicationRecord
+  include SearchIndexable
+
   belongs_to :artist
   has_many :tracks, dependent: :destroy
   has_one_attached :cover_image
@@ -30,9 +32,4 @@ class Album < ApplicationRecord
     tracks.update_all(artist_id: artist_id)
   end
 
-  def reindex_tracks_search
-    tracks.reload.find_each do |track|
-      track.send(:update_search_index)
-    end
-  end
 end

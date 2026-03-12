@@ -1,5 +1,6 @@
 class IPTVChannelsController < ApplicationController
-  before_action :require_feature
+  include FeatureFlagged
+  require_feature :iptv
 
   def show
     @channel = IPTVChannel.find(params[:id])
@@ -85,10 +86,6 @@ class IPTVChannelsController < ApplicationController
   end
 
   private
-
-  def require_feature
-    redirect_to root_path, alert: "This feature is not available." unless Flipper.enabled?(:iptv, Current.user)
-  end
 
   def channel_params
     params.require(:iptv_channel).permit(:name, :stream_url, :logo_url, :country, :language, :iptv_category_id, :tvg_id, :epg_url)

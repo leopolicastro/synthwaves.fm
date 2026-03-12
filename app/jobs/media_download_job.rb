@@ -1,4 +1,6 @@
 class MediaDownloadJob < ApplicationJob
+  include DownloadBroadcastable
+
   queue_as :default
 
   def perform(track_id, url, user_id:)
@@ -9,7 +11,7 @@ class MediaDownloadJob < ApplicationJob
     FileUtils.mkdir_p(temp_dir)
 
     track.update!(download_status: "downloading", download_error: nil)
-    broadcast_status(track, user_id)
+    broadcast_download_status(track, user_id, type: "track")
 
     file_path = MediaDownloadService.download_audio(url, output_dir: temp_dir.to_s)
 
@@ -33,25 +35,12 @@ class MediaDownloadJob < ApplicationJob
       file_format: "mp3",
       file_size: File.size(file_path)
     )
-    broadcast_status(track, user_id)
+    broadcast_download_status(track, user_id, type: "track")
   rescue MediaDownloadService::Error, StandardError => e
     track&.update!(download_status: "failed", download_error: e.message.truncate(500))
-    broadcast_status(track, user_id) if track
+    broadcast_download_status(track, user_id, type: "track") if track
     raise unless e.is_a?(MediaDownloadService::Error)
   ensure
     FileUtils.rm_rf(temp_dir) if temp_dir
-  end
-
-  private
-
-  def broadcast_status(track, user_id)
-    return unless track
-
-    Turbo::StreamsChannel.broadcast_replace_to(
-      "downloads_#{user_id}",
-      target: "media-download-track-#{track.id}",
-      partial: "youtube_imports/download_status",
-      locals: { record: track, type: "track" }
-    )
   end
 end

@@ -17,9 +17,9 @@ require "action_cable/engine"
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
-RubyLLM.configure do |config|
-  config.use_new_acts_as = true
-end
+# RubyLLM.configure do |config|
+#   config.use_new_acts_as = true
+# end
 
 module SynthWaves
   class Application < Rails::Application

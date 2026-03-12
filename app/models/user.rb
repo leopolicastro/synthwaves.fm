@@ -18,6 +18,10 @@ class User < ApplicationRecord
 
   encrypts :youtube_api_key
 
+  def favorited_ids_for(type)
+    favorites.where(favorable_type: type).pluck(:favorable_id).to_set
+  end
+
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
   validates :email_address, presence: true, uniqueness: true,

@@ -1,4 +1,6 @@
 class RadioStation < ApplicationRecord
+  include Streamable
+
   belongs_to :user
 
   validates :name, presence: true
@@ -20,7 +22,7 @@ class RadioStation < ApplicationRecord
   end
 
   def needs_proxy?
-    stream? && stream_url.present? && !stream_url.start_with?("https://")
+    stream? && super
   end
 
   private

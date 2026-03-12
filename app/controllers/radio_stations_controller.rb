@@ -1,5 +1,6 @@
 class RadioStationsController < ApplicationController
-  before_action :require_feature
+  include FeatureFlagged
+  require_feature :youtube_radio
 
   def index
     @radio_stations = RadioStation.order(created_at: :desc)
@@ -35,10 +36,6 @@ class RadioStationsController < ApplicationController
   end
 
   private
-
-  def require_feature
-    redirect_to root_path, alert: "This feature is not available." unless Flipper.enabled?(:youtube_radio, Current.user)
-  end
 
   def radio_station_params
     params.require(:radio_station).permit(:name, :youtube_url, :stream_url, :source_type)

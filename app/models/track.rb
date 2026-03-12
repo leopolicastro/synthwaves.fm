@@ -1,4 +1,6 @@
 class Track < ApplicationRecord
+  include Downloadable
+
   belongs_to :album
   belongs_to :artist
   has_one_attached :audio_file
@@ -24,18 +26,6 @@ class Track < ApplicationRecord
 
   def youtube?
     youtube_video_id.present?
-  end
-
-  def downloading?
-    download_status == "downloading"
-  end
-
-  def download_failed?
-    download_status == "failed"
-  end
-
-  def download_completed?
-    download_status == "completed"
   end
 
   scope :search, ->(query) {

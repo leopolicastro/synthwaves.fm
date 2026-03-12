@@ -1,4 +1,6 @@
 class TracksController < ApplicationController
+  include AdminAuthorization
+
   before_action :set_track, only: [:show, :edit, :update, :destroy, :stream, :download, :lyrics]
   before_action :require_admin, only: [:edit, :update, :destroy]
 
@@ -6,7 +8,7 @@ class TracksController < ApplicationController
     scope = Track.music.includes(:artist, :album).search(params[:q]).order(:title)
     @pagy, @tracks = pagy(:offset, scope)
     @query = params[:q]
-    @favorited_track_ids = Current.user.favorites.where(favorable_type: "Track").pluck(:favorable_id).to_set
+    @favorited_track_ids = Current.user.favorited_ids_for("Track")
   end
 
   def show
@@ -116,10 +118,6 @@ class TracksController < ApplicationController
 
   def set_track
     @track = Track.find(params[:id])
-  end
-
-  def require_admin
-    redirect_to tracks_path, alert: "Not authorized." unless Current.user.admin?
   end
 
   def track_params

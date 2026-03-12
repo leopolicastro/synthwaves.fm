@@ -1,5 +1,6 @@
 class YoutubeImportsController < ApplicationController
-  before_action :require_feature
+  include FeatureFlagged
+  require_feature :youtube_import
 
   def new
   end
@@ -75,7 +76,4 @@ class YoutubeImportsController < ApplicationController
     redirect_to video_path(video), notice: "Video import started! It will be ready once the download completes."
   end
 
-  def require_feature
-    redirect_to root_path, alert: "This feature is not available." unless Flipper.enabled?(:youtube_import, Current.user)
-  end
 end

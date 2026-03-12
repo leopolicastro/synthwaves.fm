@@ -1,4 +1,6 @@
 class InternetRadioStation < ApplicationRecord
+  include Streamable
+
   belongs_to :internet_radio_category, optional: true, counter_cache: :stations_count
 
   has_many :favorites, as: :favorable, dependent: :destroy
@@ -12,10 +14,6 @@ class InternetRadioStation < ApplicationRecord
   scope :by_tag, ->(tag) { where("tags LIKE ?", "%#{tag}%") if tag.present? }
   scope :search, ->(query) { where("name LIKE ?", "%#{query}%") if query.present? }
   scope :popular, -> { order(votes: :desc) }
-
-  def needs_proxy?
-    stream_url.present? && !stream_url.start_with?("https://")
-  end
 
   def display_favicon_url
     return favicon_url if favicon_url.present?

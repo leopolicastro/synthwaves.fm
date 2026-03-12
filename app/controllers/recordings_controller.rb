@@ -1,5 +1,6 @@
 class RecordingsController < ApplicationController
-  before_action :require_feature
+  include FeatureFlagged
+  require_feature :iptv
 
   def index
     @query = params[:q]
@@ -85,9 +86,4 @@ class RecordingsController < ApplicationController
     redirect_to rails_blob_path(recording.file, disposition: "attachment", filename: recording.filename), allow_other_host: true
   end
 
-  private
-
-  def require_feature
-    redirect_to root_path, alert: "This feature is not available." unless Flipper.enabled?(:iptv, Current.user)
-  end
 end

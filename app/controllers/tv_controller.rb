@@ -1,5 +1,6 @@
 class TvController < ApplicationController
-  before_action :require_feature
+  include FeatureFlagged
+  require_feature :iptv
 
   def show
     @available_tabs = available_tabs
@@ -38,7 +39,7 @@ class TvController < ApplicationController
 
     @channels = scope.all
 
-    @favorited_channel_ids = Current.user.favorites.where(favorable_type: "IPTVChannel").pluck(:favorable_id).to_set
+    @favorited_channel_ids = Current.user.favorited_ids_for("IPTVChannel")
 
     @countries = IPTVChannel.active.where.not(country: [nil, ""]).distinct.pluck(:country).sort
 
@@ -93,10 +94,6 @@ class TvController < ApplicationController
       .search(@query)
       .order(:name)
     @pagy, @podcasts = pagy(:offset, scope)
-  end
-
-  def require_feature
-    redirect_to root_path, alert: "This feature is not available." unless Flipper.enabled?(:iptv, Current.user)
   end
 
   def parse_window_time

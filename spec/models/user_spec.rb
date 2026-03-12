@@ -60,6 +60,38 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "#favorited_ids_for" do
+    let(:user) { create(:user) }
+
+    it "returns a set of IDs for the given favorable type" do
+      track1 = create(:track)
+      track2 = create(:track)
+      create(:favorite, user: user, favorable: track1)
+      create(:favorite, user: user, favorable: track2)
+
+      result = user.favorited_ids_for("Track")
+
+      expect(result).to be_a(Set)
+      expect(result).to contain_exactly(track1.id, track2.id)
+    end
+
+    it "does not include IDs of other favorable types" do
+      track = create(:track)
+      artist = create(:artist)
+      create(:favorite, user: user, favorable: track)
+      create(:favorite, user: user, favorable: artist)
+
+      expect(user.favorited_ids_for("Track")).to contain_exactly(track.id)
+      expect(user.favorited_ids_for("Artist")).to contain_exactly(artist.id)
+    end
+
+    it "returns an empty set when user has no favorites of that type" do
+      result = user.favorited_ids_for("Track")
+      expect(result).to be_empty
+      expect(result).to be_a(Set)
+    end
+  end
+
   describe "normalizes :email_address" do
     it "strips leading and trailing whitespace" do
       user = create(:user, email_address: "  padded@example.com  ")

@@ -191,7 +191,7 @@ RSpec.describe "Albums", type: :request do
       post refresh_album_path(album)
 
       expect(YoutubePlaylistImportService).to have_received(:call)
-        .with(album.youtube_playlist_url, category: album.artist.category)
+        .with(album.youtube_playlist_url, category: album.artist.category, api_key: user.youtube_api_key)
       expect(response).to redirect_to(album_path(album))
       follow_redirect!
       expect(response.body).to include("1 new episode added")

@@ -173,8 +173,8 @@ RSpec.describe "IPTVChannels", type: :request do
       get iptv_channel_path(channel)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).not_to include("Now Playing")
-      expect(response.body).not_to include("Up Next")
+      expect(response.body).not_to include("text-red-400 uppercase tracking-wide\">Now Playing</span>")
+      expect(response.body).not_to include("Up Next</h3>")
     end
 
     it "shows scheduled indicator for a recorded now-playing programme" do

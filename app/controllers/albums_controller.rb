@@ -66,7 +66,7 @@ class AlbumsController < ApplicationController
     end
 
     track_count_before = album.tracks.count
-    YoutubePlaylistImportService.call(album.youtube_playlist_url, category: album.artist.category)
+    YoutubePlaylistImportService.call(album.youtube_playlist_url, category: album.artist.category, api_key: Current.user.youtube_api_key)
     new_count = album.tracks.reload.count - track_count_before
 
     if new_count > 0

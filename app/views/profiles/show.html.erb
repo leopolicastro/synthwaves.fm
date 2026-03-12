@@ -31,6 +31,12 @@
     <%= link_to "Edit Profile", edit_profile_path, class: "rounded-md px-3.5 py-2.5 bg-neon-pink hover:shadow-neon-pink text-white inline-block font-medium" %>
   </div>
 
+  <% if turbo_native_app? %>
+    <div class="mt-6">
+      <%= button_to "Sign Out", session_path, method: :delete, class: "rounded-md px-3.5 py-2.5 bg-red-600 hover:bg-red-700 text-white inline-block font-medium cursor-pointer" %>
+    </div>
+  <% end %>
+
   <h2 class="font-bold font-display text-2xl text-white mt-10">Data</h2>
 
   <div class="mt-4 bg-gray-800 shadow-sm rounded-lg border border-gray-700 px-4 py-5 sm:px-6">

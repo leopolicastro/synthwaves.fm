@@ -62,7 +62,24 @@ class FoldersController < ApplicationController
   end
 
   def show
-    @videos_by_season = @folder.videos.ready.ordered.group_by(&:season_number)
+    @query = params[:q]
+    @season = params[:season]
+    @sort = sort_column(Video, default: "episode_number")
+    @direction = sort_direction
+
+    @available_seasons = @folder.videos.ready.where.not(season_number: nil).distinct.pluck(:season_number).sort
+    @season_counts = @folder.videos.ready.where.not(season_number: nil).group(:season_number).count
+
+    scope = @folder.videos.ready.search(@query)
+    scope = scope.where(season_number: @season) if @season.present?
+
+    scope = if @sort == "episode_number"
+      scope.order(season_number: @direction, episode_number: @direction)
+    else
+      scope.order(@sort => @direction)
+    end
+
+    @pagy, @videos = pagy(:offset, scope, limit: 24)
     @processing_count = @folder.videos.where(status: "processing").count
     @failed_count = @folder.videos.where(status: "failed").count
   end

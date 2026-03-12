@@ -38,26 +38,59 @@
     </div>
   </div>
 
-  <% if @videos_by_season.any? %>
-    <% @videos_by_season.each do |season, videos| %>
-      <div class="mb-8">
-        <% if season %>
-          <h2 class="text-xl font-bold font-display text-white mb-4">Season <%= season %></h2>
-        <% else %>
-          <h2 class="text-xl font-bold font-display text-white mb-4">Episodes</h2>
-        <% end %>
+  <turbo-frame id="folder-videos" data-turbo-action="advance">
+    <form action="<%= folder_path(@folder) %>" method="get" data-controller="search" data-search-target="form" class="mb-4">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <input type="text" name="q" value="<%= @query %>" placeholder="Search videos..."
+               class="flex-1 rounded-lg bg-gray-800 border-gray-700 text-white text-lg px-4 py-3 focus:outline-neon-cyan"
+               data-search-target="input" data-action="input->search#submit">
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          <% videos.each do |video| %>
-            <%= render VideoCardComponent.new(video: video, show_episode_number: true) %>
+        <div class="flex items-center gap-3">
+          <% if @available_seasons.any? %>
+            <select name="season" data-action="change->search#submit" class="text-sm rounded-lg border border-gray-600 bg-gray-700 text-white px-3 py-2 focus:outline-neon-cyan">
+              <option value="">All Seasons</option>
+              <% @available_seasons.each do |season| %>
+                <option value="<%= season %>" <%= "selected" if @season == season.to_s %>>Season <%= season %> (<%= @season_counts[season] %>)</option>
+              <% end %>
+            </select>
           <% end %>
+
+          <select name="sort" data-action="change->search#submit" class="text-sm rounded-lg border border-gray-600 bg-gray-700 text-white px-3 py-2 focus:outline-neon-cyan">
+            <% Video::FOLDER_SORT_OPTIONS.each do |value, label| %>
+              <option value="<%= value %>" <%= "selected" if value == @sort %>><%= label %></option>
+            <% end %>
+          </select>
+
+          <select name="direction" data-action="change->search#submit" class="text-sm rounded-lg border border-gray-600 bg-gray-700 text-white px-3 py-2 focus:outline-neon-cyan">
+            <option value="asc" <%= "selected" if @direction == "asc" %>>Ascending</option>
+            <option value="desc" <%= "selected" if @direction == "desc" %>>Descending</option>
+          </select>
         </div>
       </div>
+    </form>
+
+    <% if @videos.any? %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <% @videos.each do |video| %>
+          <%= render VideoCardComponent.new(video: video, show_episode_number: true) %>
+        <% end %>
+      </div>
+
+      <% if @pagy.pages > 1 %>
+        <div class="mt-6 flex justify-center">
+          <%== @pagy.series_nav %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="text-center py-16 text-gray-400">
+        <% if @query.present? || @season.present? %>
+          <p class="text-lg mb-2">No matching videos</p>
+          <p>Try adjusting your search or filters.</p>
+        <% else %>
+          <p class="text-lg mb-2">No ready videos yet</p>
+          <p>Videos are still being processed.</p>
+        <% end %>
+      </div>
     <% end %>
-  <% else %>
-    <div class="text-center py-16 text-gray-400">
-      <p class="text-lg mb-2">No ready videos yet</p>
-      <p>Videos are still being processed.</p>
-    </div>
-  <% end %>
+  </turbo-frame>
 </div>

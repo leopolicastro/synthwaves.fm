@@ -1,4 +1,10 @@
 class Video < ApplicationRecord
+  FOLDER_SORT_OPTIONS = {
+    "episode_number" => "Episode Number",
+    "title" => "Title",
+    "created_at" => "Date Added"
+  }.freeze
+
   belongs_to :user
   belongs_to :folder, optional: true
   has_one_attached :file

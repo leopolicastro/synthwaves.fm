@@ -123,7 +123,7 @@ RSpec.describe "Folders", type: :request do
       expect(response).to have_http_status(:ok)
     end
 
-    it "shows videos grouped by season" do
+    it "shows videos from all seasons" do
       folder = create(:folder, user: user)
       create(:video, user: user, folder: folder, season_number: 1, episode_number: 1, title: "Pilot")
       create(:video, user: user, folder: folder, season_number: 2, episode_number: 1, title: "Premiere")
@@ -131,6 +131,55 @@ RSpec.describe "Folders", type: :request do
       get folder_path(folder)
       expect(response.body).to include("Pilot")
       expect(response.body).to include("Premiere")
+    end
+
+    it "paginates when more than 24 videos" do
+      folder = create(:folder, user: user)
+      25.times do |i|
+        create(:video, user: user, folder: folder, season_number: 1, episode_number: i + 1, title: "Episode #{i + 1}")
+      end
+
+      get folder_path(folder)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("page=2")
+    end
+
+    it "filters by season" do
+      folder = create(:folder, user: user)
+      create(:video, user: user, folder: folder, season_number: 1, episode_number: 1, title: "S1 Pilot")
+      create(:video, user: user, folder: folder, season_number: 2, episode_number: 1, title: "S2 Premiere")
+
+      get folder_path(folder, season: "1")
+      expect(response.body).to include("S1 Pilot")
+      expect(response.body).not_to include("S2 Premiere")
+    end
+
+    it "filters by search query" do
+      folder = create(:folder, user: user)
+      create(:video, user: user, folder: folder, title: "Pilot")
+      create(:video, user: user, folder: folder, title: "Finale")
+
+      get folder_path(folder, q: "Pilot")
+      expect(response.body).to include("Pilot")
+      expect(response.body).not_to include("Finale")
+    end
+
+    it "sorts by title" do
+      folder = create(:folder, user: user)
+      create(:video, user: user, folder: folder, title: "Zebra")
+      create(:video, user: user, folder: folder, title: "Alpha")
+
+      get folder_path(folder, sort: "title", direction: "asc")
+      expect(response).to have_http_status(:ok)
+      expect(response.body.index("Alpha")).to be < response.body.index("Zebra")
+    end
+
+    it "falls back to default sort for invalid sort param" do
+      folder = create(:folder, user: user)
+      create(:video, user: user, folder: folder)
+
+      get folder_path(folder, sort: "bogus")
+      expect(response).to have_http_status(:ok)
     end
 
     it "returns 404 for another user's folder" do

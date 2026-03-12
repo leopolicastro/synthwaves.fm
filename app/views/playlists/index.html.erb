@@ -1,4 +1,4 @@
-<div class="w-full">
+<div class="w-full" data-controller="view-toggle" data-view-toggle-page-key-value="playlists">
   <div class="flex items-center justify-between mb-6">
     <h1 class="text-3xl font-bold font-display">Playlists</h1>
     <%= link_to "New Playlist", new_playlist_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink" %>
@@ -23,6 +23,8 @@
             <option value="asc" <%= "selected" if @direction == "asc" %>>Ascending</option>
             <option value="desc" <%= "selected" if @direction == "desc" %>>Descending</option>
           </select>
+
+          <%= render "shared/view_toggle" %>
         </div>
       </div>
     <% end %>
@@ -30,22 +32,36 @@
 
   <turbo-frame id="playlists-list" data-turbo-action="replace">
     <% if @playlists.any? %>
-      <div class="space-y-2">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 collection-grid" data-view-toggle-target="container">
         <% @playlists.each do |playlist| %>
-          <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 flex items-center justify-between hover:shadow transition-shadow">
-            <%= link_to playlist_path(playlist), class: "flex-1 min-w-0", data: { turbo_frame: "_top" } do %>
-              <div class="font-medium text-white hover:text-neon-cyan truncate"><%= playlist.name %></div>
-              <div class="text-sm text-gray-400"><%= pluralize(playlist.playlist_tracks_count, "track") %></div>
-            <% end %>
-            <div class="flex items-center gap-3 flex-shrink-0 ml-4">
-              <%= link_to edit_playlist_path(playlist), class: "text-gray-400 hover:text-neon-cyan", title: "Edit" do %>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-              <% end %>
-              <%= button_to playlist_path(playlist), method: :delete, data: { turbo_confirm: "Delete \"#{playlist.name}\"?" }, class: "text-gray-400 hover:text-red-500", title: "Delete" do %>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-              <% end %>
+          <% cover_albums = @cover_albums_by_playlist[playlist.id] || [] %>
+          <%= link_to playlist_path(playlist), class: "group collection-card", data: { turbo_frame: "_top" } do %>
+            <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden hover:shadow-lg transition-shadow collection-card-inner">
+              <div class="collection-card-image">
+                <% if cover_albums.empty? %>
+                  <div class="w-full aspect-square bg-gray-700 flex items-center justify-center">
+                    <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
+                  </div>
+                <% elsif cover_albums.size == 1 %>
+                  <%= image_tag cover_albums.first.cover_image, class: "w-full aspect-square object-cover", loading: "lazy" %>
+                <% else %>
+                  <div class="w-full aspect-square grid grid-cols-2 grid-rows-2">
+                    <% 4.times do |i| %>
+                      <% if cover_albums[i] %>
+                        <%= image_tag cover_albums[i].cover_image, class: "w-full h-full object-cover", loading: "lazy" %>
+                      <% else %>
+                        <div class="w-full h-full bg-gray-700"></div>
+                      <% end %>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+              <div class="p-3 collection-card-body">
+                <div class="font-medium text-white group-hover:text-neon-cyan truncate"><%= playlist.name %></div>
+                <div class="text-sm text-gray-400"><%= pluralize(playlist.playlist_tracks_count, "track") %></div>
+              </div>
             </div>
-          </div>
+          <% end %>
         <% end %>
       </div>
 

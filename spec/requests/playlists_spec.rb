@@ -44,20 +44,46 @@ RSpec.describe "Playlists", type: :request do
       expect(response).to have_http_status(:ok)
     end
 
-    it "shows delete buttons for each playlist" do
+    it "renders playlists in a grid layout" do
       create(:playlist, user: user, name: "My Playlist")
       get playlists_path
 
       doc = Nokogiri::HTML(response.body)
-      delete_form = doc.at_css("form[action='#{playlist_path(user.playlists.first)}'] input[name='_method'][value='delete']")
-      expect(delete_form).to be_present
+      expect(doc.at_css(".collection-grid")).to be_present
     end
 
-    it "shows edit links for each playlist" do
+    it "does not show edit or delete buttons" do
       playlist = create(:playlist, user: user, name: "My Playlist")
       get playlists_path
 
-      expect(response.body).to include(edit_playlist_path(playlist))
+      doc = Nokogiri::HTML(response.body)
+      delete_form = doc.at_css("form[action='#{playlist_path(playlist)}'] input[name='_method'][value='delete']")
+      expect(delete_form).not_to be_present
+      expect(response.body).not_to include(edit_playlist_path(playlist))
+    end
+
+    it "renders album cover images for playlists with covers" do
+      playlist = create(:playlist, user: user, name: "With Covers")
+      album = create(:album)
+      album.cover_image.attach(io: StringIO.new("fake"), filename: "cover.jpg", content_type: "image/jpeg")
+      track = create(:track, album: album, artist: album.artist)
+      create(:playlist_track, playlist: playlist, track: track, position: 1)
+
+      get playlists_path
+
+      doc = Nokogiri::HTML(response.body)
+      card = doc.at_css(".collection-card")
+      expect(card.at_css("img")).to be_present
+    end
+
+    it "renders placeholder for playlists without covers" do
+      create(:playlist, user: user, name: "Empty")
+      get playlists_path
+
+      doc = Nokogiri::HTML(response.body)
+      card = doc.at_css(".collection-card")
+      expect(card.at_css("svg")).to be_present
+      expect(card.at_css("img")).not_to be_present
     end
 
     it "displays track count from counter cache" do

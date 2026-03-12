@@ -9,6 +9,7 @@ class PlaylistsController < ApplicationController
     @direction = sort_direction
     scope = Current.user.playlists.search(@query).order(@sort => @direction)
     @pagy, @playlists = pagy(:offset, scope)
+    @cover_albums_by_playlist = Playlist.preload_cover_albums(@playlists)
   end
 
   def show

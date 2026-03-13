@@ -27,7 +27,7 @@
                  class="flex-1 rounded-lg bg-gray-800 border-gray-700 text-white text-lg px-4 py-3 focus:outline-neon-cyan"
                  data-search-target="input" autofocus>
           <% if show_controls_row? %>
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-2">
               <%= filters if filters? %>
               <% if has_sort? %>
                 <label for="sort" class="text-sm text-gray-400 font-medium">Sort by</label>

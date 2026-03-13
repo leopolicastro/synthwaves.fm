@@ -3,7 +3,7 @@
     <%= link_to "&larr; Back".html_safe, tv_path(tab: "videos"), class: "text-neon-cyan hover:underline" %>
   </div>
 
-  <div class="flex items-start gap-6 mb-8">
+  <div class="flex flex-col sm:flex-row items-start gap-6 mb-8">
     <% if @folder.cover_image.attached? %>
       <%= image_tag @folder.cover_image, class: "w-32 h-32 rounded-lg object-cover" %>
     <% elsif (first_thumb = @folder.videos.detect { |v| v.thumbnail.attached? }) %>
@@ -45,7 +45,7 @@
                class="flex-1 rounded-lg bg-gray-800 border-gray-700 text-white text-lg px-4 py-3 focus:outline-neon-cyan"
                data-search-target="input" data-action="input->search#submit">
 
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-2">
           <% if @available_seasons.any? %>
             <select name="season" data-action="change->search#submit" class="text-sm rounded-lg border border-gray-600 bg-gray-700 text-white px-3 py-2 focus:outline-neon-cyan">
               <option value="">All Seasons</option>

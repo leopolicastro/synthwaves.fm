@@ -137,7 +137,7 @@ RSpec.describe CollectionLayoutComponent, type: :component do
         c.with_filters { '<span class="custom-filter">Filter</span>'.html_safe }
         "content"
       end
-      controls_html = html.at_css(".flex.items-center.gap-3").inner_html
+      controls_html = html.at_css(".flex.flex-wrap.items-center.gap-2").inner_html
       expect(controls_html.index("custom-filter")).to be < controls_html.index('name="sort"')
     end
   end

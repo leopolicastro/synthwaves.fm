@@ -91,6 +91,41 @@ RSpec.describe "Subsonic Playlists API", type: :request do
       expect(playlist["entry"].size).to eq(2)
     end
 
+    it "returns at most 5 recent episodes per podcast" do
+      podcast_artist = create(:artist, :podcast, user: user)
+      podcast_album = create(:album, artist: podcast_artist, user: user)
+      tracks = (1..7).map do |i|
+        create(:track, title: "Episode #{i}", album: podcast_album, artist: podcast_artist, user: user,
+          created_at: i.days.ago)
+      end
+
+      get "/api/rest/getPlaylist.view", params: auth_params.merge(id: "podcasts")
+      json = JSON.parse(response.body)
+      entries = json["subsonic-response"]["playlist"]["entry"]
+      expect(entries.size).to eq(5)
+      expect(entries.map { |e| e["title"] }).to eq(["Episode 1", "Episode 2", "Episode 3", "Episode 4", "Episode 5"])
+    end
+
+    it "returns 5 recent episodes per podcast across multiple podcasts" do
+      podcast1 = create(:artist, :podcast, name: "Podcast One", user: user)
+      album1 = create(:album, artist: podcast1, user: user)
+      6.times { |i| create(:track, title: "P1 Ep #{i + 1}", album: album1, artist: podcast1, user: user, created_at: i.days.ago) }
+
+      podcast2 = create(:artist, :podcast, name: "Podcast Two", user: user)
+      album2 = create(:album, artist: podcast2, user: user)
+      3.times { |i| create(:track, title: "P2 Ep #{i + 1}", album: album2, artist: podcast2, user: user, created_at: i.days.ago) }
+
+      get "/api/rest/getPlaylist.view", params: auth_params.merge(id: "podcasts")
+      json = JSON.parse(response.body)
+      entries = json["subsonic-response"]["playlist"]["entry"]
+      # 5 from podcast1 + 3 from podcast2
+      expect(entries.size).to eq(8)
+      p1_entries = entries.select { |e| e["title"].start_with?("P1") }
+      p2_entries = entries.select { |e| e["title"].start_with?("P2") }
+      expect(p1_entries.size).to eq(5)
+      expect(p2_entries.size).to eq(3)
+    end
+
     it "excludes YouTube tracks from virtual 'all' playlist" do
       create_list(:track, 3, user: user)
       create(:track, :youtube, user: user)

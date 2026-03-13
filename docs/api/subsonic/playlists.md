@@ -103,7 +103,7 @@ Returns a playlist with its tracks.
 }
 ```
 
-Entries use the standard [child shape](README.md#child-track). For user-created playlists, entries are ordered by position. The `all` virtual playlist returns all music tracks alphabetically. The `podcasts` virtual playlist returns all podcast tracks alphabetically.
+Entries use the standard [child shape](README.md#child-track). For user-created playlists, entries are ordered by position. The `all` virtual playlist returns all music tracks alphabetically. The `podcasts` virtual playlist returns the 5 most recent episodes per podcast, ordered by newest first.
 
 ### Errors
 

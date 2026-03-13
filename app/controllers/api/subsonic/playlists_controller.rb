@@ -16,7 +16,7 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
     end
 
     if params[:id] == "podcasts"
-      tracks = current_user.tracks.podcast.streamable.includes(:album, :artist).order(:title)
+      tracks = recent_podcast_episodes
       render_subsonic(playlist: podcasts_virtual_entry.merge(
         entry: tracks.map { |t| track_to_child(t) }
       ))
@@ -84,14 +84,32 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
   end
 
   def podcasts_virtual_entry
+    tracks = recent_podcast_episodes
     {
       id: "podcasts",
       name: "Podcasts",
-      songCount: current_user.tracks.podcast.streamable.count,
-      duration: current_user.tracks.podcast.streamable.sum(:duration).to_i,
+      songCount: tracks.size,
+      duration: tracks.sum(&:duration).to_i,
       owner: current_user.email_address,
       public: false
     }
+  end
+
+  def recent_podcast_episodes
+    podcast_artist_ids = current_user.artists.podcast.pluck(:id)
+    return Track.none if podcast_artist_ids.empty?
+
+    track_ids = podcast_artist_ids.flat_map do |artist_id|
+      current_user.tracks.streamable
+        .where(artist_id: artist_id)
+        .order(created_at: :desc)
+        .limit(5)
+        .pluck(:id)
+    end
+
+    current_user.tracks.streamable.includes(:album, :artist)
+      .where(id: track_ids)
+      .order(created_at: :desc)
   end
 
   def playlist_to_entry(playlist)

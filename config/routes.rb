@@ -103,6 +103,8 @@ Rails.application.routes.draw do
   get "/home", to: "home#show", as: :home
   root "static/landing#show"
 
+  get :privacy, to: "static/privacy#show"
+
   namespace :static do
     resource :landing, only: [:show], controller: "landing"
   end

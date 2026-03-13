@@ -1,0 +1,96 @@
+<% content_for :title, "Privacy Policy — synthwaves.fm" %>
+<section class="min-h-screen py-16 px-4 sm:px-6">
+  <div class="max-w-3xl mx-auto">
+    <!-- Header -->
+    <div class="mb-12">
+      <%= link_to root_path, class: "inline-block mb-8" do %>
+        <%= render(LogoComponent.new(size: :md, icon: true)) %>
+      <% end %>
+      <h1 class="text-3xl md:text-4xl font-bold font-display text-neon-pink mb-2">Privacy Policy</h1>
+      <p class="text-gray-400">Last updated: March 12, 2026</p>
+    </div>
+
+    <div class="prose-policy space-y-10 text-gray-300 leading-relaxed">
+      <p>
+        synthwaves.fm ("we", "us", "our") operates the synthwaves.fm website and iOS application.
+        This policy describes how we collect, use, and protect your information.
+      </p>
+
+      <!-- Information We Collect -->
+      <div>
+        <h2 class="text-xl font-bold text-neon-cyan mb-4 font-display">Information We Collect</h2>
+        <ul class="space-y-2 list-disc list-inside text-gray-400">
+          <li><span class="text-gray-300">Account information:</span> Email address and password, used for authentication.</li>
+          <li><span class="text-gray-300">Playback data:</span> Listening history and scrobble data to power personalized recommendations and display recently played content.</li>
+          <li><span class="text-gray-300">Device information:</span> We do not collect device identifiers, analytics, or telemetry from the iOS app.</li>
+        </ul>
+      </div>
+
+      <!-- How We Use Your Information -->
+      <div>
+        <h2 class="text-xl font-bold text-neon-cyan mb-4 font-display">How We Use Your Information</h2>
+        <ul class="space-y-2 list-disc list-inside text-gray-400">
+          <li>To authenticate you and provide access to the streaming service.</li>
+          <li>To record scrobbles and display your listening history.</li>
+          <li>To sync playback state across devices and surfaces (widgets, lock screen, CarPlay).</li>
+        </ul>
+      </div>
+
+      <!-- Data Storage -->
+      <div>
+        <h2 class="text-xl font-bold text-neon-cyan mb-4 font-display">Data Storage</h2>
+        <ul class="space-y-2 list-disc list-inside text-gray-400">
+          <li>Account credentials are stored securely in the iOS Keychain on your device.</li>
+          <li>Downloaded music files are stored locally on your device and are not transmitted.</li>
+          <li>Cached images are stored in your device's temporary cache directory and can be cleared from Settings.</li>
+        </ul>
+      </div>
+
+      <!-- Third-Party Services -->
+      <div>
+        <h2 class="text-xl font-bold text-neon-cyan mb-4 font-display">Third-Party Services</h2>
+        <ul class="space-y-2 list-disc list-inside text-gray-400">
+          <li>We do not sell, share, or transmit your personal data to third parties.</li>
+          <li>We do not use third-party analytics, advertising, or tracking SDKs.</li>
+        </ul>
+      </div>
+
+      <!-- Data Retention -->
+      <div>
+        <h2 class="text-xl font-bold text-neon-cyan mb-4 font-display">Data Retention</h2>
+        <ul class="space-y-2 list-disc list-inside text-gray-400">
+          <li>Your account data is retained while your account is active. You can request deletion by contacting us.</li>
+          <li>Local data (downloads, caches) can be removed at any time through the app's Settings.</li>
+        </ul>
+      </div>
+
+      <!-- Children's Privacy -->
+      <div>
+        <h2 class="text-xl font-bold text-neon-cyan mb-4 font-display">Children's Privacy</h2>
+        <p class="text-gray-400">
+          synthwaves.fm is not directed at children under 13. We do not knowingly collect information from children.
+        </p>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <h2 class="text-xl font-bold text-neon-cyan mb-4 font-display">Contact</h2>
+        <p class="text-gray-400">
+          For questions about this policy, contact us at
+          <a href="mailto:privacy@synthwaves.fm" class="text-neon-pink hover:underline">privacy@synthwaves.fm</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-6 px-4 sm:py-10 sm:px-6 bg-gray-800/50 border-t border-neon-purple/20">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+    <div class="flex items-center gap-2">
+      <%= render(LogoComponent.new(size: :sm, icon: true)) %>
+      <span class="text-gray-400 text-sm">&copy; <%= Date.current.year %> synthwaves.fm</span>
+    </div>
+    <p class="text-gray-400 text-sm">Built with Ruby on Rails</p>
+  </div>
+</footer>

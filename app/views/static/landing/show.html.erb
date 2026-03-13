@@ -235,6 +235,9 @@
       <%= render(LogoComponent.new(size: :sm, icon: true)) %>
       <span class="text-gray-400 text-sm">&copy; <%= Date.current.year %> synthwaves.fm</span>
     </div>
-    <p class="text-gray-400 text-sm">Built with Ruby on Rails</p>
+    <div class="flex items-center gap-4">
+      <%= link_to "Privacy", privacy_path, class: "text-gray-400 hover:text-neon-cyan text-sm transition-colors" %>
+      <span class="text-gray-400 text-sm">Built with Ruby on Rails</span>
+    </div>
   </div>
 </footer>

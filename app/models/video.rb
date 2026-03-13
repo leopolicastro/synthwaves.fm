@@ -12,6 +12,7 @@ class Video < ApplicationRecord
   has_one_attached :file
   has_one_attached :thumbnail
   has_many :favorites, as: :favorable, dependent: :destroy
+  has_many :video_playback_positions, dependent: :destroy
 
   validates :title, presence: true
 

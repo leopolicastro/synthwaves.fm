@@ -15,6 +15,7 @@ class User < ApplicationRecord
   has_many :taggings, dependent: :destroy
   has_many :downloads, dependent: :destroy
   has_many :videos, dependent: :destroy
+  has_many :video_playback_positions, dependent: :destroy
   has_many :folders, dependent: :destroy
   has_many :user_recordings, dependent: :destroy
   has_many :recordings, through: :user_recordings

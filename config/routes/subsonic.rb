@@ -22,7 +22,15 @@ SUBSONIC_ENDPOINTS = {
   "star" => "interaction#star",
   "unstar" => "interaction#unstar",
   "getStarred2" => "interaction#get_starred2",
-  "scrobble" => "interaction#scrobble"
+  "scrobble" => "interaction#scrobble",
+  "getVideos" => "video#get_videos",
+  "getVideo" => "video#get_video",
+  "videoStream" => "video#stream",
+  "getVideoThumbnail" => "video#get_thumbnail",
+  "savePlaybackPosition" => "video#save_playback_position",
+  "getPlaybackPosition" => "video#get_playback_position",
+  "getFolders" => "video#get_folders",
+  "getFolder" => "video#get_folder"
 }.freeze
 
 SUBSONIC_ROUTES = lambda do

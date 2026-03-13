@@ -225,7 +225,18 @@ CREATE INDEX "index_tracks_on_youtube_video_id" ON "tracks" ("youtube_video_id")
 CREATE UNIQUE INDEX "index_artists_on_user_id_and_name" ON "artists" ("user_id", "name") /*application='SynthWaves'*/;
 CREATE INDEX "index_albums_on_user_id" ON "albums" ("user_id") /*application='SynthWaves'*/;
 CREATE INDEX "index_tracks_on_user_id" ON "tracks" ("user_id") /*application='SynthWaves'*/;
+CREATE TABLE IF NOT EXISTS "video_playback_positions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "user_id" integer NOT NULL, "video_id" integer NOT NULL, "position" float DEFAULT 0.0 NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_362a9c6c93"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+, CONSTRAINT "fk_rails_37e283a0b8"
+FOREIGN KEY ("video_id")
+  REFERENCES "videos" ("id")
+);
+CREATE INDEX "index_video_playback_positions_on_user_id" ON "video_playback_positions" ("user_id") /*application='SynthWaves'*/;
+CREATE INDEX "index_video_playback_positions_on_video_id" ON "video_playback_positions" ("video_id") /*application='SynthWaves'*/;
+CREATE UNIQUE INDEX "index_video_playback_positions_on_user_id_and_video_id" ON "video_playback_positions" ("user_id", "video_id") /*application='SynthWaves'*/;
 INSERT INTO "schema_migrations" (version) VALUES
+('20260313152644'),
 ('20260312231556'),
 ('20260312124420'),
 ('20260311205713'),

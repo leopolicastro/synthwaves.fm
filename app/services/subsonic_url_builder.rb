@@ -12,6 +12,14 @@ class SubsonicUrlBuilder
     build_url("/rest/getCoverArt", id: album.id, size: size)
   end
 
+  def video_stream_url(video)
+    build_url("/rest/videoStream", id: video.id)
+  end
+
+  def video_thumbnail_url(video, size: 300)
+    build_url("/rest/getVideoThumbnail", id: video.id, size: size)
+  end
+
   private
 
   def build_url(path, **extra_params)

@@ -32,7 +32,7 @@ class MusicController < ApplicationController
 
   def load_artists
     @query = params[:q]
-    @sort = sort_column(Artist, default: "name")
+    @sort = sort_column(Artist, default: "created_at")
     @direction = sort_direction
     scope = Current.user.artists.music.includes(albums: {cover_image_attachment: :blob})
       .search(@query)
@@ -42,7 +42,7 @@ class MusicController < ApplicationController
 
   def load_albums
     @query = params[:q]
-    @sort = sort_column(Album, default: "title")
+    @sort = sort_column(Album, default: "created_at")
     @direction = sort_direction
     scope = Current.user.albums.music.includes(:artist, cover_image_attachment: :blob)
       .search(@query)
@@ -52,14 +52,16 @@ class MusicController < ApplicationController
 
   def load_tracks
     @query = params[:q]
-    scope = Current.user.tracks.music.includes(:artist, :album).search(@query).order(:title)
+    @sort = sort_column(Track, default: "created_at")
+    @direction = sort_direction
+    scope = Current.user.tracks.music.includes(:artist, :album).search(@query).order(@sort => @direction)
     @pagy, @tracks = pagy(:offset, scope, limit: 24)
     @favorited_track_ids = Current.user.favorited_ids_for("Track")
   end
 
   def load_playlists
     @query = params[:q]
-    @sort = sort_column(Playlist, default: "name")
+    @sort = sort_column(Playlist, default: "created_at")
     @direction = sort_direction
     scope = Current.user.playlists.search(@query).order(@sort => @direction)
     @pagy, @playlists = pagy(:offset, scope, limit: 24)

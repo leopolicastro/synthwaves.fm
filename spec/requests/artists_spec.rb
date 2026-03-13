@@ -65,13 +65,13 @@ RSpec.describe "Artists", type: :request do
       expect(response.body).to include("Nonexistent")
     end
 
-    it "sorts artists by name ascending by default" do
-      create(:artist, name: "Zebra", user: user)
-      create(:artist, name: "Alpha", user: user)
+    it "sorts artists by recently added (newest first) by default" do
+      create(:artist, name: "Older Artist", user: user, created_at: 2.days.ago)
+      create(:artist, name: "Newer Artist", user: user, created_at: 1.hour.ago)
 
       get artists_path
 
-      expect(response.body.index("Alpha")).to be < response.body.index("Zebra")
+      expect(response.body.index("Newer Artist")).to be < response.body.index("Older Artist")
     end
 
     it "sorts artists by name descending" do

@@ -6,7 +6,7 @@ class ArtistsController < ApplicationController
 
   def index
     @query = params[:q]
-    @sort = sort_column(Artist, default: "name")
+    @sort = sort_column(Artist, default: "created_at")
     @direction = sort_direction
     scope = Current.user.artists.music.includes(albums: { cover_image_attachment: :blob })
               .search(@query)

@@ -18,6 +18,11 @@ class Track < ApplicationRecord
   scope :podcast, -> { joins(:artist).merge(Artist.podcast) }
   scope :streamable, -> { joins(:audio_file_attachment) }
 
+  SORT_OPTIONS = {
+    "title" => "Title",
+    "created_at" => "Recently Added"
+  }.freeze
+
   ALBUM_SORT_OPTIONS = {
     "disc_number" => "Track Number",
     "created_at" => "Date Added",

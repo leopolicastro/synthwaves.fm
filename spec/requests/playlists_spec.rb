@@ -21,13 +21,13 @@ RSpec.describe "Playlists", type: :request do
       expect(response.body).not_to include("Rock Anthems")
     end
 
-    it "sorts playlists by name ascending by default" do
-      beta = create(:playlist, user: user, name: "Beta")
-      alpha = create(:playlist, user: user, name: "Alpha")
+    it "sorts playlists by recently added (newest first) by default" do
+      create(:playlist, user: user, name: "Older Playlist", created_at: 2.days.ago)
+      create(:playlist, user: user, name: "Newer Playlist", created_at: 1.hour.ago)
 
       get playlists_path
 
-      expect(response.body.index("Alpha")).to be < response.body.index("Beta")
+      expect(response.body.index("Newer Playlist")).to be < response.body.index("Older Playlist")
     end
 
     it "sorts playlists by specified column and direction" do

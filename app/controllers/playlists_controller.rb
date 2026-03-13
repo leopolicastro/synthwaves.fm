@@ -5,7 +5,7 @@ class PlaylistsController < ApplicationController
 
   def index
     @query = params[:q]
-    @sort = sort_column(Playlist, default: "name")
+    @sort = sort_column(Playlist, default: "created_at")
     @direction = sort_direction
     scope = Current.user.playlists.search(@query).order(@sort => @direction)
     @pagy, @playlists = pagy(:offset, scope)

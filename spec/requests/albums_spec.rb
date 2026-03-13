@@ -31,13 +31,13 @@ RSpec.describe "Albums", type: :request do
       expect(response.body).to include("Nonexistent")
     end
 
-    it "sorts albums by title ascending by default" do
-      create(:album, title: "Zebra Album", artist: create(:artist, user: user))
-      create(:album, title: "Alpha Album", artist: create(:artist, user: user))
+    it "sorts albums by recently added (newest first) by default" do
+      create(:album, title: "Older Album", artist: create(:artist, user: user), created_at: 2.days.ago)
+      create(:album, title: "Newer Album", artist: create(:artist, user: user), created_at: 1.hour.ago)
 
       get albums_path
 
-      expect(response.body.index("Alpha Album")).to be < response.body.index("Zebra Album")
+      expect(response.body.index("Newer Album")).to be < response.body.index("Older Album")
     end
 
     it "sorts albums by title descending" do
@@ -144,9 +144,9 @@ RSpec.describe "Albums", type: :request do
       expect(response.body.index(track_a.title)).to be < response.body.index(track_b.title)
     end
 
-    it "paginates when more than 20 tracks" do
+    it "paginates when more than 24 tracks" do
       album = create(:album, artist: create(:artist, user: user))
-      21.times { |i| create(:track, album: album, track_number: i + 1, title: "Track #{(i + 1).to_s.rjust(3, "0")}") }
+      25.times { |i| create(:track, album: album, track_number: i + 1, title: "Track #{(i + 1).to_s.rjust(3, "0")}") }
 
       get album_path(album)
 

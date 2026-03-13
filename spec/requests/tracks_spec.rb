@@ -61,6 +61,24 @@ RSpec.describe "Tracks", type: :request do
 
       expect(response.body).to include("No tracks found")
     end
+
+    it "sorts tracks by recently added (newest first) by default" do
+      older = create(:track, title: "Older Track", album: create(:album, artist: create(:artist, user: user)), created_at: 2.days.ago)
+      newer = create(:track, title: "Newer Track", album: create(:album, artist: create(:artist, user: user)), created_at: 1.hour.ago)
+
+      get tracks_path
+
+      expect(response.body.index("Newer Track")).to be < response.body.index("Older Track")
+    end
+
+    it "sorts tracks by title ascending" do
+      create(:track, title: "Zebra Song", album: create(:album, artist: create(:artist, user: user)))
+      create(:track, title: "Alpha Song", album: create(:album, artist: create(:artist, user: user)))
+
+      get tracks_path, params: { sort: "title", direction: "asc" }
+
+      expect(response.body.index("Alpha Song")).to be < response.body.index("Zebra Song")
+    end
   end
 
   describe "GET /tracks/:id" do

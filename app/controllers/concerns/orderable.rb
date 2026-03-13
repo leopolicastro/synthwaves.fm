@@ -7,7 +7,7 @@ module Orderable
     params[:sort].presence_in(klass.sortable_columns) || default
   end
 
-  def sort_direction(default: "asc")
+  def sort_direction(default: "desc")
     params[:direction].presence_in(%w[asc desc]) || default
   end
 end

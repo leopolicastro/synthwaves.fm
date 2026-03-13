@@ -6,7 +6,7 @@ class AlbumsController < ApplicationController
 
   def index
     @query = params[:q]
-    @sort = sort_column(Album, default: "title")
+    @sort = sort_column(Album, default: "created_at")
     @direction = sort_direction
     scope = Current.user.albums.music.includes(:artist, cover_image_attachment: :blob)
       .search(@query)
@@ -17,7 +17,7 @@ class AlbumsController < ApplicationController
   def show
     @album = Current.user.albums.includes(:artist, tracks: :artist).find(params[:id])
     @sort = sort_column(Track, default: "disc_number")
-    @direction = sort_direction
+    @direction = sort_direction(default: "asc")
 
     scope = if @sort == "disc_number"
       @album.tracks.order(disc_number: @direction, track_number: @direction)

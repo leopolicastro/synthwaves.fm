@@ -1,13 +1,16 @@
 class TracksController < ApplicationController
+  include Orderable
   include AdminAuthorization
 
   before_action :set_track, only: [:show, :edit, :update, :destroy, :stream, :download, :lyrics]
   before_action :require_admin, only: [:edit, :update, :destroy]
 
   def index
-    scope = Current.user.tracks.music.includes(:artist, :album).search(params[:q]).order(:title)
-    @pagy, @tracks = pagy(:offset, scope)
     @query = params[:q]
+    @sort = sort_column(Track, default: "created_at")
+    @direction = sort_direction
+    scope = Current.user.tracks.music.includes(:artist, :album).search(@query).order(@sort => @direction)
+    @pagy, @tracks = pagy(:offset, scope)
     @favorited_track_ids = Current.user.favorited_ids_for("Track")
   end
 

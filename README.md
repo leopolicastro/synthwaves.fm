@@ -39,11 +39,6 @@ synthwaves.fm is a self-hosted music streaming app built with Rails. Upload your
 - Create radio stations from YouTube live streams
 - Stream YouTube audio alongside your local library
 
-### AI Chat
-
-- Built-in AI chat with streaming responses
-- Choose from multiple LLM providers and models
-
 ### Progressive Web App
 
 - Install on mobile or desktop for a native app experience

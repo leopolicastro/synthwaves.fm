@@ -22,7 +22,7 @@
     <%= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
     <meta name="theme-color" content="<%= current_theme_meta_color %>">
     <%= favicon_link_tag "icon.svg", type: "image/svg+xml" %>
-    <link rel="apple-touch-icon" href="/icon-512.png?v=2">
+    <link rel="apple-touch-icon" href="/icon-512.png?v=3">
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
@@ -53,277 +53,277 @@
       <%= yield %>
     </main>
     <% unless turbo_native_app? %>
-    <% if authenticated? %>
-      <%= render BottomTabBarComponent.new(current_path: request.path, user: Current.user) %>
-    <% end %>
-    <!-- Queue panel (slide-out) -->
-    <div id="queue-panel-container" data-turbo-permanent data-controller="queue-panel">
-      <div data-queue-panel-target="panel"
+      <% if authenticated? %>
+        <%= render BottomTabBarComponent.new(current_path: request.path, user: Current.user) %>
+      <% end %>
+      <!-- Queue panel (slide-out) -->
+      <div id="queue-panel-container" data-turbo-permanent data-controller="queue-panel">
+        <div data-queue-panel-target="panel"
            class="fixed right-0 bottom-30 md:bottom-16 w-full sm:w-80 left-0 sm:left-auto max-h-[60vh] bg-gray-800 border border-neon-purple/30 rounded-tl-lg rounded-bl-lg shadow-xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
-        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-700">
-          <h3 class="text-sm font-semibold text-white">Queue</h3>
-          <button type="button" data-action="queue-panel#clear" class="text-xs text-red-500 hover:text-red-400">Clear</button>
+          <div class="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+            <h3 class="text-sm font-semibold text-white">Queue</h3>
+            <button type="button" data-action="queue-panel#clear" class="text-xs text-red-500 hover:text-red-400">Clear</button>
+          </div>
+          <div data-queue-panel-target="list" class="overflow-y-auto flex-1"></div>
         </div>
-        <div data-queue-panel-target="list" class="overflow-y-auto flex-1"></div>
       </div>
-    </div>
-    <!-- Visualizer drawer (slides up from player bar) -->
-    <div id="visualizer-panel-container" data-turbo-permanent data-controller="visualizer-panel">
-      <div data-visualizer-panel-target="panel"
+      <!-- Visualizer drawer (slides up from player bar) -->
+      <div id="visualizer-panel-container" data-turbo-permanent data-controller="visualizer-panel">
+        <div data-visualizer-panel-target="panel"
            class="fixed left-0 right-0 bottom-30 md:bottom-16 h-[40vh] bg-gray-900/95 border-t border-neon-purple/30 shadow-xl z-40 transform translate-y-full transition-transform duration-300"
            data-controller="visualizer">
-        <button type="button" data-action="visualizer-panel#close"
+          <button type="button" data-action="visualizer-panel#close"
                 class="absolute top-2 right-2 z-10 text-gray-400 hover:text-white p-1">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-        <div class="relative w-full h-full" data-visualizer-target="container">
-          <canvas data-visualizer-target="canvas" class="w-full h-full absolute inset-0"></canvas>
-          <div data-visualizer-target="status"
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+          <div class="relative w-full h-full" data-visualizer-target="container">
+            <canvas data-visualizer-target="canvas" class="w-full h-full absolute inset-0"></canvas>
+            <div data-visualizer-target="status"
                class="absolute inset-0 flex items-center justify-center text-gray-400 text-lg pointer-events-none">
-            Play a track to see the visualizer
+              Play a track to see the visualizer
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <!-- Fullscreen Now Playing overlay -->
-    <div id="fullscreen-now-playing" data-turbo-permanent data-controller="fullscreen-now-playing">
-      <div data-fullscreen-now-playing-target="overlay"
+      <!-- Fullscreen Now Playing overlay -->
+      <div id="fullscreen-now-playing" data-turbo-permanent data-controller="fullscreen-now-playing">
+        <div data-fullscreen-now-playing-target="overlay"
            class="hidden opacity-0 fixed inset-0 z-[60] transition-opacity duration-300 fullscreen-np-bg flex flex-col items-center justify-center p-8">
-        <button data-action="fullscreen-now-playing#close" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 z-10">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-        <!-- Album art -->
-        <div data-fullscreen-now-playing-target="albumArt"
+          <button data-action="fullscreen-now-playing#close" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 z-10">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+          <!-- Album art -->
+          <div data-fullscreen-now-playing-target="albumArt"
              class="w-64 h-64 sm:w-80 sm:h-80 rounded-lg overflow-hidden crt-screen album-art-glow mb-8">
-          <div class="w-full h-full bg-gray-700 rounded-lg flex items-center justify-center">
-            <svg class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
+            <div class="w-full h-full bg-gray-700 rounded-lg flex items-center justify-center">
+              <svg class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
+            </div>
           </div>
-        </div>
-        <!-- Track info -->
-        <div class="text-center mb-6">
-          <h2 data-fullscreen-now-playing-target="title" class="text-2xl sm:text-3xl font-bold font-display text-white mb-1"></h2>
-          <p data-fullscreen-now-playing-target="artist" class="text-lg text-gray-400"></p>
-        </div>
-        <!-- Progress bar -->
-        <div class="w-full max-w-md mb-4">
-          <div class="h-1.5 bg-gray-700 rounded-full cursor-pointer" data-action="click->fullscreen-now-playing#seek">
-            <div data-fullscreen-now-playing-target="progress" class="h-full bg-gradient-to-r from-neon-pink to-neon-cyan rounded-full transition-all duration-200" style="width: 0%"></div>
+          <!-- Track info -->
+          <div class="text-center mb-6">
+            <h2 data-fullscreen-now-playing-target="title" class="text-2xl sm:text-3xl font-bold font-display text-white mb-1"></h2>
+            <p data-fullscreen-now-playing-target="artist" class="text-lg text-gray-400"></p>
           </div>
-          <div class="flex justify-between mt-1">
-            <span data-fullscreen-now-playing-target="currentTime" class="text-xs text-gray-400 tabular-nums">0:00</span>
-            <span data-fullscreen-now-playing-target="duration" class="text-xs text-gray-400 tabular-nums">0:00</span>
+          <!-- Progress bar -->
+          <div class="w-full max-w-md mb-4">
+            <div class="h-1.5 bg-gray-700 rounded-full cursor-pointer" data-action="click->fullscreen-now-playing#seek">
+              <div data-fullscreen-now-playing-target="progress" class="h-full bg-gradient-to-r from-neon-pink to-neon-cyan rounded-full transition-all duration-200" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between mt-1">
+              <span data-fullscreen-now-playing-target="currentTime" class="text-xs text-gray-400 tabular-nums">0:00</span>
+              <span data-fullscreen-now-playing-target="duration" class="text-xs text-gray-400 tabular-nums">0:00</span>
+            </div>
           </div>
-        </div>
-        <!-- Controls -->
-        <div class="flex items-center gap-6">
-          <button data-action="fullscreen-now-playing#previous" class="text-gray-400 hover:text-white">
-            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z"/></svg>
-          </button>
-          <button data-action="fullscreen-now-playing#togglePlayback" class="w-16 h-16 rounded-full bg-neon-pink text-white flex items-center justify-center hover:shadow-neon-pink transition-shadow">
-            <svg data-fullscreen-now-playing-target="playIcon" class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
-            <svg data-fullscreen-now-playing-target="pauseIcon" class="w-8 h-8 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M5.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75A.75.75 0 007.25 3h-1.5zM12.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75a.75.75 0 00-.75-.75h-1.5z"/></svg>
-          </button>
-          <button data-action="fullscreen-now-playing#next" class="text-gray-400 hover:text-white">
-            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M11.555 5.168A1 1 0 0010 6v2.798l-5.445-3.63A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4z"/></svg>
-          </button>
-        </div>
-        <!-- Lyrics -->
-        <div class="mt-6 w-full max-w-lg">
-          <%= render LyricsComponent.new(max_height: "max-h-56") %>
+          <!-- Controls -->
+          <div class="flex items-center gap-6">
+            <button data-action="fullscreen-now-playing#previous" class="text-gray-400 hover:text-white">
+              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z"/></svg>
+            </button>
+            <button data-action="fullscreen-now-playing#togglePlayback" class="w-16 h-16 rounded-full bg-neon-pink text-white flex items-center justify-center hover:shadow-neon-pink transition-shadow">
+              <svg data-fullscreen-now-playing-target="playIcon" class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+              <svg data-fullscreen-now-playing-target="pauseIcon" class="w-8 h-8 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M5.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75A.75.75 0 007.25 3h-1.5zM12.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75a.75.75 0 00-.75-.75h-1.5z"/></svg>
+            </button>
+            <button data-action="fullscreen-now-playing#next" class="text-gray-400 hover:text-white">
+              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M11.555 5.168A1 1 0 0010 6v2.798l-5.445-3.63A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4z"/></svg>
+            </button>
+          </div>
+          <!-- Lyrics -->
+          <div class="mt-6 w-full max-w-lg">
+            <%= render LyricsComponent.new(max_height: "max-h-56") %>
+          </div>
         </div>
       </div>
-    </div>
-    <!-- Keyboard shortcuts help modal -->
-    <div data-keyboard-shortcuts-target="helpModal" class="hidden fixed inset-0 z-[9998] flex items-center justify-center bg-black/70">
-      <div class="bg-gray-800 border border-neon-purple/30 rounded-lg shadow-xl max-w-lg w-full mx-4 p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-bold font-display text-white">Keyboard Shortcuts</h2>
-          <button data-action="keyboard-shortcuts#closeHelp" class="text-gray-400 hover:text-white">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-          </button>
-        </div>
-        <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
-          <div class="flex justify-between"><span class="text-gray-400">Play / Pause</span><kbd class="text-neon-cyan font-mono">Space</kbd></div>
-          <div class="flex justify-between"><span class="text-gray-400">Next track</span><kbd class="text-neon-cyan font-mono">N</kbd></div>
-          <div class="flex justify-between"><span class="text-gray-400">Previous track</span><kbd class="text-neon-cyan font-mono">P</kbd></div>
-          <div class="flex justify-between"><span class="text-gray-400">Mute</span><kbd class="text-neon-cyan font-mono">M</kbd></div>
-          <div class="flex justify-between"><span class="text-gray-400">Seek forward 5s</span><kbd class="text-neon-cyan font-mono">&rarr;</kbd></div>
-          <div class="flex justify-between"><span class="text-gray-400">Seek backward 5s</span><kbd class="text-neon-cyan font-mono">&larr;</kbd></div>
-          <div class="flex justify-between"><span class="text-gray-400">Volume up</span><kbd class="text-neon-cyan font-mono">&uarr;</kbd></div>
-          <div class="flex justify-between"><span class="text-gray-400">Volume down</span><kbd class="text-neon-cyan font-mono">&darr;</kbd></div>
-          <div class="flex justify-between"><span class="text-gray-400">Visualizer</span><kbd class="text-neon-cyan font-mono">V</kbd></div>
-          <div class="flex justify-between"><span class="text-gray-400">Queue</span><kbd class="text-neon-cyan font-mono">Q</kbd></div>
-          <div class="flex justify-between"><span class="text-gray-400">Shuffle</span><kbd class="text-neon-cyan font-mono">S</kbd></div>
-          <div class="flex justify-between"><span class="text-gray-400">Repeat</span><kbd class="text-neon-cyan font-mono">R</kbd></div>
-          <div class="flex justify-between"><span class="text-gray-400">Fullscreen</span><kbd class="text-neon-cyan font-mono">F</kbd></div>
-          <div class="flex justify-between"><span class="text-gray-400">Dismiss overlays</span><kbd class="text-neon-cyan font-mono">Esc</kbd></div>
-          <div class="flex justify-between"><span class="text-gray-400">This help</span><kbd class="text-neon-cyan font-mono">?</kbd></div>
+      <!-- Keyboard shortcuts help modal -->
+      <div data-keyboard-shortcuts-target="helpModal" class="hidden fixed inset-0 z-[9998] flex items-center justify-center bg-black/70">
+        <div class="bg-gray-800 border border-neon-purple/30 rounded-lg shadow-xl max-w-lg w-full mx-4 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold font-display text-white">Keyboard Shortcuts</h2>
+            <button data-action="keyboard-shortcuts#closeHelp" class="text-gray-400 hover:text-white">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+            <div class="flex justify-between"><span class="text-gray-400">Play / Pause</span><kbd class="text-neon-cyan font-mono">Space</kbd></div>
+            <div class="flex justify-between"><span class="text-gray-400">Next track</span><kbd class="text-neon-cyan font-mono">N</kbd></div>
+            <div class="flex justify-between"><span class="text-gray-400">Previous track</span><kbd class="text-neon-cyan font-mono">P</kbd></div>
+            <div class="flex justify-between"><span class="text-gray-400">Mute</span><kbd class="text-neon-cyan font-mono">M</kbd></div>
+            <div class="flex justify-between"><span class="text-gray-400">Seek forward 5s</span><kbd class="text-neon-cyan font-mono">&rarr;</kbd></div>
+            <div class="flex justify-between"><span class="text-gray-400">Seek backward 5s</span><kbd class="text-neon-cyan font-mono">&larr;</kbd></div>
+            <div class="flex justify-between"><span class="text-gray-400">Volume up</span><kbd class="text-neon-cyan font-mono">&uarr;</kbd></div>
+            <div class="flex justify-between"><span class="text-gray-400">Volume down</span><kbd class="text-neon-cyan font-mono">&darr;</kbd></div>
+            <div class="flex justify-between"><span class="text-gray-400">Visualizer</span><kbd class="text-neon-cyan font-mono">V</kbd></div>
+            <div class="flex justify-between"><span class="text-gray-400">Queue</span><kbd class="text-neon-cyan font-mono">Q</kbd></div>
+            <div class="flex justify-between"><span class="text-gray-400">Shuffle</span><kbd class="text-neon-cyan font-mono">S</kbd></div>
+            <div class="flex justify-between"><span class="text-gray-400">Repeat</span><kbd class="text-neon-cyan font-mono">R</kbd></div>
+            <div class="flex justify-between"><span class="text-gray-400">Fullscreen</span><kbd class="text-neon-cyan font-mono">F</kbd></div>
+            <div class="flex justify-between"><span class="text-gray-400">Dismiss overlays</span><kbd class="text-neon-cyan font-mono">Esc</kbd></div>
+            <div class="flex justify-between"><span class="text-gray-400">This help</span><kbd class="text-neon-cyan font-mono">?</kbd></div>
+          </div>
         </div>
       </div>
-    </div>
-    <!-- Persistent player bar -->
-    <div id="player-bar" class="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-neon-cyan/20 shadow-neon-cyan z-50"
+      <!-- Persistent player bar -->
+      <div id="player-bar" class="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-neon-cyan/20 shadow-neon-cyan z-50"
          data-turbo-permanent
          data-controller="player queue"
          data-player-play-history-url-value="<%= play_histories_path %>">
-      <%# <audio> element is created by player_controller.js on <html> so Turbo never detaches it %>
-      <!-- Progress bar -->
-      <div data-player-target="progressBar" class="h-2 sm:h-1 bg-gray-700 cursor-pointer" data-action="click->player#seek">
-        <div class="h-full bg-gradient-to-r from-neon-pink to-neon-cyan transition-all duration-200" data-player-target="progress" style="width: 0%"></div>
-      </div>
-      <div class="container mx-auto px-4 py-2">
-        <div class="flex items-center justify-between gap-2 sm:gap-4">
-          <!-- Track info -->
-          <div class="flex items-center gap-3 min-w-0 flex-1">
-            <div class="w-10 h-10 rounded bg-gray-700 flex-shrink-0 flex items-center justify-center" data-player-target="artwork">
-              <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
+        <%# <audio> element is created by player_controller.js on <html> so Turbo never detaches it %>
+        <!-- Progress bar -->
+        <div data-player-target="progressBar" class="h-2 sm:h-1 bg-gray-700 cursor-pointer" data-action="click->player#seek">
+          <div class="h-full bg-gradient-to-r from-neon-pink to-neon-cyan transition-all duration-200" data-player-target="progress" style="width: 0%"></div>
+        </div>
+        <div class="container mx-auto px-4 py-2">
+          <div class="flex items-center justify-between gap-2 sm:gap-4">
+            <!-- Track info -->
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <div class="w-10 h-10 rounded bg-gray-700 flex-shrink-0 flex items-center justify-center" data-player-target="artwork">
+                <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
+              </div>
+              <div class="min-w-0">
+                <div class="text-sm font-medium text-white truncate" data-player-target="title">Not playing</div>
+                <div class="text-xs text-gray-400 truncate" data-player-target="artist"></div>
+              </div>
+              <span data-player-target="liveIndicator" class="hidden inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-900 text-red-300">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                LIVE
+              </span>
             </div>
-            <div class="min-w-0">
-              <div class="text-sm font-medium text-white truncate" data-player-target="title">Not playing</div>
-              <div class="text-xs text-gray-400 truncate" data-player-target="artist"></div>
-            </div>
-            <span data-player-target="liveIndicator" class="hidden inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-900 text-red-300">
-              <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-              LIVE
-            </span>
-          </div>
-          <!-- Controls: shuffle, prev, play/pause, next, repeat -->
-          <div class="flex items-center gap-2 sm:gap-2">
-            <!-- Shuffle -->
-            <button data-action="player#toggleShuffle" class="hidden sm:inline-flex p-1" title="Shuffle">
-              <svg data-player-target="shuffleIcon" class="w-4 h-4 text-gray-400 hover:text-neon-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M18 4l3 3-3 3M18 20l3-3-3-3M2 7h6.5c2 0 3.5 2 5 5s3 5 5 5H21M2 17h6.5c2 0 3.5-2 5-5s3-5 5-5H21"/>
-              </svg>
-            </button>
-            <!-- Prev -->
-            <button data-action="player#previous" class="text-gray-400 hover:text-neon-cyan p-2.5 sm:p-1">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z"/></svg>
-            </button>
-            <!-- Play/Pause -->
-            <button data-action="player#toggle" class="w-12 h-12 sm:w-10 sm:h-10 rounded-full bg-neon-pink text-white flex items-center justify-center hover:shadow-neon-pink transition-shadow">
-              <svg data-player-target="playIcon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
-              <svg data-player-target="pauseIcon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M5.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75A.75.75 0 007.25 3h-1.5zM12.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75a.75.75 0 00-.75-.75h-1.5z"/></svg>
-            </button>
-            <!-- Next -->
-            <button data-action="player#next" class="text-gray-400 hover:text-neon-cyan p-2.5 sm:p-1">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M11.555 5.168A1 1 0 0010 6v2.798l-5.445-3.63A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4z"/></svg>
-            </button>
-            <!-- Repeat -->
-            <button data-action="player#cycleRepeat" class="hidden sm:inline-flex p-1 relative" title="Repeat">
-              <!-- Repeat off (gray) -->
-              <svg data-player-target="repeatOff" class="w-4 h-4 text-gray-400 hover:text-neon-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17 1l4 4-4 4M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 01-4 4H3"/>
-              </svg>
-              <!-- Repeat all (neon cyan) -->
-              <svg data-player-target="repeatAll" class="w-4 h-4 text-neon-cyan hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17 1l4 4-4 4M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 01-4 4H3"/>
-              </svg>
-              <!-- Repeat one (neon cyan + badge) -->
-              <span data-player-target="repeatOne" class="hidden">
-                <svg class="w-4 h-4 text-neon-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <!-- Controls: shuffle, prev, play/pause, next, repeat -->
+            <div class="flex items-center gap-2 sm:gap-2">
+              <!-- Shuffle -->
+              <button data-action="player#toggleShuffle" class="hidden sm:inline-flex p-1" title="Shuffle">
+                <svg data-player-target="shuffleIcon" class="w-4 h-4 text-gray-400 hover:text-neon-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M18 4l3 3-3 3M18 20l3-3-3-3M2 7h6.5c2 0 3.5 2 5 5s3 5 5 5H21M2 17h6.5c2 0 3.5-2 5-5s3-5 5-5H21"/>
+                </svg>
+              </button>
+              <!-- Prev -->
+              <button data-action="player#previous" class="text-gray-400 hover:text-neon-cyan p-2.5 sm:p-1">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z"/></svg>
+              </button>
+              <!-- Play/Pause -->
+              <button data-action="player#toggle" class="w-12 h-12 sm:w-10 sm:h-10 rounded-full bg-neon-pink text-white flex items-center justify-center hover:shadow-neon-pink transition-shadow">
+                <svg data-player-target="playIcon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+                <svg data-player-target="pauseIcon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M5.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75A.75.75 0 007.25 3h-1.5zM12.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75a.75.75 0 00-.75-.75h-1.5z"/></svg>
+              </button>
+              <!-- Next -->
+              <button data-action="player#next" class="text-gray-400 hover:text-neon-cyan p-2.5 sm:p-1">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M11.555 5.168A1 1 0 0010 6v2.798l-5.445-3.63A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4z"/></svg>
+              </button>
+              <!-- Repeat -->
+              <button data-action="player#cycleRepeat" class="hidden sm:inline-flex p-1 relative" title="Repeat">
+                <!-- Repeat off (gray) -->
+                <svg data-player-target="repeatOff" class="w-4 h-4 text-gray-400 hover:text-neon-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M17 1l4 4-4 4M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 01-4 4H3"/>
                 </svg>
-                <span class="absolute -top-1 -right-1 text-[9px] font-bold text-neon-cyan">1</span>
-              </span>
-            </button>
-          </div>
-          <!-- Time & volume & queue toggle -->
-          <div class="flex items-center gap-2 sm:gap-3 flex-1 justify-end">
-            <span class="hidden sm:inline-flex items-center gap-1">
-              <span class="text-xs text-gray-400 tabular-nums" data-player-target="currentTime">0:00</span>
-              <span class="text-xs text-gray-400">/</span>
-              <span class="text-xs text-gray-400 tabular-nums" data-player-target="duration">0:00</span>
-            </span>
-            <!-- Podcast speed selector (hidden by default, shown for podcasts) -->
-            <div data-player-target="speedControl" class="hidden relative group">
-              <button class="text-xs text-neon-cyan font-mono px-1.5 py-0.5 rounded bg-gray-700 hover:bg-gray-600" data-player-target="speedDisplay">1x</button>
-              <div class="hidden group-hover:block absolute bottom-full right-0 mb-1 bg-gray-800 border border-neon-purple/30 rounded shadow-xl py-1 min-w-[60px]">
-                <button data-action="player#setSpeed" data-rate="0.5" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">0.5x</button>
-                <button data-action="player#setSpeed" data-rate="0.75" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">0.75x</button>
-                <button data-action="player#setSpeed" data-rate="1" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">1x</button>
-                <button data-action="player#setSpeed" data-rate="1.25" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">1.25x</button>
-                <button data-action="player#setSpeed" data-rate="1.5" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">1.5x</button>
-                <button data-action="player#setSpeed" data-rate="1.75" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">1.75x</button>
-                <button data-action="player#setSpeed" data-rate="2" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">2x</button>
-              </div>
+                <!-- Repeat all (neon cyan) -->
+                <svg data-player-target="repeatAll" class="w-4 h-4 text-neon-cyan hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 1l4 4-4 4M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 01-4 4H3"/>
+                </svg>
+                <!-- Repeat one (neon cyan + badge) -->
+                <span data-player-target="repeatOne" class="hidden">
+                  <svg class="w-4 h-4 text-neon-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 1l4 4-4 4M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 01-4 4H3"/>
+                  </svg>
+                  <span class="absolute -top-1 -right-1 text-[9px] font-bold text-neon-cyan">1</span>
+                </span>
+              </button>
             </div>
-            <input type="range" min="0" max="1" step="0.01" value="1"
+            <!-- Time & volume & queue toggle -->
+            <div class="flex items-center gap-2 sm:gap-3 flex-1 justify-end">
+              <span class="hidden sm:inline-flex items-center gap-1">
+                <span class="text-xs text-gray-400 tabular-nums" data-player-target="currentTime">0:00</span>
+                <span class="text-xs text-gray-400">/</span>
+                <span class="text-xs text-gray-400 tabular-nums" data-player-target="duration">0:00</span>
+              </span>
+              <!-- Podcast speed selector (hidden by default, shown for podcasts) -->
+              <div data-player-target="speedControl" class="hidden relative group">
+                <button class="text-xs text-neon-cyan font-mono px-1.5 py-0.5 rounded bg-gray-700 hover:bg-gray-600" data-player-target="speedDisplay">1x</button>
+                <div class="hidden group-hover:block absolute bottom-full right-0 mb-1 bg-gray-800 border border-neon-purple/30 rounded shadow-xl py-1 min-w-[60px]">
+                  <button data-action="player#setSpeed" data-rate="0.5" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">0.5x</button>
+                  <button data-action="player#setSpeed" data-rate="0.75" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">0.75x</button>
+                  <button data-action="player#setSpeed" data-rate="1" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">1x</button>
+                  <button data-action="player#setSpeed" data-rate="1.25" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">1.25x</button>
+                  <button data-action="player#setSpeed" data-rate="1.5" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">1.5x</button>
+                  <button data-action="player#setSpeed" data-rate="1.75" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">1.75x</button>
+                  <button data-action="player#setSpeed" data-rate="2" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">2x</button>
+                </div>
+              </div>
+              <input type="range" min="0" max="1" step="0.01" value="1"
                    class="hidden md:inline-block w-20 h-1 accent-neon-pink"
                    data-player-target="volume"
                    data-action="input->player#setVolume">
-            <!-- AirPlay button -->
-            <div data-controller="airplay" data-airplay-target="button" class="hidden">
-              <button data-action="airplay#pick" class="text-gray-400 hover:text-neon-cyan p-1" title="AirPlay">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 22h12l-6-6-6 6zM21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4v-2H3V5h18v12h-4v2h4c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
-              </button>
-            </div>
-            <!-- Cast button -->
-            <div data-controller="cast" class="hidden" data-cast-target="button">
-              <button data-action="cast#requestSession" class="text-gray-400 hover:text-neon-cyan p-1" title="Cast">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2a9 9 0 019 9h2c0-6.08-4.93-11-11-11zm20-7H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
-              </button>
-            </div>
-            <!-- Crossfade control -->
-            <div class="hidden md:block relative group">
-              <button class="text-gray-400 hover:text-neon-cyan p-1" title="Crossfade">
+              <!-- AirPlay button -->
+              <div data-controller="airplay" data-airplay-target="button" class="hidden">
+                <button data-action="airplay#pick" class="text-gray-400 hover:text-neon-cyan p-1" title="AirPlay">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 22h12l-6-6-6 6zM21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4v-2H3V5h18v12h-4v2h4c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+                </button>
+              </div>
+              <!-- Cast button -->
+              <div data-controller="cast" class="hidden" data-cast-target="button">
+                <button data-action="cast#requestSession" class="text-gray-400 hover:text-neon-cyan p-1" title="Cast">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2a9 9 0 019 9h2c0-6.08-4.93-11-11-11zm20-7H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+                </button>
+              </div>
+              <!-- Crossfade control -->
+              <div class="hidden md:block relative group">
+                <button class="text-gray-400 hover:text-neon-cyan p-1" title="Crossfade">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                  </svg>
+                </button>
+                <div class="hidden group-hover:block absolute bottom-full right-0 mb-1 bg-gray-800 border border-neon-purple/30 rounded shadow-xl py-1 min-w-[90px]">
+                  <button data-action="player#setCrossfade" data-duration="0" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">Off</button>
+                  <button data-action="player#setCrossfade" data-duration="3" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">3s</button>
+                  <button data-action="player#setCrossfade" data-duration="6" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">6s</button>
+                  <button data-action="player#setCrossfade" data-duration="9" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">9s</button>
+                  <button data-action="player#setCrossfade" data-duration="12" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">12s</button>
+                </div>
+              </div>
+              <!-- Fullscreen now playing toggle -->
+              <button data-action="click->player#toggleFullscreen" class="text-gray-400 hover:text-neon-cyan p-2.5 sm:p-1" title="Now Playing">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
                 </svg>
               </button>
-              <div class="hidden group-hover:block absolute bottom-full right-0 mb-1 bg-gray-800 border border-neon-purple/30 rounded shadow-xl py-1 min-w-[90px]">
-                <button data-action="player#setCrossfade" data-duration="0" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">Off</button>
-                <button data-action="player#setCrossfade" data-duration="3" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">3s</button>
-                <button data-action="player#setCrossfade" data-duration="6" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">6s</button>
-                <button data-action="player#setCrossfade" data-duration="9" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">9s</button>
-                <button data-action="player#setCrossfade" data-duration="12" class="block w-full text-left px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-gray-700">12s</button>
+              <!-- Sleep timer -->
+              <div class="hidden sm:block sm:relative" data-controller="sleep-timer">
+                <button data-action="sleep-timer#toggleMenu" class="text-gray-400 hover:text-neon-cyan p-1 relative" title="Sleep Timer">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                  </svg>
+                  <span data-sleep-timer-target="badge" class="hidden absolute -top-2 -right-2 text-[9px] font-bold text-neon-pink bg-gray-900 px-1 rounded tabular-nums"></span>
+                </button>
+                <div data-sleep-timer-target="menu" class="hidden absolute bottom-full right-0 mb-2 bg-gray-800 border border-neon-purple/30 rounded-lg shadow-xl py-1 min-w-[140px]">
+                  <button data-action="sleep-timer#start" data-minutes="15" class="block w-full text-left px-4 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-gray-700">15 minutes</button>
+                  <button data-action="sleep-timer#start" data-minutes="30" class="block w-full text-left px-4 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-gray-700">30 minutes</button>
+                  <button data-action="sleep-timer#start" data-minutes="60" class="block w-full text-left px-4 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-gray-700">60 minutes</button>
+                  <button data-action="sleep-timer#start" data-minutes="90" class="block w-full text-left px-4 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-gray-700">90 minutes</button>
+                  <button data-action="sleep-timer#start" data-minutes="120" class="block w-full text-left px-4 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-gray-700">120 minutes</button>
+                  <hr class="border-gray-700 my-1">
+                  <button data-action="sleep-timer#cancel" class="block w-full text-left px-4 py-1.5 text-sm text-red-400 hover:text-red-300 hover:bg-gray-700">Cancel timer</button>
+                </div>
               </div>
-            </div>
-            <!-- Fullscreen now playing toggle -->
-            <button data-action="click->player#toggleFullscreen" class="text-gray-400 hover:text-neon-cyan p-2.5 sm:p-1" title="Now Playing">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
-              </svg>
-            </button>
-            <!-- Sleep timer -->
-            <div class="hidden sm:block sm:relative" data-controller="sleep-timer">
-              <button data-action="sleep-timer#toggleMenu" class="text-gray-400 hover:text-neon-cyan p-1 relative" title="Sleep Timer">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+              <!-- Visualizer toggle -->
+              <button data-action="player#toggleVisualizer" class="hidden sm:inline-flex text-gray-400 hover:text-neon-cyan p-1" title="Visualizer">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <rect x="1" y="8" width="3" height="8" rx="0.5"/>
+                  <rect x="6" y="4" width="3" height="16" rx="0.5"/>
+                  <rect x="11" y="6" width="3" height="12" rx="0.5"/>
+                  <rect x="16" y="2" width="3" height="20" rx="0.5"/>
+                  <rect x="21" y="9" width="3" height="6" rx="0.5"/>
                 </svg>
-                <span data-sleep-timer-target="badge" class="hidden absolute -top-2 -right-2 text-[9px] font-bold text-neon-pink bg-gray-900 px-1 rounded tabular-nums"></span>
               </button>
-              <div data-sleep-timer-target="menu" class="hidden absolute bottom-full right-0 mb-2 bg-gray-800 border border-neon-purple/30 rounded-lg shadow-xl py-1 min-w-[140px]">
-                <button data-action="sleep-timer#start" data-minutes="15" class="block w-full text-left px-4 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-gray-700">15 minutes</button>
-                <button data-action="sleep-timer#start" data-minutes="30" class="block w-full text-left px-4 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-gray-700">30 minutes</button>
-                <button data-action="sleep-timer#start" data-minutes="60" class="block w-full text-left px-4 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-gray-700">60 minutes</button>
-                <button data-action="sleep-timer#start" data-minutes="90" class="block w-full text-left px-4 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-gray-700">90 minutes</button>
-                <button data-action="sleep-timer#start" data-minutes="120" class="block w-full text-left px-4 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-gray-700">120 minutes</button>
-                <hr class="border-gray-700 my-1">
-                <button data-action="sleep-timer#cancel" class="block w-full text-left px-4 py-1.5 text-sm text-red-400 hover:text-red-300 hover:bg-gray-700">Cancel timer</button>
-              </div>
+              <!-- Queue toggle -->
+              <button data-action="player#toggleQueue" class="text-gray-400 hover:text-neon-cyan p-2.5 sm:p-1" title="Queue">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+              </button>
             </div>
-            <!-- Visualizer toggle -->
-            <button data-action="player#toggleVisualizer" class="hidden sm:inline-flex text-gray-400 hover:text-neon-cyan p-1" title="Visualizer">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <rect x="1" y="8" width="3" height="8" rx="0.5"/>
-                <rect x="6" y="4" width="3" height="16" rx="0.5"/>
-                <rect x="11" y="6" width="3" height="12" rx="0.5"/>
-                <rect x="16" y="2" width="3" height="20" rx="0.5"/>
-                <rect x="21" y="9" width="3" height="6" rx="0.5"/>
-              </svg>
-            </button>
-            <!-- Queue toggle -->
-            <button data-action="player#toggleQueue" class="text-gray-400 hover:text-neon-cyan p-2.5 sm:p-1" title="Queue">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-              </svg>
-            </button>
           </div>
         </div>
       </div>
-    </div>
     <% end %>
   </body>
 </html>

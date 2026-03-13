@@ -6,7 +6,7 @@ RSpec.describe "Subsonic Media API", type: :request do
 
   describe "GET /api/rest/stream.view" do
     it "redirects when audio file is attached" do
-      track = create(:track)
+      track = create(:track, user: user)
       track.audio_file.attach(
         io: File.open(Rails.root.join("spec/fixtures/files/test.mp3")),
         filename: "test.mp3",
@@ -18,7 +18,7 @@ RSpec.describe "Subsonic Media API", type: :request do
     end
 
     it "redirects to an https URL when audio file is attached" do
-      track = create(:track)
+      track = create(:track, user: user)
       track.audio_file.attach(
         io: File.open(Rails.root.join("spec/fixtures/files/test.mp3")),
         filename: "test.mp3",
@@ -31,7 +31,7 @@ RSpec.describe "Subsonic Media API", type: :request do
     end
 
     it "returns error when no audio file attached" do
-      track = create(:track, :youtube)
+      track = create(:track, :youtube, user: user)
       get "/api/rest/stream.view", params: auth_params.merge(id: track.id)
       json = JSON.parse(response.body)
       expect(json["subsonic-response"]["error"]["code"]).to eq(70)
@@ -46,7 +46,7 @@ RSpec.describe "Subsonic Media API", type: :request do
 
   describe "GET /api/rest/download.view" do
     it "redirects when audio file is attached" do
-      track = create(:track)
+      track = create(:track, user: user)
       track.audio_file.attach(
         io: File.open(Rails.root.join("spec/fixtures/files/test.mp3")),
         filename: "test.mp3",
@@ -58,7 +58,7 @@ RSpec.describe "Subsonic Media API", type: :request do
     end
 
     it "redirects to an https URL when audio file is attached" do
-      track = create(:track)
+      track = create(:track, user: user)
       track.audio_file.attach(
         io: File.open(Rails.root.join("spec/fixtures/files/test.mp3")),
         filename: "test.mp3",
@@ -71,7 +71,7 @@ RSpec.describe "Subsonic Media API", type: :request do
     end
 
     it "returns error when no audio file attached" do
-      track = create(:track, :youtube)
+      track = create(:track, :youtube, user: user)
       get "/api/rest/download.view", params: auth_params.merge(id: track.id)
       json = JSON.parse(response.body)
       expect(json["subsonic-response"]["error"]["code"]).to eq(70)
@@ -86,7 +86,7 @@ RSpec.describe "Subsonic Media API", type: :request do
 
   describe "GET /api/rest/getCoverArt.view" do
     it "redirects when cover image is attached" do
-      album = create(:album)
+      album = create(:album, user: user)
       album.cover_image.attach(
         io: StringIO.new("fake image data"),
         filename: "cover.jpg",
@@ -98,7 +98,7 @@ RSpec.describe "Subsonic Media API", type: :request do
     end
 
     it "redirects to an https URL when cover image is attached" do
-      album = create(:album)
+      album = create(:album, user: user)
       album.cover_image.attach(
         io: StringIO.new("fake image data"),
         filename: "cover.jpg",
@@ -111,7 +111,7 @@ RSpec.describe "Subsonic Media API", type: :request do
     end
 
     it "returns 404 when no cover image" do
-      album = create(:album)
+      album = create(:album, user: user)
       get "/api/rest/getCoverArt.view", params: auth_params.merge(id: album.id)
       expect(response).to have_http_status(:not_found)
     end

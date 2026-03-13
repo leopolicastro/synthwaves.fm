@@ -6,7 +6,6 @@ RSpec.describe "Recordings", type: :request do
 
   before do
     login_user(user)
-    Flipper.enable(:iptv)
   end
 
   def create_recording_for(user, **attrs)
@@ -97,13 +96,6 @@ RSpec.describe "Recordings", type: :request do
       expect(response).to redirect_to(new_session_path)
     end
 
-    it "requires iptv feature flag" do
-      Flipper.disable(:iptv)
-
-      get recordings_path
-
-      expect(response).to redirect_to(root_path)
-    end
   end
 
   describe "GET /recordings/:id" do

@@ -24,7 +24,8 @@ RSpec.describe "Library", type: :request do
 
     context "Recently Played section" do
       it "appears when play histories exist and shows the album" do
-        track = create(:track)
+        artist = create(:artist, user: user)
+        track = create(:track, album: create(:album, artist: artist), artist: artist)
         create(:play_history, user: user, track: track)
 
         get library_path
@@ -38,7 +39,7 @@ RSpec.describe "Library", type: :request do
       end
 
       it "deduplicates to one album card when multiple tracks from same album are played" do
-        album = create(:album)
+        album = create(:album, artist: create(:artist, user: user))
         track1 = create(:track, album: album, artist: album.artist)
         track2 = create(:track, album: album, artist: album.artist)
         create(:play_history, user: user, track: track1, played_at: 2.hours.ago)
@@ -50,8 +51,8 @@ RSpec.describe "Library", type: :request do
       end
 
       it "shows different albums separately" do
-        album1 = create(:album)
-        album2 = create(:album)
+        album1 = create(:album, artist: create(:artist, user: user))
+        album2 = create(:album, artist: create(:artist, user: user))
         track1 = create(:track, album: album1, artist: album1.artist)
         track2 = create(:track, album: album2, artist: album2.artist)
         create(:play_history, user: user, track: track1, played_at: 2.hours.ago)
@@ -79,7 +80,7 @@ RSpec.describe "Library", type: :request do
 
     context "Favorites section" do
       it "appears when user has favorite tracks" do
-        track = create(:track)
+        track = create(:track, album: create(:album, artist: create(:artist, user: user)))
         create(:favorite, user: user, favorable: track)
 
         get library_path
@@ -117,7 +118,7 @@ RSpec.describe "Library", type: :request do
 
     context "Recently Added section" do
       it "appears when albums with tracks exist" do
-        album = create(:album)
+        album = create(:album, artist: create(:artist, user: user))
         create(:track, album: album, artist: album.artist)
 
         get library_path
@@ -133,7 +134,7 @@ RSpec.describe "Library", type: :request do
 
     context "Podcasts section" do
       it "appears when podcast artists exist" do
-        podcast_artist = create(:artist, :podcast, name: "Tech Talk")
+        podcast_artist = create(:artist, :podcast, name: "Tech Talk", user: user)
 
         get library_path
         expect(response.body).to include("Podcasts")
@@ -149,8 +150,8 @@ RSpec.describe "Library", type: :request do
 
     context "Browse section" do
       it "shows correct counts" do
-        create(:track) # creates artist + album too
-        create(:artist, :podcast)
+        create(:track, album: create(:album, artist: create(:artist, user: user))) # creates artist + album too
+        create(:artist, :podcast, user: user)
 
         get library_path
         expect(response.body).to include("Browse")

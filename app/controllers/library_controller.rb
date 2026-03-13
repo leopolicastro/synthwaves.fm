@@ -21,7 +21,7 @@ class LibraryController < ApplicationController
       @radio_stations = Current.user.radio_stations.order(created_at: :desc).limit(10)
     end
 
-    @recently_added_albums = Album.music
+    @recently_added_albums = Current.user.albums.music
       .joins(:tracks)
       .includes(:artist)
       .select("albums.*, MAX(tracks.created_at) AS latest_track_at")
@@ -29,12 +29,12 @@ class LibraryController < ApplicationController
       .order("latest_track_at DESC")
       .limit(10)
 
-    @podcasts = Artist.podcast.limit(10)
+    @podcasts = Current.user.artists.podcast.limit(10)
 
-    @artist_count = Artist.music.count
-    @album_count = Album.music.count
-    @track_count = Track.music.count
-    @podcast_count = Artist.podcast.count
+    @artist_count = Current.user.artists.music.count
+    @album_count = Current.user.albums.music.count
+    @track_count = Current.user.tracks.music.count
+    @podcast_count = Current.user.artists.podcast.count
   end
 
   private
@@ -51,7 +51,7 @@ class LibraryController < ApplicationController
   end
 
   def recently_played_albums
-    Album.joins(tracks: :play_histories)
+    Current.user.albums.joins(tracks: :play_histories)
       .where(play_histories: { user_id: Current.user.id })
       .select("albums.*, MAX(play_histories.played_at) AS last_played_at")
       .group("albums.id")

@@ -7,14 +7,14 @@ RSpec.describe "Albums", type: :request do
 
   describe "GET /albums" do
     it "returns success" do
-      create(:album)
+      create(:album, artist: create(:artist, user: user))
       get albums_path
       expect(response).to have_http_status(:ok)
     end
 
     it "filters albums by search query" do
-      create(:album, title: "Abbey Road")
-      create(:album, title: "Dark Side of the Moon")
+      create(:album, title: "Abbey Road", artist: create(:artist, user: user))
+      create(:album, title: "Dark Side of the Moon", artist: create(:artist, user: user))
 
       get albums_path, params: {q: "Abbey"}
 
@@ -23,7 +23,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "shows no albums found message when search has no results" do
-      create(:album, title: "Abbey Road")
+      create(:album, title: "Abbey Road", artist: create(:artist, user: user))
 
       get albums_path, params: {q: "Nonexistent"}
 
@@ -32,8 +32,8 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "sorts albums by title ascending by default" do
-      create(:album, title: "Zebra Album")
-      create(:album, title: "Alpha Album")
+      create(:album, title: "Zebra Album", artist: create(:artist, user: user))
+      create(:album, title: "Alpha Album", artist: create(:artist, user: user))
 
       get albums_path
 
@@ -41,8 +41,8 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "sorts albums by title descending" do
-      create(:album, title: "Zebra Album")
-      create(:album, title: "Alpha Album")
+      create(:album, title: "Zebra Album", artist: create(:artist, user: user))
+      create(:album, title: "Alpha Album", artist: create(:artist, user: user))
 
       get albums_path, params: {sort: "title", direction: "desc"}
 
@@ -50,8 +50,8 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "sorts albums by recently added" do
-      create(:album, title: "Older Album", created_at: 2.days.ago)
-      create(:album, title: "Newer Album", created_at: 1.hour.ago)
+      create(:album, title: "Older Album", artist: create(:artist, user: user), created_at: 2.days.ago)
+      create(:album, title: "Newer Album", artist: create(:artist, user: user), created_at: 1.hour.ago)
 
       get albums_path, params: {sort: "created_at", direction: "desc"}
 
@@ -59,8 +59,8 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "sorts albums by year" do
-      create(:album, title: "Old Album", year: 1970)
-      create(:album, title: "New Album", year: 2020)
+      create(:album, title: "Old Album", year: 1970, artist: create(:artist, user: user))
+      create(:album, title: "New Album", year: 2020, artist: create(:artist, user: user))
 
       get albums_path, params: {sort: "year", direction: "desc"}
 
@@ -68,8 +68,8 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "excludes podcast albums from index" do
-      create(:album, title: "Music Album", artist: create(:artist, category: "music"))
-      create(:album, title: "Podcast Album", artist: create(:artist, :podcast))
+      create(:album, title: "Music Album", artist: create(:artist, category: "music", user: user))
+      create(:album, title: "Podcast Album", artist: create(:artist, :podcast, user: user))
 
       get albums_path
 
@@ -78,7 +78,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "paginates results" do
-      26.times { |i| create(:album, title: "Album #{i.to_s.rjust(2, "0")}") }
+      26.times { |i| create(:album, title: "Album #{i.to_s.rjust(2, "0")}", artist: create(:artist, user: user)) }
 
       get albums_path
 
@@ -86,7 +86,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "renders album links that break out of the turbo frame" do
-      create(:album, title: "Turbo Album")
+      create(:album, title: "Turbo Album", artist: create(:artist, user: user))
 
       get albums_path
 
@@ -96,13 +96,13 @@ RSpec.describe "Albums", type: :request do
 
   describe "GET /albums/:id" do
     it "returns success" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       get album_path(album)
       expect(response).to have_http_status(:ok)
     end
 
     it "sorts by disc/track number by default" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       track_b = create(:track, album: album, disc_number: 1, track_number: 2, title: "Beta")
       track_a = create(:track, album: album, disc_number: 1, track_number: 1, title: "Alpha")
       track_c = create(:track, album: album, disc_number: 2, track_number: 1, title: "Charlie")
@@ -114,7 +114,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "sorts by created_at desc (newest first)" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       old_track = create(:track, album: album, title: "Old Track", created_at: 2.days.ago)
       new_track = create(:track, album: album, title: "New Track", created_at: 1.hour.ago)
 
@@ -124,7 +124,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "sorts by title asc (alphabetical)" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       track_z = create(:track, album: album, title: "Zebra")
       track_a = create(:track, album: album, title: "Apple")
 
@@ -134,7 +134,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "falls back to disc_number for invalid sort column" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       track_b = create(:track, album: album, disc_number: 1, track_number: 2, title: "Beta")
       track_a = create(:track, album: album, disc_number: 1, track_number: 1, title: "Alpha")
 
@@ -145,7 +145,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "paginates when more than 20 tracks" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       21.times { |i| create(:track, album: album, track_number: i + 1, title: "Track #{(i + 1).to_s.rjust(3, "0")}") }
 
       get album_path(album)
@@ -154,7 +154,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "displays total play length" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       create(:track, album: album, duration: 180.0)
       create(:track, album: album, duration: 60.0)
 
@@ -164,7 +164,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "does not show pagination nav with 20 or fewer tracks" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       5.times { |i| create(:track, album: album, track_number: i + 1) }
 
       get album_path(album)
@@ -174,7 +174,7 @@ RSpec.describe "Albums", type: :request do
   end
 
   describe "POST /albums/:id/refresh" do
-    let(:album) { create(:album, youtube_playlist_url: "https://www.youtube.com/playlist?list=PLtest123") }
+    let(:album) { create(:album, youtube_playlist_url: "https://www.youtube.com/playlist?list=PLtest123", artist: create(:artist, user: user)) }
 
     before do
       Flipper.enable(:youtube_import)
@@ -191,7 +191,7 @@ RSpec.describe "Albums", type: :request do
       post refresh_album_path(album)
 
       expect(YoutubePlaylistImportService).to have_received(:call)
-        .with(album.youtube_playlist_url, category: album.artist.category, api_key: user.youtube_api_key)
+        .with(album.youtube_playlist_url, category: album.artist.category, api_key: user.youtube_api_key, user: user)
       expect(response).to redirect_to(album_path(album))
       follow_redirect!
       expect(response.body).to include("1 new episode added")
@@ -208,7 +208,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "redirects with error when album has no youtube_playlist_url" do
-      album_without_url = create(:album, youtube_playlist_url: nil)
+      album_without_url = create(:album, youtube_playlist_url: nil, artist: create(:artist, user: user))
 
       post refresh_album_path(album_without_url)
 
@@ -241,7 +241,7 @@ RSpec.describe "Albums", type: :request do
 
   describe "POST /albums/:id/fetch_cover" do
     it "calls the service and redirects with success notice" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       allow(CoverArtSearchService).to receive(:call).with(album).and_return(:itunes)
 
       post fetch_cover_album_path(album)
@@ -253,7 +253,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "redirects with alert when no cover found" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       allow(CoverArtSearchService).to receive(:call).with(album).and_return(:not_found)
 
       post fetch_cover_album_path(album)
@@ -264,7 +264,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "requires authentication" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       reset!
       post fetch_cover_album_path(album)
       expect(response).to redirect_to(new_session_path)
@@ -273,7 +273,7 @@ RSpec.describe "Albums", type: :request do
 
   describe "PATCH /albums/:id" do
     it "saves the youtube_playlist_url" do
-      album = create(:album, youtube_playlist_url: nil)
+      album = create(:album, youtube_playlist_url: nil, artist: create(:artist, user: user))
 
       patch album_path(album), params: {album: {youtube_playlist_url: "https://www.youtube.com/playlist?list=PLnew"}}
 
@@ -282,7 +282,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "clears the youtube_playlist_url" do
-      album = create(:album, youtube_playlist_url: "https://www.youtube.com/playlist?list=PLold")
+      album = create(:album, youtube_playlist_url: "https://www.youtube.com/playlist?list=PLold", artist: create(:artist, user: user))
 
       patch album_path(album), params: {album: {youtube_playlist_url: ""}}
 
@@ -290,7 +290,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "requires authentication" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       reset!
       patch album_path(album), params: {album: {youtube_playlist_url: "https://example.com"}}
       expect(response).to redirect_to(new_session_path)
@@ -301,7 +301,7 @@ RSpec.describe "Albums", type: :request do
     before { Flipper.enable(:youtube_import) }
 
     it "enqueues MediaDownloadJob for YouTube tracks without audio" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       yt_track = create(:track, album: album, youtube_video_id: "abc123")
       local_track = create(:track, album: album)
 
@@ -315,7 +315,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "skips YouTube tracks that already have audio attached" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       yt_track = create(:track, album: album, youtube_video_id: "abc123")
       yt_track.audio_file.attach(
         io: File.open(Rails.root.join("spec/fixtures/files/test.mp3")),
@@ -333,7 +333,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "redirects with alert when no YouTube tracks exist" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       create(:track, album: album)
 
       post download_audio_album_path(album)
@@ -345,7 +345,7 @@ RSpec.describe "Albums", type: :request do
 
     it "requires the youtube_import feature flag" do
       Flipper.disable(:youtube_import)
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
 
       post download_audio_album_path(album)
 
@@ -361,14 +361,14 @@ RSpec.describe "Albums", type: :request do
     before { login_user(admin) }
 
     it "returns success for admin" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: admin))
       get edit_album_path(album)
       expect(response).to have_http_status(:ok)
     end
 
     it "redirects non-admin" do
       login_user(user)
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       get edit_album_path(album)
       expect(response).to redirect_to(root_path)
     end
@@ -380,7 +380,7 @@ RSpec.describe "Albums", type: :request do
     before { login_user(admin) }
 
     it "updates album title" do
-      album = create(:album, title: "Old Title")
+      album = create(:album, title: "Old Title", artist: create(:artist, user: admin))
       patch album_path(album), params: {album: {title: "New Title"}}
 
       expect(album.reload.title).to eq("New Title")
@@ -388,8 +388,8 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "updates album artist" do
-      old_artist = create(:artist, name: "Old Artist")
-      new_artist = create(:artist, name: "New Artist")
+      old_artist = create(:artist, name: "Old Artist", user: admin)
+      new_artist = create(:artist, name: "New Artist", user: admin)
       album = create(:album, artist: old_artist)
       track = create(:track, album: album, artist: old_artist)
 
@@ -401,7 +401,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "renders edit on validation error" do
-      existing = create(:album, title: "Taken", artist: create(:artist, name: "Same"))
+      existing = create(:album, title: "Taken", artist: create(:artist, name: "Same", user: admin))
       album = create(:album, title: "Other", artist: existing.artist)
 
       patch album_path(album), params: {album: {title: "Taken"}}
@@ -416,7 +416,7 @@ RSpec.describe "Albums", type: :request do
     before { login_user(admin) }
 
     it "deletes the album and its tracks" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: admin))
       create(:track, album: album)
 
       expect {
@@ -428,7 +428,7 @@ RSpec.describe "Albums", type: :request do
 
     it "redirects non-admin" do
       login_user(user)
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       delete album_path(album)
       expect(response).to redirect_to(root_path)
       expect(Album.exists?(album.id)).to be true
@@ -441,8 +441,8 @@ RSpec.describe "Albums", type: :request do
     before { login_user(admin) }
 
     it "merges source album into target" do
-      target = create(:album, title: "Target")
-      source = create(:album, title: "Source")
+      target = create(:album, title: "Target", artist: create(:artist, user: admin))
+      source = create(:album, title: "Source", artist: create(:artist, user: admin))
       track = create(:track, album: source, artist: source.artist)
 
       post merge_album_path(target), params: {source_album_id: source.id}
@@ -453,7 +453,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "rejects self-merge" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: admin))
       post merge_album_path(album), params: {source_album_id: album.id}
 
       expect(response).to redirect_to(album_path(album))
@@ -463,8 +463,8 @@ RSpec.describe "Albums", type: :request do
 
     it "redirects non-admin" do
       login_user(user)
-      album = create(:album)
-      source = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
+      source = create(:album, artist: create(:artist, user: user))
       post merge_album_path(album), params: {source_album_id: source.id}
       expect(response).to redirect_to(root_path)
     end
@@ -472,7 +472,7 @@ RSpec.describe "Albums", type: :request do
 
   describe "POST /albums/:id/create_playlist" do
     it "creates a playlist named after the album with all tracks in disc/track order" do
-      album = create(:album, title: "Great Album")
+      album = create(:album, title: "Great Album", artist: create(:artist, user: user))
       track3 = create(:track, album: album, disc_number: 2, track_number: 1, title: "Disc 2 Track 1")
       track1 = create(:track, album: album, disc_number: 1, track_number: 1, title: "Disc 1 Track 1")
       track2 = create(:track, album: album, disc_number: 1, track_number: 2, title: "Disc 1 Track 2")
@@ -488,7 +488,7 @@ RSpec.describe "Albums", type: :request do
     end
 
     it "requires authentication" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       reset!
       post create_playlist_album_path(album)
       expect(response).to redirect_to(new_session_path)

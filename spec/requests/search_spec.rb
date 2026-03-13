@@ -12,14 +12,14 @@ RSpec.describe "Search", type: :request do
     end
 
     it "returns matching results" do
-      create(:artist, name: "The Beatles")
+      create(:artist, name: "The Beatles", user: user)
       get search_path, params: {q: "Beatles"}
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("The Beatles")
     end
 
     it "filters by genre" do
-      artist = create(:artist, name: "DJ Pulse")
+      artist = create(:artist, name: "DJ Pulse", user: user)
       create(:album, title: "Electric Nights", artist: artist, genre: "Electronic")
       create(:album, title: "Rock Nights", artist: artist, genre: "Rock")
 
@@ -30,7 +30,7 @@ RSpec.describe "Search", type: :request do
     end
 
     it "filters by year range" do
-      artist = create(:artist, name: "Time Traveler")
+      artist = create(:artist, name: "Time Traveler", user: user)
       create(:album, title: "Old Times", artist: artist, year: 2010)
       create(:album, title: "New Times", artist: artist, year: 2023)
 
@@ -41,7 +41,7 @@ RSpec.describe "Search", type: :request do
     end
 
     it "filters by favorites only" do
-      artist = create(:artist, name: "Fave Band")
+      artist = create(:artist, name: "Fave Band", user: user)
       fav_album = create(:album, title: "Loved It", artist: artist)
       create(:album, title: "Skipped It", artist: artist)
       create(:favorite, user: user, favorable: fav_album)
@@ -53,8 +53,8 @@ RSpec.describe "Search", type: :request do
     end
 
     it "populates genre select options" do
-      create(:album, title: "Test", artist: create(:artist), genre: "Jazz")
-      create(:album, title: "Test2", artist: create(:artist), genre: "Electronic")
+      create(:album, title: "Test", artist: create(:artist, user: user), genre: "Jazz")
+      create(:album, title: "Test2", artist: create(:artist, user: user), genre: "Electronic")
 
       get search_path, params: {q: "Test"}
       expect(response.body).to include("Jazz")

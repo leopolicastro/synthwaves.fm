@@ -2,13 +2,10 @@ require "rails_helper"
 
 RSpec.describe "TV", type: :request do
   describe "GET /tv" do
-    before do
-      Flipper.enable(:iptv)
-    end
-
     it "renders the podcasts tab with podcast artists" do
-      login_user(create(:user))
-      create(:artist, :podcast, name: "My Great Podcast")
+      user = create(:user)
+      login_user(user)
+      create(:artist, :podcast, name: "My Great Podcast", user: user)
 
       get tv_path(tab: "podcasts")
 
@@ -17,8 +14,9 @@ RSpec.describe "TV", type: :request do
     end
 
     it "does not show music artists in the podcasts tab" do
-      login_user(create(:user))
-      create(:artist, name: "Music Only Band", category: :music)
+      user = create(:user)
+      login_user(user)
+      create(:artist, name: "Music Only Band", category: :music, user: user)
 
       get tv_path(tab: "podcasts")
 

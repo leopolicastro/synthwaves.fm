@@ -2,10 +2,11 @@ require "rails_helper"
 
 RSpec.describe YoutubeVideoImportService do
   let(:api_key) { "test_api_key" }
+  let(:user) { create(:user) }
 
   describe ".call" do
     it "raises error for invalid URL" do
-      expect { described_class.call("https://example.com/not-a-video", api_key: api_key) }
+      expect { described_class.call("https://example.com/not-a-video", api_key: api_key, user: user) }
         .to raise_error(YoutubeVideoImportService::Error, "Invalid YouTube video URL")
     end
 
@@ -18,14 +19,14 @@ RSpec.describe YoutubeVideoImportService do
           body: {items: []}.to_json
         )
 
-      expect { described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key) }
+      expect { described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key, user: user) }
         .to raise_error(YoutubeVideoImportService::Error, "Video not found")
     end
 
     it "imports a video as a track under a YouTube Singles album" do
       stub_video_api_call
 
-      track = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key)
+      track = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key, user: user)
 
       expect(track).to be_persisted
       expect(track.title).to eq("Test Song")
@@ -36,7 +37,7 @@ RSpec.describe YoutubeVideoImportService do
     it "uses channel name as artist" do
       stub_video_api_call
 
-      track = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key)
+      track = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key, user: user)
 
       expect(track.artist.name).to eq("Test Channel")
     end
@@ -44,7 +45,7 @@ RSpec.describe YoutubeVideoImportService do
     it "sets youtube_video_id and duration" do
       stub_video_api_call
 
-      track = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key)
+      track = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key, user: user)
 
       expect(track.youtube_video_id).to eq("R-FxmoVM7X4")
       expect(track.duration).to eq(225.0)
@@ -54,8 +55,8 @@ RSpec.describe YoutubeVideoImportService do
       stub_video_api_call(video_id: "R-FxmoVM7X4")
       stub_video_api_call(video_id: "abc12345678", title: "Second Song")
 
-      track1 = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key)
-      track2 = described_class.call("https://youtu.be/abc12345678", api_key: api_key)
+      track1 = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key, user: user)
+      track2 = described_class.call("https://youtu.be/abc12345678", api_key: api_key, user: user)
 
       expect(track1.track_number).to eq(1)
       expect(track2.track_number).to eq(2)
@@ -64,8 +65,8 @@ RSpec.describe YoutubeVideoImportService do
     it "returns existing track on duplicate import without creating a new record" do
       stub_video_api_call
 
-      track1 = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key)
-      track2 = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key)
+      track1 = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key, user: user)
+      track2 = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key, user: user)
 
       expect(track2.id).to eq(track1.id)
       expect(Track.where(youtube_video_id: "R-FxmoVM7X4").count).to eq(1)
@@ -74,7 +75,7 @@ RSpec.describe YoutubeVideoImportService do
     it "creates a music artist by default" do
       stub_video_api_call
 
-      track = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key)
+      track = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key, user: user)
 
       expect(track.artist).to be_music
     end
@@ -82,7 +83,7 @@ RSpec.describe YoutubeVideoImportService do
     it "creates a podcast artist when category is podcast" do
       stub_video_api_call
 
-      track = described_class.call("https://youtu.be/R-FxmoVM7X4", category: "podcast", api_key: api_key)
+      track = described_class.call("https://youtu.be/R-FxmoVM7X4", category: "podcast", api_key: api_key, user: user)
 
       expect(track.artist).to be_podcast
     end
@@ -92,7 +93,7 @@ RSpec.describe YoutubeVideoImportService do
       stub_request(:get, "https://i.ytimg.com/vi/R-FxmoVM7X4/hqdefault.jpg")
         .to_return(status: 200, body: "fake_image_data", headers: {"Content-Type" => "image/jpeg"})
 
-      track = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key)
+      track = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key, user: user)
 
       expect(track.album.cover_image).to be_attached
     end
@@ -105,8 +106,8 @@ RSpec.describe YoutubeVideoImportService do
       stub_request(:get, "https://i.ytimg.com/vi/abc12345678/hqdefault.jpg")
         .to_return(status: 200, body: "second_image", headers: {"Content-Type" => "image/jpeg"})
 
-      track1 = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key)
-      described_class.call("https://youtu.be/abc12345678", api_key: api_key)
+      track1 = described_class.call("https://youtu.be/R-FxmoVM7X4", api_key: api_key, user: user)
+      described_class.call("https://youtu.be/abc12345678", api_key: api_key, user: user)
 
       # Cover should still be the first image
       expect(track1.album.cover_image.blob.download).to eq("first_image")

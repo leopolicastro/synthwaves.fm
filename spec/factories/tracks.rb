@@ -3,6 +3,7 @@ FactoryBot.define do
     sequence(:title) { |n| "Track #{n}" }
     album
     artist { album.artist }
+    user { album.user }
     duration { 180.0 }
     track_number { 1 }
     disc_number { 1 }

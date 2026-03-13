@@ -1,7 +1,4 @@
 class TvController < ApplicationController
-  include FeatureFlagged
-  require_feature :iptv
-
   def show
     @available_tabs = available_tabs
     @tab = params[:tab].presence_in(@available_tabs) || "guide"
@@ -90,7 +87,7 @@ class TvController < ApplicationController
 
   def load_podcasts
     @query = params[:q]
-    scope = Artist.podcast.includes(albums: {cover_image_attachment: :blob})
+    scope = Current.user.artists.podcast.includes(albums: {cover_image_attachment: :blob})
       .search(@query)
       .order(:name)
     @pagy, @podcasts = pagy(:offset, scope)

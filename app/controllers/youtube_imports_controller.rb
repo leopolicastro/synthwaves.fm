@@ -26,7 +26,7 @@ class YoutubeImportsController < ApplicationController
       YoutubeImportJob.perform_later(url, category: category, download: true, user_id: Current.user.id)
       redirect_to library_path, notice: "Playlist import started! Audio will be downloaded in the background."
     elsif YoutubeUrlParser.video_url?(url)
-      track = YoutubeVideoImportService.call(url, category: category, api_key: Current.user.youtube_api_key)
+      track = YoutubeVideoImportService.call(url, category: category, api_key: Current.user.youtube_api_key, user: Current.user)
       MediaDownloadJob.perform_later(track.id, url, user_id: Current.user.id)
       redirect_to album_path(track.album), notice: "Video imported! Audio download started in the background."
     else

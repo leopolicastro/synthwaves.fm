@@ -28,9 +28,9 @@ class FavoritesController < ApplicationController
 
   def find_favorable
     case params[:favorable_type]
-    when "Track" then Track.find(params[:favorable_id])
-    when "Album" then Album.find(params[:favorable_id])
-    when "Artist" then Artist.find(params[:favorable_id])
+    when "Track" then Current.user.tracks.find(params[:favorable_id])
+    when "Album" then Current.user.albums.find(params[:favorable_id])
+    when "Artist" then Current.user.artists.find(params[:favorable_id])
     when "IPTVChannel" then IPTVChannel.find(params[:favorable_id])
     when "InternetRadioStation" then InternetRadioStation.find(params[:favorable_id])
     else raise ActiveRecord::RecordNotFound

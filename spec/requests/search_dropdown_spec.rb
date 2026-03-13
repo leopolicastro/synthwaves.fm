@@ -17,7 +17,7 @@ RSpec.describe "Search Dropdown", type: :request do
     end
 
     it "returns matching artists" do
-      create(:artist, name: "The Beatles")
+      create(:artist, name: "The Beatles", user: user)
       get search_dropdown_path, params: {q: "Beatles"}
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("The Beatles")
@@ -25,7 +25,7 @@ RSpec.describe "Search Dropdown", type: :request do
     end
 
     it "returns matching albums" do
-      artist = create(:artist, name: "Pink Floyd")
+      artist = create(:artist, name: "Pink Floyd", user: user)
       create(:album, title: "The Wall", artist: artist)
       get search_dropdown_path, params: {q: "Wall"}
       expect(response).to have_http_status(:ok)
@@ -34,7 +34,7 @@ RSpec.describe "Search Dropdown", type: :request do
     end
 
     it "returns matching tracks" do
-      artist = create(:artist, name: "Queen")
+      artist = create(:artist, name: "Queen", user: user)
       album = create(:album, title: "A Night at the Opera", artist: artist)
       create(:track, title: "Bohemian Rhapsody", artist: artist, album: album)
       get search_dropdown_path, params: {q: "Bohemian"}
@@ -50,7 +50,7 @@ RSpec.describe "Search Dropdown", type: :request do
     end
 
     it "includes a link to the full search page" do
-      create(:artist, name: "Radiohead")
+      create(:artist, name: "Radiohead", user: user)
       get search_dropdown_path, params: {q: "Radiohead"}
       expect(response.body).to include("See all results")
       expect(response.body).to include(search_path(q: "Radiohead"))

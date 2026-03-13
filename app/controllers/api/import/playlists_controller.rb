@@ -18,7 +18,7 @@ class API::Import::PlaylistsController < API::Import::BaseController
     position = 0
 
     Array(params[:tracks]).each do |track_params|
-      track = Track.joins(:artist, :album)
+      track = current_user.tracks.joins(:artist, :album)
         .where("LOWER(tracks.title) = ?", track_params[:title].to_s.downcase)
         .where("LOWER(artists.name) = ?", track_params[:artist].to_s.downcase)
         .where("LOWER(albums.title) = ?", track_params[:album].to_s.downcase)

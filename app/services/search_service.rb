@@ -34,7 +34,7 @@ class SearchService
 
   def search_artists(pattern)
     return [] unless @types.include?(:artist)
-    scope = Artist.where("name LIKE ?", pattern)
+    scope = base_scope(Artist).where("name LIKE ?", pattern)
     scope = scope.where(category: @category) if @category.present?
     scope = scope.where(id: @user.favorites.where(favorable_type: "Artist").select(:favorable_id)) if @favorites_only && @user
     scope.limit(@limit)
@@ -42,7 +42,7 @@ class SearchService
 
   def search_albums(pattern)
     return [] unless @types.include?(:album)
-    scope = Album.includes(:artist).where("albums.title LIKE ?", pattern)
+    scope = base_scope(Album).includes(:artist).where("albums.title LIKE ?", pattern)
     scope = scope.joins(:artist).where(artists: { category: @category }) if @category.present?
     scope = scope.where(genre: @genre) if @genre.present?
     scope = scope.where("year >= ?", @year_from) if @year_from
@@ -53,7 +53,7 @@ class SearchService
 
   def search_tracks(pattern)
     return [] unless @types.include?(:track)
-    scope = Track.includes(:artist, :album).where("tracks.title LIKE ?", pattern)
+    scope = base_scope(Track).includes(:artist, :album).where("tracks.title LIKE ?", pattern)
     scope = scope.joins(:artist).where(artists: { category: @category }) if @category.present?
     if @genre.present? || @year_from || @year_to
       scope = scope.joins(:album)
@@ -64,6 +64,10 @@ class SearchService
     scope = scope.where(id: @user.favorites.where(favorable_type: "Track").select(:favorable_id)) if @favorites_only && @user
     scope = filter_by_tags(scope, "Track") if @tags.present?
     scope.limit(@limit)
+  end
+
+  def base_scope(model)
+    @user ? @user.public_send(model.table_name) : model
   end
 
   def filter_by_tags(scope, taggable_type)

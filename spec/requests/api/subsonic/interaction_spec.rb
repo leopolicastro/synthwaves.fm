@@ -6,7 +6,7 @@ RSpec.describe "Subsonic Interaction API", type: :request do
 
   describe "GET /api/rest/star.view" do
     it "stars a track" do
-      track = create(:track)
+      track = create(:track, user: user)
 
       expect {
         get "/api/rest/star.view", params: auth_params.merge(id: track.id)
@@ -26,7 +26,7 @@ RSpec.describe "Subsonic Interaction API", type: :request do
     end
 
     it "stars an album via albumId" do
-      album = create(:album)
+      album = create(:album, user: user)
 
       expect {
         get "/api/rest/star.view", params: auth_params.merge(albumId: album.id)
@@ -37,7 +37,7 @@ RSpec.describe "Subsonic Interaction API", type: :request do
     end
 
     it "stars an artist via artistId" do
-      artist = create(:artist)
+      artist = create(:artist, user: user)
 
       expect {
         get "/api/rest/star.view", params: auth_params.merge(artistId: artist.id)
@@ -50,7 +50,7 @@ RSpec.describe "Subsonic Interaction API", type: :request do
 
   describe "GET /api/rest/unstar.view" do
     it "unstars a track" do
-      track = create(:track)
+      track = create(:track, user: user)
       create(:favorite, user: user, favorable: track)
 
       expect {
@@ -59,7 +59,7 @@ RSpec.describe "Subsonic Interaction API", type: :request do
     end
 
     it "unstars an album via albumId" do
-      album = create(:album)
+      album = create(:album, user: user)
       create(:favorite, user: user, favorable: album)
 
       expect {
@@ -68,7 +68,7 @@ RSpec.describe "Subsonic Interaction API", type: :request do
     end
 
     it "unstars an artist via artistId" do
-      artist = create(:artist)
+      artist = create(:artist, user: user)
       create(:favorite, user: user, favorable: artist)
 
       expect {
@@ -88,9 +88,9 @@ RSpec.describe "Subsonic Interaction API", type: :request do
     end
 
     it "returns starred artists, albums, and songs" do
-      artist = create(:artist)
-      album = create(:album, artist: artist)
-      track = create(:track, album: album, artist: artist)
+      artist = create(:artist, user: user)
+      album = create(:album, artist: artist, user: user)
+      track = create(:track, album: album, artist: artist, user: user)
 
       create(:favorite, user: user, favorable: artist)
       create(:favorite, user: user, favorable: album)
@@ -114,7 +114,7 @@ RSpec.describe "Subsonic Interaction API", type: :request do
     end
 
     it "excludes starred tracks without audio files" do
-      youtube_track = create(:track, :youtube)
+      youtube_track = create(:track, :youtube, user: user)
       create(:favorite, user: user, favorable: youtube_track)
 
       get "/api/rest/getStarred2.view", params: auth_params
@@ -123,7 +123,7 @@ RSpec.describe "Subsonic Interaction API", type: :request do
     end
 
     it "includes starred YouTube tracks that have downloaded audio" do
-      youtube_track = create(:track, :youtube)
+      youtube_track = create(:track, :youtube, user: user)
       youtube_track.audio_file.attach(
         io: StringIO.new("fake audio data"),
         filename: "track.mp3",
@@ -140,7 +140,7 @@ RSpec.describe "Subsonic Interaction API", type: :request do
 
     it "does not return other users' starred items" do
       other = create(:user)
-      track = create(:track)
+      track = create(:track, user: other)
       create(:favorite, user: other, favorable: track)
 
       get "/api/rest/getStarred2.view", params: auth_params
@@ -152,7 +152,7 @@ RSpec.describe "Subsonic Interaction API", type: :request do
 
   describe "GET /api/rest/scrobble.view" do
     it "records play history" do
-      track = create(:track)
+      track = create(:track, user: user)
 
       expect {
         get "/api/rest/scrobble.view", params: auth_params.merge(id: track.id)

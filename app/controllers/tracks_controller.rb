@@ -5,7 +5,7 @@ class TracksController < ApplicationController
   before_action :require_admin, only: [:edit, :update, :destroy]
 
   def index
-    scope = Track.music.includes(:artist, :album).search(params[:q]).order(:title)
+    scope = Current.user.tracks.music.includes(:artist, :album).search(params[:q]).order(:title)
     @pagy, @tracks = pagy(:offset, scope)
     @query = params[:q]
     @favorited_track_ids = Current.user.favorited_ids_for("Track")
@@ -31,8 +31,8 @@ class TracksController < ApplicationController
     file_format = uploaded_file.original_filename[/\.\w+$/]&.delete(".")
     metadata = extract_metadata(uploaded_file, file_format)
 
-    artist = Artist.find_or_create_by!(name: metadata[:artist] || "Unknown Artist")
-    album = Album.find_or_create_by!(title: metadata[:album] || "Unknown Album", artist: artist) do |a|
+    artist = Current.user.artists.find_or_create_by!(name: metadata[:artist] || "Unknown Artist")
+    album = Current.user.albums.find_or_create_by!(title: metadata[:album] || "Unknown Album", artist: artist) do |a|
       a.year = metadata[:year]
       a.genre = metadata[:genre]
     end
@@ -47,6 +47,7 @@ class TracksController < ApplicationController
 
     @track = Track.new(
       title: metadata[:title] || uploaded_file.original_filename.sub(/\.\w+$/, ""),
+      user: Current.user,
       artist: artist,
       album: album,
       track_number: metadata[:track_number],
@@ -67,16 +68,16 @@ class TracksController < ApplicationController
   end
 
   def edit
-    @artists = Artist.order(:name)
-    @albums = Album.includes(:artist).order(:title)
+    @artists = Current.user.artists.order(:name)
+    @albums = Current.user.albums.includes(:artist).order(:title)
   end
 
   def update
     if @track.update(track_params)
       redirect_to @track, notice: "Track updated successfully."
     else
-      @artists = Artist.order(:name)
-      @albums = Album.includes(:artist).order(:title)
+      @artists = Current.user.artists.order(:name)
+      @albums = Current.user.albums.includes(:artist).order(:title)
       render :edit, status: :unprocessable_content
     end
   end
@@ -117,7 +118,7 @@ class TracksController < ApplicationController
   private
 
   def set_track
-    @track = Track.find(params[:id])
+    @track = Current.user.tracks.find(params[:id])
   end
 
   def track_params

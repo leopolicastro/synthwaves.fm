@@ -64,7 +64,7 @@ class AudioConversionJob < ApplicationJob
     album = track.album
 
     if metadata[:artist].present? && track.artist.name == "Unknown Artist"
-      artist = Artist.find_or_create_by!(name: metadata[:artist])
+      artist = track.user.artists.find_or_create_by!(name: metadata[:artist])
       track.update!(artist: artist)
     end
 

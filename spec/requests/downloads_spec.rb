@@ -36,7 +36,7 @@ RSpec.describe "Downloads", type: :request do
 
   describe "POST /downloads" do
     it "creates a download for an album and enqueues job" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
 
       expect {
         post downloads_path, params: {downloadable_type: "Album", downloadable_id: album.id}
@@ -77,7 +77,7 @@ RSpec.describe "Downloads", type: :request do
     end
 
     it "deduplicates existing pending downloads" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       existing = create(:download, user: user, downloadable: album, downloadable_type: "Album", status: "processing")
 
       expect {

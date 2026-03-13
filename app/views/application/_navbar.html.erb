@@ -9,9 +9,7 @@
         <% if authenticated? %>
           <nav class="hidden md:flex items-center space-x-3 text-sm">
             <%= link_to "Listen", music_path, class: "text-white hover:text-neon-cyan transition-colors" %>
-            <% if Flipper.enabled?(:iptv, Current.user) %>
-              <%= link_to "Watch", tv_path, class: "text-white hover:text-neon-cyan transition-colors" %>
-            <% end %>
+            <%= link_to "Watch", tv_path, class: "text-white hover:text-neon-cyan transition-colors" %>
             <%= link_to "Stats", stats_path, class: "text-white hover:text-neon-cyan transition-colors" %>
           </nav>
         <% end %>

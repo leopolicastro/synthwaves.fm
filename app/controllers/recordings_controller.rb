@@ -1,6 +1,4 @@
 class RecordingsController < ApplicationController
-  include FeatureFlagged
-  require_feature :iptv
 
   def index
     @query = params[:q]

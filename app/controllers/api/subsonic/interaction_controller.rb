@@ -41,7 +41,7 @@ class API::Subsonic::InteractionController < API::Subsonic::BaseController
   end
 
   def scrobble
-    track = Track.find(params[:id])
+    track = current_user.tracks.find(params[:id])
     current_user.play_histories.create!(track: track, played_at: Time.current)
     render_subsonic
   rescue ActiveRecord::RecordNotFound
@@ -53,7 +53,7 @@ class API::Subsonic::InteractionController < API::Subsonic::BaseController
   def star_items(ids, type)
     return if ids.blank?
     Array(ids).each do |id|
-      record = type.constantize.find_by(id: id)
+      record = current_user.public_send(type.tableize).find_by(id: id)
       next unless record
       current_user.favorites.find_or_create_by(favorable: record)
     end

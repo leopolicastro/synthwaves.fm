@@ -53,8 +53,8 @@ class API::Import::TracksController < API::Import::BaseController
   end
 
   def create_track(metadata:, file_format:, file_size:, fallback_title:)
-    artist = Artist.find_or_create_by!(name: metadata[:artist] || "Unknown Artist")
-    album = Album.find_or_create_by!(title: metadata[:album] || "Unknown Album", artist: artist) do |a|
+    artist = current_user.artists.find_or_create_by!(name: metadata[:artist] || "Unknown Artist")
+    album = current_user.albums.find_or_create_by!(title: metadata[:album] || "Unknown Album", artist: artist) do |a|
       a.year = metadata[:year]
       a.genre = metadata[:genre]
     end
@@ -66,7 +66,7 @@ class API::Import::TracksController < API::Import::BaseController
     title = metadata[:title] || fallback_title
     track_number = metadata[:track_number]
 
-    existing = Track.find_by(title: title, album: album, artist: artist, track_number: track_number)
+    existing = current_user.tracks.find_by(title: title, album: album, artist: artist, track_number: track_number)
 
     if existing&.audio_file&.attached?
       render json: {
@@ -83,6 +83,7 @@ class API::Import::TracksController < API::Import::BaseController
 
     track = Track.new(
       title: title,
+      user: current_user,
       artist: artist,
       album: album,
       track_number: track_number,

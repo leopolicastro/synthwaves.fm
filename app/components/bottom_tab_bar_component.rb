@@ -10,7 +10,7 @@ class BottomTabBarComponent < ViewComponent::Base
     @tabs ||= [
       Tab.new(label: "Library", path: helpers.library_path, icon: :library),
       Tab.new(label: "Listen", path: helpers.music_path, icon: :listen),
-      (Tab.new(label: "Watch", path: helpers.tv_path, icon: :watch) if Flipper.enabled?(:iptv, @user)),
+      Tab.new(label: "Watch", path: helpers.tv_path, icon: :watch),
       Tab.new(label: "Search", path: helpers.search_path, icon: :search)
     ].compact
   end

@@ -12,20 +12,20 @@ RSpec.describe "Tracks", type: :request do
     end
 
     it "paginates results" do
-      create_list(:track, 25)
+      create_list(:track, 25, album: create(:album, artist: create(:artist, user: user)))
       get tracks_path
       expect(response.body).to include("series-nav")
     end
 
     it "respects page parameter" do
-      tracks = create_list(:track, 25)
+      tracks = create_list(:track, 25, album: create(:album, artist: create(:artist, user: user)))
       get tracks_path, params: {page: 2}
       expect(response).to have_http_status(:ok)
     end
 
     it "filters tracks by search query" do
-      matching = create(:track, title: "Bohemian Rhapsody")
-      non_matching = create(:track, title: "Stairway to Heaven")
+      matching = create(:track, title: "Bohemian Rhapsody", album: create(:album, artist: create(:artist, user: user)))
+      non_matching = create(:track, title: "Stairway to Heaven", album: create(:album, artist: create(:artist, user: user)))
 
       get tracks_path, params: {q: "Bohemian"}
 
@@ -34,8 +34,8 @@ RSpec.describe "Tracks", type: :request do
     end
 
     it "returns all tracks when query is empty" do
-      track1 = create(:track, title: "Track Alpha")
-      track2 = create(:track, title: "Track Beta")
+      track1 = create(:track, title: "Track Alpha", album: create(:album, artist: create(:artist, user: user)))
+      track2 = create(:track, title: "Track Beta", album: create(:album, artist: create(:artist, user: user)))
 
       get tracks_path, params: {q: ""}
 
@@ -44,9 +44,9 @@ RSpec.describe "Tracks", type: :request do
     end
 
     it "excludes podcast tracks from index" do
-      music_track = create(:track, title: "Music Song")
-      podcast_artist = create(:artist, :podcast)
-      podcast_track = create(:track, title: "Podcast Episode", artist: podcast_artist)
+      music_track = create(:track, title: "Music Song", album: create(:album, artist: create(:artist, user: user)))
+      podcast_artist = create(:artist, :podcast, user: user)
+      podcast_track = create(:track, title: "Podcast Episode", artist: podcast_artist, album: create(:album, artist: podcast_artist))
 
       get tracks_path
 
@@ -55,7 +55,7 @@ RSpec.describe "Tracks", type: :request do
     end
 
     it "shows empty state when no tracks match" do
-      create(:track, title: "Something Else")
+      create(:track, title: "Something Else", album: create(:album, artist: create(:artist, user: user)))
 
       get tracks_path, params: {q: "xyznonexistent"}
 
@@ -64,7 +64,7 @@ RSpec.describe "Tracks", type: :request do
   end
 
   describe "GET /tracks/:id" do
-    let(:track) { create(:track) }
+    let(:track) { create(:track, album: create(:album, artist: create(:artist, user: user))) }
 
     it "returns success" do
       get track_path(track)
@@ -93,7 +93,7 @@ RSpec.describe "Tracks", type: :request do
     end
 
     it "renders download icon button only when audio file is attached" do
-      youtube_track = create(:track, :youtube)
+      youtube_track = create(:track, :youtube, album: create(:album, artist: create(:artist, user: user)))
       get track_path(youtube_track)
       doc = Nokogiri::HTML(response.body)
       expect(doc.at_css('a[title="Download"]')).to be_nil
@@ -132,7 +132,7 @@ RSpec.describe "Tracks", type: :request do
     end
 
     it "reuses existing artist and album" do
-      artist = create(:artist, name: "Test Artist")
+      artist = create(:artist, name: "Test Artist", user: user)
       album = create(:album, title: "Test Album", artist: artist)
 
       file = fixture_file_upload("test.mp3", "audio/mpeg")
@@ -144,7 +144,7 @@ RSpec.describe "Tracks", type: :request do
     end
 
     it "does not overwrite existing album cover art" do
-      artist = create(:artist, name: "Cover Artist")
+      artist = create(:artist, name: "Cover Artist", user: user)
       album = create(:album, title: "Cover Album", artist: artist)
       album.cover_image.attach(
         io: StringIO.new("existing cover"),
@@ -183,7 +183,7 @@ RSpec.describe "Tracks", type: :request do
   end
 
   describe "PATCH /tracks/:id" do
-    let(:track) { create(:track) }
+    let(:track) { create(:track, album: create(:album, artist: create(:artist, user: user))) }
 
     it "updates the track" do
       patch track_path(track), params: {track: {title: "New Title"}}
@@ -197,14 +197,14 @@ RSpec.describe "Tracks", type: :request do
     end
 
     it "moves track to a different album" do
-      new_album = create(:album, title: "New Album")
+      new_album = create(:album, title: "New Album", artist: create(:artist, user: user))
       patch track_path(track), params: {track: {album_id: new_album.id}}
 
       expect(track.reload.album).to eq(new_album)
     end
 
     it "moves track to a different artist" do
-      new_artist = create(:artist, name: "New Artist")
+      new_artist = create(:artist, name: "New Artist", user: user)
       patch track_path(track), params: {track: {artist_id: new_artist.id}}
 
       expect(track.reload.artist).to eq(new_artist)
@@ -212,7 +212,7 @@ RSpec.describe "Tracks", type: :request do
   end
 
   describe "DELETE /tracks/:id" do
-    let!(:track) { create(:track) }
+    let!(:track) { create(:track, album: create(:album, artist: create(:artist, user: user))) }
 
     it "deletes the track" do
       expect {
@@ -224,7 +224,7 @@ RSpec.describe "Tracks", type: :request do
 
   describe "authorization" do
     let(:non_admin) { create(:user, admin: false) }
-    let(:track) { create(:track) }
+    let(:track) { create(:track, album: create(:album, artist: create(:artist, user: non_admin))) }
 
     before { login_user(non_admin) }
 
@@ -259,7 +259,7 @@ RSpec.describe "Tracks", type: :request do
   end
 
   describe "GET /tracks/:id/download" do
-    let(:track) { create(:track) }
+    let(:track) { create(:track, album: create(:album, artist: create(:artist, user: user))) }
 
     it "redirects to blob with attachment disposition when audio file is attached" do
       track.audio_file.attach(
@@ -275,7 +275,7 @@ RSpec.describe "Tracks", type: :request do
     end
 
     it "redirects with alert for YouTube tracks without audio" do
-      youtube_track = create(:track, youtube_video_id: "abc123")
+      youtube_track = create(:track, youtube_video_id: "abc123", album: create(:album, artist: create(:artist, user: user)))
 
       get download_track_path(youtube_track)
 
@@ -284,7 +284,7 @@ RSpec.describe "Tracks", type: :request do
     end
 
     it "allows download for YouTube tracks with audio file attached" do
-      youtube_track = create(:track, youtube_video_id: "abc123")
+      youtube_track = create(:track, youtube_video_id: "abc123", album: create(:album, artist: create(:artist, user: user)))
       youtube_track.audio_file.attach(
         io: File.open(Rails.root.join("spec/fixtures/files/test.mp3")),
         filename: "test.mp3",
@@ -298,7 +298,7 @@ RSpec.describe "Tracks", type: :request do
     end
 
     it "redirects with alert when no audio file is attached" do
-      youtube_track = create(:track, :youtube)
+      youtube_track = create(:track, :youtube, album: create(:album, artist: create(:artist, user: user)))
 
       get download_track_path(youtube_track)
 
@@ -308,16 +308,16 @@ RSpec.describe "Tracks", type: :request do
   end
 
   describe "GET /tracks/:id/stream" do
-    let(:track) { create(:track) }
+    let(:track) { create(:track, album: create(:album, artist: create(:artist, user: user))) }
 
     it "returns not_found when no audio file is attached" do
-      youtube_track = create(:track, :youtube)
+      youtube_track = create(:track, :youtube, album: create(:album, artist: create(:artist, user: user)))
       get stream_track_path(youtube_track)
       expect(response).to have_http_status(:not_found)
     end
 
     it "streams YouTube tracks that have downloaded audio files" do
-      youtube_track = create(:track, youtube_video_id: "abc123")
+      youtube_track = create(:track, youtube_video_id: "abc123", album: create(:album, artist: create(:artist, user: user)))
       youtube_track.audio_file.attach(
         io: File.open(Rails.root.join("spec/fixtures/files/test.mp3")),
         filename: "test.mp3",
@@ -383,7 +383,7 @@ RSpec.describe "Tracks", type: :request do
 
   describe "GET /tracks/:id/lyrics" do
     it "returns lyrics as JSON when present" do
-      track = create(:track, :with_lyrics)
+      track = create(:track, :with_lyrics, album: create(:album, artist: create(:artist, user: user)))
       get lyrics_track_path(track), as: :json
       expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body)
@@ -394,7 +394,7 @@ RSpec.describe "Tracks", type: :request do
       stub_request(:get, /lrclib\.net\/api\/search/)
         .to_return(status: 200, body: "[]", headers: { "Content-Type" => "application/json" })
 
-      track = create(:track)
+      track = create(:track, album: create(:album, artist: create(:artist, user: user)))
       get lyrics_track_path(track), as: :json
       expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body)
@@ -403,7 +403,7 @@ RSpec.describe "Tracks", type: :request do
   end
 
   describe "PATCH /tracks/:id with lyrics" do
-    let(:track) { create(:track) }
+    let(:track) { create(:track, album: create(:album, artist: create(:artist, user: user))) }
 
     it "updates lyrics" do
       patch track_path(track), params: { track: { lyrics: "New lyrics here" } }

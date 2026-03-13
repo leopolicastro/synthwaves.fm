@@ -2,6 +2,7 @@ class Album < ApplicationRecord
   include SearchIndexable
 
   belongs_to :artist
+  belongs_to :user
   has_many :tracks, dependent: :destroy
   has_one_attached :cover_image
   has_many :favorites, as: :favorable, dependent: :destroy
@@ -29,7 +30,7 @@ class Album < ApplicationRecord
   private
 
   def reassign_tracks_to_artist
-    tracks.update_all(artist_id: artist_id)
+    tracks.update_all(artist_id: artist_id, user_id: user_id)
   end
 
 end

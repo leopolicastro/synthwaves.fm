@@ -8,14 +8,14 @@ class AlbumsController < ApplicationController
     @query = params[:q]
     @sort = sort_column(Album, default: "title")
     @direction = sort_direction
-    scope = Album.music.includes(:artist, cover_image_attachment: :blob)
+    scope = Current.user.albums.music.includes(:artist, cover_image_attachment: :blob)
       .search(@query)
       .order(@sort => @direction)
     @pagy, @albums = pagy(:offset, scope)
   end
 
   def show
-    @album = Album.includes(:artist, tracks: :artist).find(params[:id])
+    @album = Current.user.albums.includes(:artist, tracks: :artist).find(params[:id])
     @sort = sort_column(Track, default: "disc_number")
     @direction = sort_direction
 
@@ -33,20 +33,20 @@ class AlbumsController < ApplicationController
   end
 
   def edit
-    @album = Album.find(params[:id])
-    @artists = Artist.order(:name)
+    @album = Current.user.albums.find(params[:id])
+    @artists = Current.user.artists.order(:name)
   end
 
   def destroy
-    @album = Album.find(params[:id])
+    @album = Current.user.albums.find(params[:id])
     artist = @album.artist
     @album.destroy
     redirect_to artist_path(artist), notice: "Album deleted."
   end
 
   def merge
-    @album = Album.find(params[:id])
-    source = Album.find(params[:source_album_id])
+    @album = Current.user.albums.find(params[:id])
+    source = Current.user.albums.find(params[:source_album_id])
     AlbumMergeService.call(target: @album, source: source)
     redirect_to @album, notice: "Merged \"#{source.title}\" into this album."
   rescue AlbumMergeService::Error => e
@@ -54,7 +54,7 @@ class AlbumsController < ApplicationController
   end
 
   def refresh
-    album = Album.find(params[:id])
+    album = Current.user.albums.find(params[:id])
 
     unless Flipper.enabled?(:youtube_import, Current.user)
       redirect_to album, alert: "This feature is not available."
@@ -67,7 +67,7 @@ class AlbumsController < ApplicationController
     end
 
     track_count_before = album.tracks.count
-    YoutubePlaylistImportService.call(album.youtube_playlist_url, category: album.artist.category, api_key: Current.user.youtube_api_key)
+    YoutubePlaylistImportService.call(album.youtube_playlist_url, category: album.artist.category, api_key: Current.user.youtube_api_key, user: Current.user)
     new_count = album.tracks.reload.count - track_count_before
 
     if new_count > 0
@@ -80,7 +80,7 @@ class AlbumsController < ApplicationController
   end
 
   def download_audio
-    album = Album.find(params[:id])
+    album = Current.user.albums.find(params[:id])
 
     unless Flipper.enabled?(:youtube_import, Current.user)
       redirect_to album, alert: "This feature is not available."
@@ -108,17 +108,17 @@ class AlbumsController < ApplicationController
   end
 
   def update
-    @album = Album.find(params[:id])
+    @album = Current.user.albums.find(params[:id])
     if @album.update(album_params)
       redirect_to @album, notice: "Album updated."
     else
-      @artists = Artist.order(:name)
+      @artists = Current.user.artists.order(:name)
       render :edit, status: :unprocessable_content
     end
   end
 
   def fetch_cover
-    album = Album.find(params[:id])
+    album = Current.user.albums.find(params[:id])
 
     result = CoverArtSearchService.call(album)
 
@@ -130,7 +130,7 @@ class AlbumsController < ApplicationController
   end
 
   def create_playlist
-    album = Album.find(params[:id])
+    album = Current.user.albums.find(params[:id])
     tracks = album.tracks.order(:disc_number, :track_number)
     playlist = Current.user.playlists.create!(name: album.title)
 

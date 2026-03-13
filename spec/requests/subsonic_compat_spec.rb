@@ -28,7 +28,7 @@ RSpec.describe "Subsonic /rest/ compatibility routes", type: :request do
 
   describe "GET /rest/stream.view" do
     it "redirects when audio file is attached" do
-      track = create(:track)
+      track = create(:track, album: create(:album, artist: create(:artist, user: user)))
       track.audio_file.attach(
         io: File.open(Rails.root.join("spec/fixtures/files/test.mp3")),
         filename: "test.mp3",
@@ -42,7 +42,7 @@ RSpec.describe "Subsonic /rest/ compatibility routes", type: :request do
 
   describe "GET /rest/download.view" do
     it "redirects when audio file is attached" do
-      track = create(:track)
+      track = create(:track, album: create(:album, artist: create(:artist, user: user)))
       track.audio_file.attach(
         io: File.open(Rails.root.join("spec/fixtures/files/test.mp3")),
         filename: "test.mp3",

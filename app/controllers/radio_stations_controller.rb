@@ -3,7 +3,7 @@ class RadioStationsController < ApplicationController
   require_feature :youtube_radio
 
   def index
-    @radio_stations = RadioStation.order(created_at: :desc)
+    @radio_stations = Current.user.radio_stations.order(created_at: :desc)
   end
 
   def new

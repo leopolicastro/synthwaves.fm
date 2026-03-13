@@ -142,12 +142,12 @@ RSpec.describe SearchService, type: :service do
 
     context "favorites only filter" do
       let(:user) { create(:user) }
-      let!(:fav_album) { create(:album, title: "Loved Album", artist: artist) }
-      let!(:unfav_album) { create(:album, title: "Unloved Album", artist: artist) }
-      let!(:fav_track) { create(:track, title: "Loved Song", album: fav_album, artist: artist) }
-      let!(:unfav_track) { create(:track, title: "Unloved Song", album: unfav_album, artist: artist) }
-      let!(:fav_artist) { create(:artist, name: "Beloved Artist") }
-      let!(:unfav_artist) { create(:artist, name: "Unknown Artist") }
+      let!(:fav_album) { create(:album, title: "Loved Album", artist: artist, user: user) }
+      let!(:unfav_album) { create(:album, title: "Unloved Album", artist: artist, user: user) }
+      let!(:fav_track) { create(:track, title: "Loved Song", album: fav_album, artist: artist, user: user) }
+      let!(:unfav_track) { create(:track, title: "Unloved Song", album: unfav_album, artist: artist, user: user) }
+      let!(:fav_artist) { create(:artist, name: "Beloved Artist", user: user) }
+      let!(:unfav_artist) { create(:artist, name: "Unknown Artist", user: user) }
 
       before do
         create(:favorite, user: user, favorable: fav_album)
@@ -181,11 +181,11 @@ RSpec.describe SearchService, type: :service do
 
     context "combined filters" do
       let(:user) { create(:user) }
-      let!(:matching_album) { create(:album, title: "Perfect Match", artist: artist, genre: "Electronic", year: 2022) }
-      let!(:wrong_genre_album) { create(:album, title: "Perfect Miss", artist: artist, genre: "Rock", year: 2022) }
-      let!(:wrong_year_album) { create(:album, title: "Perfect Old", artist: artist, genre: "Electronic", year: 2010) }
-      let!(:matching_track) { create(:track, title: "Hit Song", album: matching_album, artist: artist) }
-      let!(:wrong_genre_track) { create(:track, title: "Hit Rock", album: wrong_genre_album, artist: artist) }
+      let!(:matching_album) { create(:album, title: "Perfect Match", artist: artist, genre: "Electronic", year: 2022, user: user) }
+      let!(:wrong_genre_album) { create(:album, title: "Perfect Miss", artist: artist, genre: "Rock", year: 2022, user: user) }
+      let!(:wrong_year_album) { create(:album, title: "Perfect Old", artist: artist, genre: "Electronic", year: 2010, user: user) }
+      let!(:matching_track) { create(:track, title: "Hit Song", album: matching_album, artist: artist, user: user) }
+      let!(:wrong_genre_track) { create(:track, title: "Hit Rock", album: wrong_genre_album, artist: artist, user: user) }
 
       before do
         create(:favorite, user: user, favorable: matching_album)

@@ -8,8 +8,8 @@ RSpec.describe "API Import Playlists", type: :request do
     { "Authorization" => "Bearer #{token}", "Content-Type" => "application/json" }
   end
 
-  let(:artist) { create(:artist, name: "The Beatles") }
-  let(:album) { create(:album, title: "Abbey Road", artist: artist) }
+  let(:artist) { create(:artist, name: "The Beatles", user: user) }
+  let(:album) { create(:album, title: "Abbey Road", artist: artist, user: user) }
 
   describe "POST /api/import/playlists" do
     it "creates a playlist with matched tracks in sequential positions" do

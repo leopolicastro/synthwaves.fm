@@ -16,7 +16,7 @@ class S3RecoveryService
   end
 
   def call
-    @user = User.find_by!(email_address: @user_email) if @commit
+    @user = User.find_by!(email_address: @user_email)
 
     orphaned = scan_and_categorize
     recover_audio_files(orphaned[:audio])
@@ -94,13 +94,13 @@ class S3RecoveryService
       title = metadata[:title].presence || File.basename(entry[:filename], File.extname(entry[:filename]))
 
       if @commit
-        artist = Artist.find_or_create_by!(name: artist_name)
-        album = Album.find_or_create_by!(title: album_title, artist: artist) do |a|
+        artist = @user.artists.find_or_create_by!(name: artist_name)
+        album = @user.albums.find_or_create_by!(title: album_title, artist: artist) do |a|
           a.genre = metadata[:genre]
           a.year = metadata[:year]
         end
 
-        if Track.exists?(title: title, album: album, artist: artist)
+        if @user.tracks.exists?(title: title, album: album, artist: artist)
           @stats[:skipped] += 1
           log "SKIP (duplicate): #{artist_name} - #{title}"
           return
@@ -108,6 +108,7 @@ class S3RecoveryService
 
         track = Track.new(
           title: title,
+          user: @user,
           album: album,
           artist: artist,
           track_number: metadata[:track_number],

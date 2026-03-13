@@ -70,24 +70,6 @@ CREATE TABLE IF NOT EXISTS "ahoy_events" ("id" integer PRIMARY KEY AUTOINCREMENT
 CREATE INDEX "index_ahoy_events_on_visit_id" ON "ahoy_events" ("visit_id") /*application='GroovyTunes'*/;
 CREATE INDEX "index_ahoy_events_on_user_id" ON "ahoy_events" ("user_id") /*application='GroovyTunes'*/;
 CREATE INDEX "index_ahoy_events_on_name_and_time" ON "ahoy_events" ("name", "time") /*application='GroovyTunes'*/;
-CREATE TABLE IF NOT EXISTS "artists" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "image_url" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "category" varchar DEFAULT 'music' NOT NULL /*application='GroovyTunes'*/);
-CREATE UNIQUE INDEX "index_artists_on_name" ON "artists" ("name") /*application='GroovyTunes'*/;
-CREATE TABLE IF NOT EXISTS "albums" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar NOT NULL, "artist_id" integer NOT NULL, "year" integer, "genre" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "youtube_playlist_url" varchar /*application='GroovyTunes'*/, CONSTRAINT "fk_rails_124a79559a"
-FOREIGN KEY ("artist_id")
-  REFERENCES "artists" ("id")
-);
-CREATE INDEX "index_albums_on_artist_id" ON "albums" ("artist_id") /*application='GroovyTunes'*/;
-CREATE UNIQUE INDEX "index_albums_on_artist_id_and_title" ON "albums" ("artist_id", "title") /*application='GroovyTunes'*/;
-CREATE TABLE IF NOT EXISTS "tracks" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar NOT NULL, "album_id" integer NOT NULL, "artist_id" integer NOT NULL, "track_number" integer, "disc_number" integer DEFAULT 1, "duration" float, "file_format" varchar, "file_size" integer, "bitrate" integer, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "youtube_video_id" varchar /*application='GroovyTunes'*/, "lyrics" text /*application='SynthWaves'*/, "download_status" varchar /*application='SynthWaves'*/, "download_error" varchar /*application='SynthWaves'*/, CONSTRAINT "fk_rails_7c47d80164"
-FOREIGN KEY ("album_id")
-  REFERENCES "albums" ("id")
-, CONSTRAINT "fk_rails_d99a0cbd74"
-FOREIGN KEY ("artist_id")
-  REFERENCES "artists" ("id")
-);
-CREATE INDEX "index_tracks_on_album_id" ON "tracks" ("album_id") /*application='GroovyTunes'*/;
-CREATE INDEX "index_tracks_on_artist_id" ON "tracks" ("artist_id") /*application='GroovyTunes'*/;
-CREATE INDEX "index_tracks_on_album_id_and_disc_number_and_track_number" ON "tracks" ("album_id", "disc_number", "track_number") /*application='GroovyTunes'*/;
 CREATE TABLE IF NOT EXISTS "playlists" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "user_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "playlist_tracks_count" integer DEFAULT 0 NOT NULL /*application='SynthwavesFm'*/, CONSTRAINT "fk_rails_d67ef1eb45"
 FOREIGN KEY ("user_id")
   REFERENCES "users" ("id")
@@ -119,8 +101,6 @@ FOREIGN KEY ("track_id")
 CREATE INDEX "index_play_histories_on_user_id" ON "play_histories" ("user_id") /*application='GroovyTunes'*/;
 CREATE INDEX "index_play_histories_on_track_id" ON "play_histories" ("track_id") /*application='GroovyTunes'*/;
 CREATE INDEX "index_play_histories_on_user_id_and_played_at" ON "play_histories" ("user_id", "played_at") /*application='GroovyTunes'*/;
-CREATE INDEX "index_tracks_on_youtube_video_id" ON "tracks" ("youtube_video_id") /*application='GroovyTunes'*/;
-CREATE INDEX "index_artists_on_category" ON "artists" ("category") /*application='GroovyTunes'*/;
 CREATE TABLE IF NOT EXISTS "radio_stations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "user_id" integer NOT NULL, "name" varchar NOT NULL, "youtube_url" varchar, "youtube_video_id" varchar, "thumbnail_url" varchar, "description" text, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "source_type" varchar DEFAULT 'youtube' NOT NULL, "stream_url" varchar, "original_url" varchar, CONSTRAINT "fk_rails_0b9af78719"
 FOREIGN KEY ("user_id")
   REFERENCES "users" ("id")
@@ -223,7 +203,30 @@ CREATE TABLE IF NOT EXISTS 'tracks_search_idx'(segid, term, pgno, PRIMARY KEY(se
 CREATE TABLE IF NOT EXISTS 'tracks_search_content'(id INTEGER PRIMARY KEY, c0, c1, c2, c3);
 CREATE TABLE IF NOT EXISTS 'tracks_search_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
 CREATE TABLE IF NOT EXISTS 'tracks_search_config'(k PRIMARY KEY, v) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS "artists" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "image_url" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "category" varchar DEFAULT 'music' NOT NULL, "user_id" integer NOT NULL);
+CREATE INDEX "index_artists_on_category" ON "artists" ("category") /*application='SynthWaves'*/;
+CREATE TABLE IF NOT EXISTS "albums" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar NOT NULL, "artist_id" integer NOT NULL, "year" integer, "genre" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "youtube_playlist_url" varchar, "user_id" integer NOT NULL, CONSTRAINT "fk_rails_124a79559a"
+FOREIGN KEY ("artist_id")
+  REFERENCES "artists" ("id")
+);
+CREATE INDEX "index_albums_on_artist_id" ON "albums" ("artist_id") /*application='SynthWaves'*/;
+CREATE UNIQUE INDEX "index_albums_on_artist_id_and_title" ON "albums" ("artist_id", "title") /*application='SynthWaves'*/;
+CREATE TABLE IF NOT EXISTS "tracks" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar NOT NULL, "album_id" integer NOT NULL, "artist_id" integer NOT NULL, "track_number" integer, "disc_number" integer DEFAULT 1, "duration" float, "file_format" varchar, "file_size" integer, "bitrate" integer, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "youtube_video_id" varchar, "lyrics" text, "download_status" varchar, "download_error" varchar, "user_id" integer NOT NULL, CONSTRAINT "fk_rails_d99a0cbd74"
+FOREIGN KEY ("artist_id")
+  REFERENCES "artists" ("id")
+, CONSTRAINT "fk_rails_7c47d80164"
+FOREIGN KEY ("album_id")
+  REFERENCES "albums" ("id")
+);
+CREATE INDEX "index_tracks_on_album_id" ON "tracks" ("album_id") /*application='SynthWaves'*/;
+CREATE INDEX "index_tracks_on_artist_id" ON "tracks" ("artist_id") /*application='SynthWaves'*/;
+CREATE INDEX "index_tracks_on_album_id_and_disc_number_and_track_number" ON "tracks" ("album_id", "disc_number", "track_number") /*application='SynthWaves'*/;
+CREATE INDEX "index_tracks_on_youtube_video_id" ON "tracks" ("youtube_video_id") /*application='SynthWaves'*/;
+CREATE UNIQUE INDEX "index_artists_on_user_id_and_name" ON "artists" ("user_id", "name") /*application='SynthWaves'*/;
+CREATE INDEX "index_albums_on_user_id" ON "albums" ("user_id") /*application='SynthWaves'*/;
+CREATE INDEX "index_tracks_on_user_id" ON "tracks" ("user_id") /*application='SynthWaves'*/;
 INSERT INTO "schema_migrations" (version) VALUES
+('20260312231556'),
 ('20260312124420'),
 ('20260311205713'),
 ('20260311202752'),

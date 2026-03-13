@@ -14,7 +14,7 @@ RSpec.describe "Subsonic Playlists API", type: :request do
     end
 
     it "includes All Tracks virtual playlist first" do
-      create_list(:track, 3)
+      create_list(:track, 3, user: user)
       get "/api/rest/getPlaylists.view", params: auth_params
       json = JSON.parse(response.body)
       playlists = json["subsonic-response"]["playlists"]["playlist"]
@@ -25,10 +25,10 @@ RSpec.describe "Subsonic Playlists API", type: :request do
     end
 
     it "includes Podcasts virtual playlist second" do
-      podcast_artist = create(:artist, :podcast)
-      podcast_album = create(:album, artist: podcast_artist)
-      create_list(:track, 2, album: podcast_album, artist: podcast_artist)
-      create_list(:track, 3)
+      podcast_artist = create(:artist, :podcast, user: user)
+      podcast_album = create(:album, artist: podcast_artist, user: user)
+      create_list(:track, 2, album: podcast_album, artist: podcast_artist, user: user)
+      create_list(:track, 3, user: user)
 
       get "/api/rest/getPlaylists.view", params: auth_params
       json = JSON.parse(response.body)
@@ -55,7 +55,7 @@ RSpec.describe "Subsonic Playlists API", type: :request do
   describe "GET /api/rest/getPlaylist.view" do
     it "returns playlist with entries" do
       playlist = create(:playlist, user: user)
-      track = create(:track)
+      track = create(:track, user: user)
       create(:playlist_track, playlist: playlist, track: track, position: 1)
 
       get "/api/rest/getPlaylist.view", params: auth_params.merge(id: playlist.id)
@@ -64,10 +64,10 @@ RSpec.describe "Subsonic Playlists API", type: :request do
     end
 
     it "returns all tracks when id is 'all' excluding podcasts" do
-      podcast_artist = create(:artist, :podcast)
-      podcast_album = create(:album, artist: podcast_artist)
-      create_list(:track, 2, album: podcast_album, artist: podcast_artist)
-      create_list(:track, 3)
+      podcast_artist = create(:artist, :podcast, user: user)
+      podcast_album = create(:album, artist: podcast_artist, user: user)
+      create_list(:track, 2, album: podcast_album, artist: podcast_artist, user: user)
+      create_list(:track, 3, user: user)
 
       get "/api/rest/getPlaylist.view", params: auth_params.merge(id: "all")
       json = JSON.parse(response.body)
@@ -78,10 +78,10 @@ RSpec.describe "Subsonic Playlists API", type: :request do
     end
 
     it "returns only podcast tracks when id is 'podcasts'" do
-      podcast_artist = create(:artist, :podcast)
-      podcast_album = create(:album, artist: podcast_artist)
-      create_list(:track, 2, album: podcast_album, artist: podcast_artist)
-      create_list(:track, 3)
+      podcast_artist = create(:artist, :podcast, user: user)
+      podcast_album = create(:album, artist: podcast_artist, user: user)
+      create_list(:track, 2, album: podcast_album, artist: podcast_artist, user: user)
+      create_list(:track, 3, user: user)
 
       get "/api/rest/getPlaylist.view", params: auth_params.merge(id: "podcasts")
       json = JSON.parse(response.body)
@@ -92,8 +92,8 @@ RSpec.describe "Subsonic Playlists API", type: :request do
     end
 
     it "excludes YouTube tracks from virtual 'all' playlist" do
-      create_list(:track, 3)
-      create(:track, :youtube)
+      create_list(:track, 3, user: user)
+      create(:track, :youtube, user: user)
 
       get "/api/rest/getPlaylist.view", params: auth_params.merge(id: "all")
       json = JSON.parse(response.body)
@@ -104,8 +104,8 @@ RSpec.describe "Subsonic Playlists API", type: :request do
 
     it "excludes tracks without audio files from user playlists" do
       playlist = create(:playlist, user: user)
-      streamable = create(:track, title: "Streamable")
-      youtube = create(:track, :youtube, title: "No Audio")
+      streamable = create(:track, title: "Streamable", user: user)
+      youtube = create(:track, :youtube, title: "No Audio", user: user)
       create(:playlist_track, playlist: playlist, track: streamable, position: 1)
       create(:playlist_track, playlist: playlist, track: youtube, position: 2)
 
@@ -119,7 +119,7 @@ RSpec.describe "Subsonic Playlists API", type: :request do
 
     it "includes downloaded YouTube tracks in user playlists" do
       playlist = create(:playlist, user: user)
-      downloaded_youtube = create(:track, :youtube, title: "Downloaded YouTube")
+      downloaded_youtube = create(:track, :youtube, title: "Downloaded YouTube", user: user)
       downloaded_youtube.audio_file.attach(
         io: StringIO.new("fake audio data"),
         filename: "track.mp3",
@@ -159,7 +159,7 @@ RSpec.describe "Subsonic Playlists API", type: :request do
 
     it "sets songs on playlist" do
       playlist = create(:playlist, user: user)
-      track = create(:track)
+      track = create(:track, user: user)
       get "/api/rest/createPlaylist.view", params: auth_params.merge(playlistId: playlist.id, songId: [track.id])
       expect(playlist.reload.tracks).to include(track)
     end

@@ -75,9 +75,9 @@ class DownloadsController < ApplicationController
   def resolve_downloadable(type, id)
     case type
     when "Track"
-      Track.find_by(id: id)
+      Current.user.tracks.find_by(id: id)
     when "Album"
-      Album.find_by(id: id)
+      Current.user.albums.find_by(id: id)
     when "Playlist"
       Current.user.playlists.find_by(id: id)
     when "Library"

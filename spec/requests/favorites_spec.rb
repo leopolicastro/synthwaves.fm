@@ -14,21 +14,21 @@ RSpec.describe "Favorites", type: :request do
 
   describe "POST /favorites" do
     it "creates a favorite for a Track" do
-      track = create(:track)
+      track = create(:track, album: create(:album, artist: create(:artist, user: user)))
       expect {
         post favorites_path, params: {favorable_type: "Track", favorable_id: track.id}
       }.to change(Favorite, :count).by(1)
     end
 
     it "creates a favorite for an Album" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       expect {
         post favorites_path, params: {favorable_type: "Album", favorable_id: album.id}
       }.to change(Favorite, :count).by(1)
     end
 
     it "creates a favorite for an Artist" do
-      artist = create(:artist)
+      artist = create(:artist, user: user)
       expect {
         post favorites_path, params: {favorable_type: "Artist", favorable_id: artist.id}
       }.to change(Favorite, :count).by(1)
@@ -49,7 +49,7 @@ RSpec.describe "Favorites", type: :request do
     end
 
     it "is idempotent for the same favorable" do
-      track = create(:track)
+      track = create(:track, album: create(:album, artist: create(:artist, user: user)))
       post favorites_path, params: {favorable_type: "Track", favorable_id: track.id}
       expect {
         post favorites_path, params: {favorable_type: "Track", favorable_id: track.id}
@@ -63,7 +63,7 @@ RSpec.describe "Favorites", type: :request do
   end
 
   describe "DELETE /favorites/:id" do
-    let(:track) { create(:track) }
+    let(:track) { create(:track, album: create(:album, artist: create(:artist, user: user))) }
     let!(:favorite) { create(:favorite, user: user, favorable: track) }
 
     it "removes the favorite" do

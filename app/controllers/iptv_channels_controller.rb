@@ -1,7 +1,4 @@
 class IPTVChannelsController < ApplicationController
-  include FeatureFlagged
-  require_feature :iptv
-
   def show
     @channel = IPTVChannel.find(params[:id])
     @now_playing = @channel.now_playing

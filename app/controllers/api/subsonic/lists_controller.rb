@@ -6,21 +6,21 @@ class API::Subsonic::ListsController < API::Subsonic::BaseController
 
     albums = case type
     when "newest"
-      Album.includes(:artist, :tracks).order(created_at: :desc)
+      current_user.albums.includes(:artist, :tracks).order(created_at: :desc)
     when "random"
-      Album.includes(:artist, :tracks).order("RANDOM()")
+      current_user.albums.includes(:artist, :tracks).order("RANDOM()")
     when "alphabeticalByName"
-      Album.includes(:artist, :tracks).order(:title)
+      current_user.albums.includes(:artist, :tracks).order(:title)
     when "alphabeticalByArtist"
-      Album.includes(:artist, :tracks).joins(:artist).order("artists.name")
+      current_user.albums.includes(:artist, :tracks).joins(:artist).order("artists.name")
     when "byYear"
       from_year = params[:fromYear].to_i
       to_year = params[:toYear].to_i
-      Album.includes(:artist, :tracks).where(year: from_year..to_year).order(:year)
+      current_user.albums.includes(:artist, :tracks).where(year: from_year..to_year).order(:year)
     when "byGenre"
-      Album.includes(:artist, :tracks).where(genre: params[:genre])
+      current_user.albums.includes(:artist, :tracks).where(genre: params[:genre])
     else
-      Album.includes(:artist, :tracks).order(:title)
+      current_user.albums.includes(:artist, :tracks).order(:title)
     end
 
     render_subsonic(albumList2: {
@@ -30,7 +30,7 @@ class API::Subsonic::ListsController < API::Subsonic::BaseController
 
   def get_random_songs
     size = (params[:size] || 10).to_i.clamp(1, 500)
-    tracks = Track.streamable.includes(:album, :artist).order("RANDOM()").limit(size)
+    tracks = current_user.tracks.streamable.includes(:album, :artist).order("RANDOM()").limit(size)
     render_subsonic(randomSongs: {
       song: tracks.map { |t| track_to_child(t) }
     })

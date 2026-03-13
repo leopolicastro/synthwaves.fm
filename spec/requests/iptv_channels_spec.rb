@@ -5,7 +5,6 @@ RSpec.describe "IPTVChannels", type: :request do
 
   before do
     login_user(user)
-    Flipper.enable(:iptv)
   end
 
   describe "GET /tv" do
@@ -296,11 +295,4 @@ RSpec.describe "IPTVChannels", type: :request do
     end
   end
 
-  describe "feature flag" do
-    it "redirects when feature is disabled" do
-      Flipper.disable(:iptv)
-      get tv_path
-      expect(response).to redirect_to(root_path)
-    end
-  end
 end

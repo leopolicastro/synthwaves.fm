@@ -12,7 +12,7 @@ RSpec.describe "PlayHistories", type: :request do
     end
 
     it "groups tracks under album headers" do
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       track1 = create(:track, album: album, artist: album.artist)
       track2 = create(:track, album: album, artist: album.artist)
       create(:play_history, user: user, track: track1, played_at: 2.hours.ago)
@@ -25,8 +25,8 @@ RSpec.describe "PlayHistories", type: :request do
     end
 
     it "shows tracks from different albums under separate headers" do
-      album1 = create(:album)
-      album2 = create(:album)
+      album1 = create(:album, artist: create(:artist, user: user))
+      album2 = create(:album, artist: create(:artist, user: user))
       track1 = create(:track, album: album1, artist: album1.artist)
       track2 = create(:track, album: album2, artist: album2.artist)
       create(:play_history, user: user, track: track1, played_at: 2.hours.ago)
@@ -39,7 +39,7 @@ RSpec.describe "PlayHistories", type: :request do
   end
 
   describe "POST /play_histories" do
-    let(:track) { create(:track) }
+    let(:track) { create(:track, album: create(:album, artist: create(:artist, user: user))) }
 
     it "records a play" do
       expect {

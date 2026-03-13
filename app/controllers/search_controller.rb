@@ -22,7 +22,7 @@ class SearchController < ApplicationController
   def dropdown
     @query = params[:q].to_s.strip
     @results = if @query.present?
-      SearchService.call(query: @query, limit: 5)
+      SearchService.call(query: @query, limit: 5, user: Current.user)
     else
       {artists: [], albums: [], tracks: []}
     end

@@ -10,26 +10,13 @@ RSpec.describe BottomTabBarComponent, type: :component do
   end
 
   describe "tab rendering" do
-    it "renders Library, Listen, and Search tabs" do
+    it "renders Library, Listen, Watch, and Search tabs" do
       html = render_component
       expect(html.at_css("a[href='/library']")).to be_present
       expect(html.at_css("a[href='/music']")).to be_present
-      expect(html.at_css("a[href='/search']")).to be_present
-      expect(html.text).to include("Library", "Listen", "Search")
-    end
-
-    it "does not render Watch tab when iptv flag is disabled" do
-      Flipper.disable(:iptv, user)
-      html = render_component
-      expect(html.at_css("a[href='/tv']")).not_to be_present
-      expect(html.text).not_to include("Watch")
-    end
-
-    it "renders Watch tab when iptv flag is enabled" do
-      Flipper.enable(:iptv, user)
-      html = render_component
       expect(html.at_css("a[href='/tv']")).to be_present
-      expect(html.text).to include("Watch")
+      expect(html.at_css("a[href='/search']")).to be_present
+      expect(html.text).to include("Library", "Listen", "Watch", "Search")
     end
   end
 
@@ -76,8 +63,7 @@ RSpec.describe BottomTabBarComponent, type: :component do
       expect(search_link["class"]).to include("text-neon-cyan")
     end
 
-    it "highlights Watch tab on /tv when iptv enabled" do
-      Flipper.enable(:iptv, user)
+    it "highlights Watch tab on /tv" do
       html = render_component(current_path: "/tv")
       watch_link = html.at_css("a[href='/tv']")
       expect(watch_link["class"]).to include("text-neon-cyan")

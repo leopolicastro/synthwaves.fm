@@ -116,7 +116,7 @@ RSpec.describe "YoutubeImports", type: :request do
 
           post youtube_imports_path, params: { youtube_url: video_url }
 
-          expect(YoutubeVideoImportService).to have_received(:call).with(video_url, category: "music", api_key: "test_key")
+          expect(YoutubeVideoImportService).to have_received(:call).with(video_url, category: "music", api_key: "test_key", user: user)
           expect(MediaDownloadJob).to have_been_enqueued.with(track.id, video_url, user_id: user.id)
           expect(response).to redirect_to(album_path(album))
         end
@@ -128,7 +128,7 @@ RSpec.describe "YoutubeImports", type: :request do
 
           post youtube_imports_path, params: { youtube_url: video_url, category: "podcast" }
 
-          expect(YoutubeVideoImportService).to have_received(:call).with(video_url, category: "podcast", api_key: "test_key")
+          expect(YoutubeVideoImportService).to have_received(:call).with(video_url, category: "podcast", api_key: "test_key", user: user)
         end
 
         it "renders the form with an error when the service fails" do

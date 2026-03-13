@@ -8,15 +8,17 @@ RSpec.describe "Music", type: :request do
     end
 
     it "defaults to artists tab" do
-      login_user(create(:user))
+      user = create(:user)
+      login_user(user)
       get music_path
       expect(response).to have_http_status(:success)
       expect(response.body).to include("Music")
     end
 
     it "renders the artists tab" do
-      login_user(create(:user))
-      artist = create(:artist, name: "Test Artist", category: :music)
+      user = create(:user)
+      login_user(user)
+      artist = create(:artist, name: "Test Artist", category: :music, user: user)
 
       get music_path(tab: "artists")
 
@@ -25,8 +27,9 @@ RSpec.describe "Music", type: :request do
     end
 
     it "renders the albums tab" do
-      login_user(create(:user))
-      artist = create(:artist, category: :music)
+      user = create(:user)
+      login_user(user)
+      artist = create(:artist, category: :music, user: user)
       album = create(:album, title: "Test Album", artist: artist)
 
       get music_path(tab: "albums")
@@ -36,8 +39,9 @@ RSpec.describe "Music", type: :request do
     end
 
     it "renders the tracks tab" do
-      login_user(create(:user))
-      artist = create(:artist, category: :music)
+      user = create(:user)
+      login_user(user)
+      artist = create(:artist, category: :music, user: user)
       album = create(:album, artist: artist)
       track = create(:track, title: "Test Track", artist: artist, album: album)
 
@@ -48,7 +52,8 @@ RSpec.describe "Music", type: :request do
     end
 
     it "falls back to artists for invalid tab" do
-      login_user(create(:user))
+      user = create(:user)
+      login_user(user)
       get music_path(tab: "invalid")
       expect(response).to have_http_status(:success)
       expect(response.body).to include("Search artists...")

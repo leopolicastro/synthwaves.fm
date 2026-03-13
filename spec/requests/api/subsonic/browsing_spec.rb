@@ -15,9 +15,9 @@ RSpec.describe "Subsonic Browsing API", type: :request do
 
   describe "GET /api/rest/getIndexes.view" do
     it "groups artists by first letter" do
-      create(:artist, name: "Beatles")
-      create(:artist, name: "ABBA")
-      create(:artist, name: "123 Band")
+      create(:artist, name: "Beatles", user: user)
+      create(:artist, name: "ABBA", user: user)
+      create(:artist, name: "123 Band", user: user)
 
       get "/api/rest/getIndexes.view", params: auth_params
       json = JSON.parse(response.body)
@@ -29,8 +29,8 @@ RSpec.describe "Subsonic Browsing API", type: :request do
 
   describe "GET /api/rest/getArtists.view" do
     it "returns artists grouped by letter" do
-      create(:artist, name: "Beatles")
-      create(:artist, name: "ABBA")
+      create(:artist, name: "Beatles", user: user)
+      create(:artist, name: "ABBA", user: user)
 
       get "/api/rest/getArtists.view", params: auth_params
       json = JSON.parse(response.body)
@@ -41,8 +41,8 @@ RSpec.describe "Subsonic Browsing API", type: :request do
 
   describe "GET /api/rest/getArtist.view" do
     it "returns artist with albums" do
-      artist = create(:artist)
-      album = create(:album, artist: artist)
+      artist = create(:artist, user: user)
+      album = create(:album, artist: artist, user: user)
 
       get "/api/rest/getArtist.view", params: auth_params.merge(id: artist.id)
       json = JSON.parse(response.body)
@@ -58,8 +58,8 @@ RSpec.describe "Subsonic Browsing API", type: :request do
 
   describe "GET /api/rest/getAlbum.view" do
     it "returns album with tracks" do
-      album = create(:album)
-      track = create(:track, album: album, artist: album.artist)
+      album = create(:album, user: user)
+      track = create(:track, album: album, artist: album.artist, user: user)
 
       get "/api/rest/getAlbum.view", params: auth_params.merge(id: album.id)
       json = JSON.parse(response.body)
@@ -68,9 +68,9 @@ RSpec.describe "Subsonic Browsing API", type: :request do
     end
 
     it "excludes YouTube tracks from song list" do
-      album = create(:album)
-      streamable = create(:track, album: album, artist: album.artist, title: "Streamable")
-      youtube = create(:track, :youtube, album: album, artist: album.artist, title: "YouTube Only")
+      album = create(:album, user: user)
+      streamable = create(:track, album: album, artist: album.artist, title: "Streamable", user: user)
+      youtube = create(:track, :youtube, album: album, artist: album.artist, title: "YouTube Only", user: user)
 
       get "/api/rest/getAlbum.view", params: auth_params.merge(id: album.id)
       json = JSON.parse(response.body)
@@ -91,7 +91,7 @@ RSpec.describe "Subsonic Browsing API", type: :request do
 
   describe "GET /api/rest/getSong.view" do
     it "returns song details" do
-      track = create(:track)
+      track = create(:track, user: user)
 
       get "/api/rest/getSong.view", params: auth_params.merge(id: track.id)
       json = JSON.parse(response.body)
@@ -99,7 +99,7 @@ RSpec.describe "Subsonic Browsing API", type: :request do
     end
 
     it "returns error for YouTube track" do
-      youtube_track = create(:track, :youtube)
+      youtube_track = create(:track, :youtube, user: user)
 
       get "/api/rest/getSong.view", params: auth_params.merge(id: youtube_track.id)
       json = JSON.parse(response.body)

@@ -1,6 +1,7 @@
 class Artist < ApplicationRecord
   include SearchIndexable
 
+  belongs_to :user
   has_many :albums, dependent: :destroy
   has_many :tracks, dependent: :destroy
   has_many :favorites, as: :favorable, dependent: :destroy
@@ -14,7 +15,7 @@ class Artist < ApplicationRecord
     "created_at" => "Recently Added"
   }.freeze
 
-  validates :name, presence: true, uniqueness: true
+  validates :name, presence: true, uniqueness: { scope: :user_id }
 
   after_update_commit :reindex_tracks_search, if: :saved_change_to_name?
 

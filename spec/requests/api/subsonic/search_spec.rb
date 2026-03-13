@@ -6,9 +6,9 @@ RSpec.describe "Subsonic Search API", type: :request do
 
   describe "GET /api/rest/search3.view" do
     it "returns matching results" do
-      artist = create(:artist, name: "The Beatles")
-      album = create(:album, title: "Abbey Road", artist: artist)
-      track = create(:track, title: "Come Together", album: album, artist: artist)
+      artist = create(:artist, name: "The Beatles", user: user)
+      album = create(:album, title: "Abbey Road", artist: artist, user: user)
+      track = create(:track, title: "Come Together", album: album, artist: artist, user: user)
 
       get "/api/rest/search3.view", params: auth_params.merge(query: "Beatles")
       json = JSON.parse(response.body)
@@ -16,10 +16,10 @@ RSpec.describe "Subsonic Search API", type: :request do
     end
 
     it "excludes YouTube tracks from song results" do
-      artist = create(:artist, name: "Test Artist")
-      album = create(:album, title: "Test Album", artist: artist)
-      streamable = create(:track, title: "Test Streamable", album: album, artist: artist)
-      youtube = create(:track, :youtube, title: "Test YouTube", album: album, artist: artist)
+      artist = create(:artist, name: "Test Artist", user: user)
+      album = create(:album, title: "Test Album", artist: artist, user: user)
+      streamable = create(:track, title: "Test Streamable", album: album, artist: artist, user: user)
+      youtube = create(:track, :youtube, title: "Test YouTube", album: album, artist: artist, user: user)
 
       get "/api/rest/search3.view", params: auth_params.merge(query: "Test")
       json = JSON.parse(response.body)
@@ -30,11 +30,11 @@ RSpec.describe "Subsonic Search API", type: :request do
     end
 
     it "excludes all-YouTube albums from album results" do
-      streamable_album = create(:album, title: "SearchMe Streamable")
-      create(:track, album: streamable_album, artist: streamable_album.artist)
+      streamable_album = create(:album, title: "SearchMe Streamable", user: user)
+      create(:track, album: streamable_album, artist: streamable_album.artist, user: user)
 
-      youtube_album = create(:album, title: "SearchMe YouTube")
-      create(:track, :youtube, album: youtube_album, artist: youtube_album.artist)
+      youtube_album = create(:album, title: "SearchMe YouTube", user: user)
+      create(:track, :youtube, album: youtube_album, artist: youtube_album.artist, user: user)
 
       get "/api/rest/search3.view", params: auth_params.merge(query: "SearchMe")
       json = JSON.parse(response.body)

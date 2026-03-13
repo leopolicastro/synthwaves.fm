@@ -8,23 +8,23 @@ class ArtistsController < ApplicationController
     @query = params[:q]
     @sort = sort_column(Artist, default: "name")
     @direction = sort_direction
-    scope = Artist.music.includes(albums: { cover_image_attachment: :blob })
+    scope = Current.user.artists.music.includes(albums: { cover_image_attachment: :blob })
               .search(@query)
               .order(@sort => @direction)
     @pagy, @artists = pagy(:offset, scope)
   end
 
   def show
-    @artist = Artist.find(params[:id])
+    @artist = Current.user.artists.find(params[:id])
     @albums = @artist.albums.includes(:tracks).order(:year)
   end
 
   def edit
-    @artist = Artist.find(params[:id])
+    @artist = Current.user.artists.find(params[:id])
   end
 
   def update
-    @artist = Artist.find(params[:id])
+    @artist = Current.user.artists.find(params[:id])
     if @artist.update(artist_params)
       redirect_to @artist, notice: "Artist updated."
     else
@@ -33,7 +33,7 @@ class ArtistsController < ApplicationController
   end
 
   def destroy
-    @artist = Artist.find(params[:id])
+    @artist = Current.user.artists.find(params[:id])
     @artist.destroy
     redirect_to artists_path, notice: "Artist deleted."
   end

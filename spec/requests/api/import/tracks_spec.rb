@@ -63,8 +63,8 @@ RSpec.describe "API Import Tracks", type: :request do
     end
 
     it "reuses existing artist and album" do
-      artist = create(:artist, name: "Test Artist")
-      album = create(:album, title: "Test Album", artist: artist)
+      artist = create(:artist, name: "Test Artist", user: user)
+      album = create(:album, title: "Test Album", artist: artist, user: user)
 
       file = fixture_file_upload("test.mp3", "audio/mpeg")
       post api_import_tracks_path, params: { audio_file: file }, headers: auth_headers

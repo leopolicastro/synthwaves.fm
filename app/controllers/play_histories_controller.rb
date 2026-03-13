@@ -8,7 +8,7 @@ class PlayHistoriesController < ApplicationController
   end
 
   def create
-    track = Track.find(params[:track_id])
+    track = Current.user.tracks.find(params[:track_id])
     Current.user.play_histories.create!(track: track, played_at: Time.current)
     head :ok
   end

@@ -13,7 +13,7 @@ RSpec.describe "PlaylistTracks", type: :request do
       user = create(:user)
       login_user(user)
       playlist = create(:playlist, user: user)
-      track = create(:track)
+      track = create(:track, album: create(:album, artist: create(:artist, user: user)))
 
       expect {
         post playlist_tracks_path(playlist), params: {track_id: track.id}
@@ -27,8 +27,9 @@ RSpec.describe "PlaylistTracks", type: :request do
       user = create(:user)
       login_user(user)
       playlist = create(:playlist, user: user)
-      track1 = create(:track)
-      track2 = create(:track)
+      artist = create(:artist, user: user)
+      track1 = create(:track, album: create(:album, artist: artist))
+      track2 = create(:track, album: create(:album, artist: artist))
 
       post playlist_tracks_path(playlist), params: {track_id: track1.id}
       post playlist_tracks_path(playlist), params: {track_id: track2.id}
@@ -41,7 +42,7 @@ RSpec.describe "PlaylistTracks", type: :request do
       user = create(:user)
       login_user(user)
       playlist = create(:playlist, user: user)
-      track = create(:track)
+      track = create(:track, album: create(:album, artist: create(:artist, user: user)))
       create(:playlist_track, playlist: playlist, track: track, position: 1)
 
       expect {
@@ -54,7 +55,7 @@ RSpec.describe "PlaylistTracks", type: :request do
       other_user = create(:user)
       login_user(user)
       playlist = create(:playlist, user: other_user)
-      track = create(:track)
+      track = create(:track, album: create(:album, artist: create(:artist, user: user)))
 
       post playlist_tracks_path(playlist), params: {track_id: track.id}
       expect(response).to have_http_status(:not_found)
@@ -66,7 +67,7 @@ RSpec.describe "PlaylistTracks", type: :request do
       user = create(:user)
       login_user(user)
       playlist = create(:playlist, user: user)
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       track3 = create(:track, album: album, disc_number: 2, track_number: 1)
       track1 = create(:track, album: album, disc_number: 1, track_number: 1)
       track2 = create(:track, album: album, disc_number: 1, track_number: 2)
@@ -82,7 +83,7 @@ RSpec.describe "PlaylistTracks", type: :request do
       user = create(:user)
       login_user(user)
       playlist = create(:playlist, user: user)
-      album = create(:album)
+      album = create(:album, artist: create(:artist, user: user))
       track1 = create(:track, album: album, disc_number: 1, track_number: 1)
       track2 = create(:track, album: album, disc_number: 1, track_number: 2)
       create(:playlist_track, playlist: playlist, track: track1, position: 1)
@@ -98,10 +99,11 @@ RSpec.describe "PlaylistTracks", type: :request do
       user = create(:user)
       login_user(user)
       playlist = create(:playlist, user: user)
-      existing_track = create(:track)
+      artist = create(:artist, user: user)
+      existing_track = create(:track, album: create(:album, artist: artist))
       create(:playlist_track, playlist: playlist, track: existing_track, position: 5)
 
-      album = create(:album)
+      album = create(:album, artist: artist)
       create(:track, album: album, disc_number: 1, track_number: 1)
 
       post playlist_tracks_path(playlist), params: { album_id: album.id }
@@ -116,9 +118,10 @@ RSpec.describe "PlaylistTracks", type: :request do
       user = create(:user)
       login_user(user)
       playlist = create(:playlist, user: user)
-      track1 = create(:track)
-      track2 = create(:track)
-      track3 = create(:track)
+      artist = create(:artist, user: user)
+      track1 = create(:track, album: create(:album, artist: artist))
+      track2 = create(:track, album: create(:album, artist: artist))
+      track3 = create(:track, album: create(:album, artist: artist))
 
       expect {
         post playlist_tracks_path(playlist), params: { track_ids: [track1.id, track2.id, track3.id] }
@@ -131,8 +134,9 @@ RSpec.describe "PlaylistTracks", type: :request do
       user = create(:user)
       login_user(user)
       playlist = create(:playlist, user: user)
-      track1 = create(:track)
-      track2 = create(:track)
+      artist = create(:artist, user: user)
+      track1 = create(:track, album: create(:album, artist: artist))
+      track2 = create(:track, album: create(:album, artist: artist))
       create(:playlist_track, playlist: playlist, track: track1, position: 1)
 
       expect {
@@ -146,11 +150,12 @@ RSpec.describe "PlaylistTracks", type: :request do
       user = create(:user)
       login_user(user)
       playlist = create(:playlist, user: user)
-      existing_track = create(:track)
+      artist = create(:artist, user: user)
+      existing_track = create(:track, album: create(:album, artist: artist))
       create(:playlist_track, playlist: playlist, track: existing_track, position: 5)
 
-      track1 = create(:track)
-      track2 = create(:track)
+      track1 = create(:track, album: create(:album, artist: artist))
+      track2 = create(:track, album: create(:album, artist: artist))
 
       post playlist_tracks_path(playlist), params: { track_ids: [track1.id, track2.id] }
 
@@ -162,7 +167,7 @@ RSpec.describe "PlaylistTracks", type: :request do
       user = create(:user)
       login_user(user)
       playlist = create(:playlist, user: user)
-      track = create(:track)
+      track = create(:track, album: create(:album, artist: create(:artist, user: user)))
 
       expect {
         post playlist_tracks_path(playlist), params: { track_ids: [track.id, 999999] }

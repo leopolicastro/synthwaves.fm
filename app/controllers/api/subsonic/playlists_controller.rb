@@ -8,7 +8,7 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
 
   def get_playlist
     if params[:id] == "all"
-      tracks = Track.music.streamable.includes(:album, :artist).order(:title)
+      tracks = current_user.tracks.music.streamable.includes(:album, :artist).order(:title)
       render_subsonic(playlist: all_tracks_virtual_entry.merge(
         entry: tracks.map { |t| track_to_child(t) }
       ))
@@ -16,7 +16,7 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
     end
 
     if params[:id] == "podcasts"
-      tracks = Track.podcast.streamable.includes(:album, :artist).order(:title)
+      tracks = current_user.tracks.podcast.streamable.includes(:album, :artist).order(:title)
       render_subsonic(playlist: podcasts_virtual_entry.merge(
         entry: tracks.map { |t| track_to_child(t) }
       ))
@@ -76,8 +76,8 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
     {
       id: "all",
       name: "All Tracks",
-      songCount: Track.music.streamable.count,
-      duration: Track.music.streamable.sum(:duration).to_i,
+      songCount: current_user.tracks.music.streamable.count,
+      duration: current_user.tracks.music.streamable.sum(:duration).to_i,
       owner: current_user.email_address,
       public: false
     }
@@ -87,8 +87,8 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
     {
       id: "podcasts",
       name: "Podcasts",
-      songCount: Track.podcast.streamable.count,
-      duration: Track.podcast.streamable.sum(:duration).to_i,
+      songCount: current_user.tracks.podcast.streamable.count,
+      duration: current_user.tracks.podcast.streamable.sum(:duration).to_i,
       owner: current_user.email_address,
       public: false
     }

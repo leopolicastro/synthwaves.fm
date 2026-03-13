@@ -5,8 +5,8 @@ RSpec.describe "Subsonic Lists API", type: :request do
   let(:auth_params) { {u: user.email_address, p: "testpass", v: "1.16.1", c: "test", f: "json"} }
 
   describe "GET /api/rest/getAlbumList2.view" do
-    let!(:album_a) { create(:album, title: "Alpha", year: 2020, genre: "Rock").tap { |a| create(:track, album: a, artist: a.artist) } }
-    let!(:album_b) { create(:album, title: "Beta", year: 2022, genre: "Jazz").tap { |a| create(:track, album: a, artist: a.artist) } }
+    let!(:album_a) { create(:album, title: "Alpha", year: 2020, genre: "Rock", user: user).tap { |a| create(:track, album: a, artist: a.artist, user: user) } }
+    let!(:album_b) { create(:album, title: "Beta", year: 2022, genre: "Jazz", user: user).tap { |a| create(:track, album: a, artist: a.artist, user: user) } }
 
     it "returns albums alphabetically by name by default" do
       get "/api/rest/getAlbumList2.view", params: auth_params
@@ -60,15 +60,15 @@ RSpec.describe "Subsonic Lists API", type: :request do
 
   describe "GET /api/rest/getRandomSongs.view" do
     it "returns random songs" do
-      create(:track)
+      create(:track, user: user)
       get "/api/rest/getRandomSongs.view", params: auth_params.merge(size: 5)
       json = JSON.parse(response.body)
       expect(json["subsonic-response"]["randomSongs"]["song"]).to be_present
     end
 
     it "excludes YouTube tracks" do
-      create_list(:track, 3)
-      create(:track, :youtube)
+      create_list(:track, 3, user: user)
+      create(:track, :youtube, user: user)
 
       get "/api/rest/getRandomSongs.view", params: auth_params.merge(size: 500)
       json = JSON.parse(response.body)
@@ -85,11 +85,11 @@ RSpec.describe "Subsonic Lists API", type: :request do
 
   describe "GET /api/rest/getAlbumList2.view (YouTube filtering)" do
     it "excludes albums where all tracks are YouTube-only" do
-      streamable_album = create(:album, title: "Has Audio")
-      create(:track, album: streamable_album, artist: streamable_album.artist)
+      streamable_album = create(:album, title: "Has Audio", user: user)
+      create(:track, album: streamable_album, artist: streamable_album.artist, user: user)
 
-      youtube_album = create(:album, title: "YouTube Only")
-      create(:track, :youtube, album: youtube_album, artist: youtube_album.artist)
+      youtube_album = create(:album, title: "YouTube Only", user: user)
+      create(:track, :youtube, album: youtube_album, artist: youtube_album.artist, user: user)
 
       get "/api/rest/getAlbumList2.view", params: auth_params
       json = JSON.parse(response.body)

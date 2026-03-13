@@ -3,14 +3,15 @@ class YoutubePlaylistImportService
 
   class Error < StandardError; end
 
-  def self.call(url, category: "music", api_key:)
-    new(url, category: category, api_key: api_key).call
+  def self.call(url, category: "music", api_key:, user:)
+    new(url, category: category, api_key: api_key, user: user).call
   end
 
-  def initialize(url, category: "music", api_key:)
+  def initialize(url, category: "music", api_key:, user:)
     @url = url
     @category = category
     @api_key = api_key
+    @user = user
     @playlist_id = YoutubeUrlParser.extract_playlist_id(url)
     raise Error, "Invalid YouTube playlist URL" if @playlist_id.blank?
   end
@@ -27,11 +28,11 @@ class YoutubePlaylistImportService
     video_details = api.fetch_video_details(video_ids)
     details_by_id = video_details.index_by { |v| v[:video_id] }
 
-    artist = Artist.find_or_create_by!(name: playlist_info[:channel_name] || "Unknown Artist") do |a|
+    artist = @user.artists.find_or_create_by!(name: playlist_info[:channel_name] || "Unknown Artist") do |a|
       a.category = @category
     end
 
-    album = Album.find_or_create_by!(title: playlist_info[:title], artist: artist)
+    album = @user.albums.find_or_create_by!(title: playlist_info[:title], artist: artist)
     album.update!(youtube_playlist_url: @url) if album.youtube_playlist_url.blank?
 
     if playlist_info[:thumbnail_url].present? && !album.cover_image.attached?
@@ -41,7 +42,7 @@ class YoutubePlaylistImportService
     playlist_items.each do |item|
       details = details_by_id[item[:video_id]] || {}
 
-      Track.find_or_create_by!(youtube_video_id: item[:video_id]) do |track|
+      @user.tracks.find_or_create_by!(youtube_video_id: item[:video_id]) do |track|
         track.title = item[:title]
         track.artist = artist
         track.album = album

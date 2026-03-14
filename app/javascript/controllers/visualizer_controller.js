@@ -89,8 +89,23 @@ export default class extends Controller {
   }
 
   _onSourceChanged({ streamUrl }) {
+    this._rebindAudio()
     if (!this._visible || !this._shadowAudio) return
     this._updateShadowSrc(streamUrl)
+  }
+
+  _rebindAudio() {
+    const current = document.getElementById("persistent-audio")
+    if (!current || current === this.audio) return
+
+    if (this.audio) {
+      this.audio.removeEventListener("play", this._onPlay)
+      this.audio.removeEventListener("pause", this._onPause)
+    }
+    this.audio = current
+    this.audio.addEventListener("play", this._onPlay)
+    this.audio.addEventListener("pause", this._onPause)
+    this._setActive(!this.audio.paused && !!this.audio.src)
   }
 
   _initAudioNodes() {

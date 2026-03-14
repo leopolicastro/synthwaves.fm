@@ -1,12 +1,10 @@
 <div id="tags-<%= taggable.class.name.downcase %>-<%= taggable.id %>" class="flex flex-wrap items-center gap-2">
   <% taggable.taggings.includes(:tag).each do |tagging| %>
-    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium
-                 <%= tagging.tag.tag_type == 'genre' ? 'bg-neon-cyan/20 text-neon-cyan' : 'bg-neon-purple/20 text-neon-purple' %>">
-      <%= tagging.tag.name %>
+    <%= render Badge::Component.new(text: tagging.tag.name, variant: tagging.tag.tag_type.to_sym, dismissible: true) do %>
       <%= button_to tagging_path(tagging), method: :delete, class: "hover:text-white transition-colors", data: { turbo_method: :delete } do %>
         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       <% end %>
-    </span>
+    <% end %>
   <% end %>
 
   <details class="relative inline-block">

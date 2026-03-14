@@ -8,9 +8,9 @@
         <% end %>
         <% if authenticated? %>
           <nav class="hidden md:flex items-center space-x-3 text-sm">
-            <%= link_to "Listen", music_path, class: "text-white hover:text-neon-cyan transition-colors" %>
-            <%= link_to "Watch", tv_path, class: "text-white hover:text-neon-cyan transition-colors" %>
-            <%= link_to "Stats", stats_path, class: "text-white hover:text-neon-cyan transition-colors" %>
+            <%= render ButtonComponent.new(label: "Listen", behavior: :navigation, link_url: music_path, style: :nav_link) %>
+            <%= render ButtonComponent.new(label: "Watch", behavior: :navigation, link_url: tv_path, style: :nav_link) %>
+            <%= render ButtonComponent.new(label: "Stats", behavior: :navigation, link_url: stats_path, style: :nav_link) %>
           </nav>
         <% end %>
       </div>
@@ -34,34 +34,34 @@
       <% end %>
       <!-- Right side: User Dropdown or Auth links -->
       <% if authenticated? %>
-        <details class="relative">
-          <summary class="flex items-center gap-2 text-sm font-medium text-white hover:text-neon-cyan cursor-pointer list-none">
-            <span class="max-w-[120px] sm:max-w-none truncate"><%= Current.user.name || Current.user.email_address %></span>
-            <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
-          </summary>
-          <div class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg border border-gray-700 py-1 z-50">
-            <div class="md:hidden">
-              <%= link_to "Stats", stats_path, class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
-              <div class="border-t border-gray-700 my-1"></div>
-            </div>
-            <%= link_to "Profile", profile_path, class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
-            <% if Current.user.admin? %>
-              <div class="border-t border-gray-700 my-1"></div>
-              <%= link_to "Admin", "/admin", class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
-              <%= link_to "Jobs", "/admin/jobs", class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
-              <%= link_to "Feature Flags", "/admin/flipper", class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
-              <%= link_to "Maintenance", "/admin/maintenance_tasks", class: "block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-neon-cyan" %>
-            <% end %>
+        <%= render Dropdown::Component.new(position: :right) do |dropdown| %>
+          <% dropdown.with_trigger do %>
+            <span class="flex items-center gap-2 text-sm font-medium text-white hover:text-neon-cyan">
+              <span class="max-w-[120px] sm:max-w-none truncate"><%= Current.user.name || Current.user.email_address %></span>
+              <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </span>
+          <% end %>
+          <div class="md:hidden">
+            <%= render ButtonComponent.new(label: "Stats", behavior: :navigation, link_url: stats_path, style: :menu_item) %>
             <div class="border-t border-gray-700 my-1"></div>
-            <%= button_to "Sign Out", session_path, method: :delete, data: { turbo_method: :delete }, class: "w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700" %>
           </div>
-        </details>
+          <%= render ButtonComponent.new(label: "Profile", behavior: :navigation, link_url: profile_path, style: :menu_item) %>
+          <% if Current.user.admin? %>
+            <div class="border-t border-gray-700 my-1"></div>
+            <%= render ButtonComponent.new(label: "Admin", behavior: :navigation, link_url: "/admin", style: :menu_item) %>
+            <%= render ButtonComponent.new(label: "Jobs", behavior: :navigation, link_url: "/admin/jobs", style: :menu_item) %>
+            <%= render ButtonComponent.new(label: "Feature Flags", behavior: :navigation, link_url: "/admin/flipper", style: :menu_item) %>
+            <%= render ButtonComponent.new(label: "Maintenance", behavior: :navigation, link_url: "/admin/maintenance_tasks", style: :menu_item) %>
+          <% end %>
+          <div class="border-t border-gray-700 my-1"></div>
+          <%= button_to "Sign Out", session_path, method: :delete, data: { turbo_method: :delete }, class: "w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700" %>
+        <% end %>
       <% else %>
         <div class="flex items-center space-x-1">
-          <%= link_to "Log in", new_session_path, class: "px-3 py-2 rounded-md text-sm font-medium bg-gray-700 text-white hover:bg-gray-600 transition-colors duration-200" %>
-          <%= link_to "Sign up", new_registration_path, class: "px-4 py-2 rounded-lg text-sm font-medium text-white bg-sunset-gradient hover:shadow-neon-pink transition-shadow duration-200" %>
+          <%= render ButtonComponent.new(label: "Log in", behavior: :navigation, link_url: new_session_path, style: :secondary) %>
+          <%= render ButtonComponent.new(label: "Sign up", behavior: :navigation, link_url: new_registration_path, style: :gradient) %>
         </div>
       <% end %>
     </div>

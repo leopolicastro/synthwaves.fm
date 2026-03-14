@@ -31,7 +31,7 @@
     <div class="min-w-0">
       <div class="font-medium text-white truncate">
         <% if link_title? %>
-          <%= link_to track.title, track_path(track), data: { turbo_frame: "_top" }, class: "hover:text-neon-cyan hover:underline" %>
+          <%= render ButtonComponent.new(label: track.title, behavior: :navigation, link_url: track_path(track), style: :inline_link, turbo_frame: "_top") %>
         <% else %>
           <%= track.title %>
         <% end %>
@@ -41,14 +41,14 @@
           <% parts = [] %>
           <% if show_artist? %>
             <% if link_subtitle? %>
-              <% parts << link_to(track.artist.name, artist_path(track.artist), data: { turbo_frame: "_top" }, class: "hover:text-neon-cyan hover:underline") %>
+              <% parts << render(ButtonComponent.new(label: track.artist.name, behavior: :navigation, link_url: artist_path(track.artist), style: :inline_link, turbo_frame: "_top")) %>
             <% else %>
               <% parts << track.artist.name %>
             <% end %>
           <% end %>
           <% if show_album? %>
             <% if link_subtitle? %>
-              <% parts << link_to(track.album.title, album_path(track.album), data: { turbo_frame: "_top" }, class: "hover:text-neon-cyan hover:underline") %>
+              <% parts << render(ButtonComponent.new(label: track.album.title, behavior: :navigation, link_url: album_path(track.album), style: :inline_link, turbo_frame: "_top")) %>
             <% else %>
               <% parts << track.album.title %>
             <% end %>

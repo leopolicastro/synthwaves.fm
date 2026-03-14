@@ -1,0 +1,8 @@
+<div class="relative" data-controller="dropdown">
+  <button type="button" data-action="dropdown#toggle" class="cursor-pointer">
+    <%= trigger %>
+  </button>
+  <div class="<%= menu_classes %>" data-dropdown-target="menu">
+    <%= content %>
+  </div>
+</div>

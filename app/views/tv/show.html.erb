@@ -4,19 +4,15 @@
       <h1 class="text-3xl font-bold font-display">TV</h1>
       <div class="flex items-center gap-3 flex-wrap">
         <% if @tab == "videos" %>
-          <%= link_to new_folder_path, class: "px-4 py-2 border border-gray-600 text-gray-400 rounded-lg hover:border-neon-cyan hover:text-neon-cyan text-sm font-medium transition-colors", data: { turbo_frame: "_top" } do %>
-            Upload Season
-          <% end %>
-          <%= link_to new_video_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink text-sm font-medium", data: { turbo_frame: "_top" } do %>
-            Upload Video
-          <% end %>
+          <%= render ButtonComponent.new(label: "Upload Season", behavior: :navigation, link_url: new_folder_path, style: :ghost, turbo_frame: "_top") %>
+          <%= render ButtonComponent.new(label: "Upload Video", behavior: :navigation, link_url: new_video_path, turbo_frame: "_top") %>
         <% elsif @tab == "guide" %>
           <%= form_with url: import_iptv_channels_path, method: :post, class: "flex items-center gap-2", data: { turbo_frame: "_top" } do %>
             <input type="url" name="playlist_url" placeholder="M3U playlist URL..."
                    class="w-36 sm:w-48 lg:w-64 px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan focus:border-transparent placeholder-gray-500">
-            <button type="submit" class="px-4 py-2 border border-gray-600 text-gray-400 rounded-lg hover:border-neon-cyan hover:text-neon-cyan text-sm font-medium transition-colors">Import</button>
+            <%= render ButtonComponent.new(label: "Import", style: :ghost, type: "submit") %>
           <% end %>
-          <%= link_to "Add Channel", new_iptv_channel_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink text-sm font-medium", data: { turbo_frame: "_top" } %>
+          <%= render ButtonComponent.new(label: "Add Channel", behavior: :navigation, link_url: new_iptv_channel_path, turbo_frame: "_top") %>
         <% end %>
       </div>
     </div>

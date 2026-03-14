@@ -8,10 +8,10 @@
       <%= form_with url: import_iptv_channels_path, method: :post, class: "flex items-center gap-2" do %>
         <input type="url" name="playlist_url" placeholder="M3U playlist URL..."
                class="w-48 lg:w-64 px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan focus:border-transparent placeholder-gray-500">
-        <button type="submit" class="px-4 py-2 border border-gray-600 text-gray-400 rounded-lg hover:border-neon-cyan hover:text-neon-cyan text-sm font-medium transition-colors">Import</button>
+        <%= render ButtonComponent.new(label: "Import", style: :ghost, type: "submit") %>
       <% end %>
-      <%= link_to "Recordings", recordings_path, class: "px-4 py-2 border border-gray-600 text-gray-400 rounded-lg hover:border-neon-cyan hover:text-neon-cyan text-sm font-medium transition-colors" %>
-      <%= link_to "Add Channel", new_iptv_channel_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink text-sm font-medium" %>
+      <%= render ButtonComponent.new(label: "Recordings", behavior: :navigation, link_url: recordings_path, style: :ghost) %>
+      <%= render ButtonComponent.new(label: "Add Channel", behavior: :navigation, link_url: new_iptv_channel_path) %>
     </div>
   </div>
   <%# Search and country filter %>
@@ -57,18 +57,12 @@
       <%# TV Guide navigation %>
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2">
-          <button type="button" data-action="tv-guide#navigateBack"
-              class="px-3 py-1.5 text-sm border border-gray-600 text-gray-400 rounded-lg hover:border-neon-cyan hover:text-neon-cyan transition-colors">
-            &larr; Back
-          </button>
+          <%= render ButtonComponent.new(label: "← Back", style: :ghost, size: :small, data: { action: "tv-guide#navigateBack" }) %>
           <button type="button" data-action="tv-guide#jumpToNow"
               class="px-3 py-1.5 text-sm bg-neon-cyan/10 border border-neon-cyan/50 text-neon-cyan rounded-lg hover:bg-neon-cyan/20 transition-colors">
             Now
           </button>
-          <button type="button" data-action="tv-guide#navigateForward"
-              class="px-3 py-1.5 text-sm border border-gray-600 text-gray-400 rounded-lg hover:border-neon-cyan hover:text-neon-cyan transition-colors">
-            Forward &rarr;
-          </button>
+          <%= render ButtonComponent.new(label: "Forward →", style: :ghost, size: :small, data: { action: "tv-guide#navigateForward" }) %>
         </div>
         <div class="text-sm text-gray-400">
           <%= @window_start.strftime("%-I:%M %p") %> &ndash; <%= @window_end.strftime("%-I:%M %p %Z") %>

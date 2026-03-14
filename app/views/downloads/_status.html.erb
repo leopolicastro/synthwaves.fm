@@ -12,8 +12,7 @@
         <p class="text-xs text-gray-400 mt-1"><%= download.processed_tracks %>/<%= download.total_tracks %> tracks</p>
       <% elsif download.ready? %>
         <span class="text-xs text-green-400">Ready</span>
-        <%= link_to "Download", file_download_path(download),
-              class: "mt-2 inline-block px-3 py-1 text-sm font-medium text-white bg-neon-pink rounded-lg hover:shadow-neon-pink transition-shadow" %>
+        <%= render ButtonComponent.new(label: "Download", behavior: :navigation, link_url: file_download_path(download), size: :extra_small, extra_classes: "mt-2") %>
       <% elsif download.failed? %>
         <span class="text-xs text-red-400">Failed</span>
         <% if download.error_message.present? %>

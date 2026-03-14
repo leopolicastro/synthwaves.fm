@@ -44,7 +44,7 @@
     <%= render 'navbar' unless turbo_native_app? %>
     <%= render 'alerts' %>
     <%= render TvPlayerComponent.new %>
-    <%= render PipComponent.new %>
+    <%= render PIPComponent.new %>
     <!-- Screensaver -->
     <div class="hidden fixed inset-0 z-[9998] bg-black" data-turbo-permanent data-controller="screensaver">
       <canvas data-screensaver-target="canvas" class="w-full h-full"></canvas>

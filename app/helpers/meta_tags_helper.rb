@@ -5,7 +5,7 @@ module MetaTagsHelper
   def meta_tags
     title = content_for(:meta_title).presence || content_for(:title).presence || DEFAULT_SITE_NAME
     description = content_for(:meta_description).presence || DEFAULT_DESCRIPTION
-    image = content_for(:meta_image).presence || "#{request.base_url}#{ActionController::Base.helpers.asset_path('hero.jpg')}"
+    image = content_for(:meta_image).presence || "#{request.base_url}#{ActionController::Base.helpers.asset_path("hero2.jpg")}"
     url = content_for(:meta_url).presence || request.original_url
     type = content_for(:meta_type).presence || "website"
     card_type = content_for(:meta_image).present? ? "summary_large_image" : "summary_large_image"

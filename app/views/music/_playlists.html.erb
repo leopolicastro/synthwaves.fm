@@ -13,7 +13,7 @@
   empty_label: "playlists"
 ) do |c| %>
   <% c.with_actions do %>
-    <%= link_to "New Playlist", new_playlist_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink text-sm font-medium", data: { turbo_frame: "_top" } %>
+    <%= render ButtonComponent.new(label: "New Playlist", behavior: :navigation, link_url: new_playlist_path, turbo_frame: "_top") %>
   <% end %>
   <% @playlists.each do |playlist| %>
     <% cover_albums = @cover_albums_by_playlist[playlist.id] || [] %>

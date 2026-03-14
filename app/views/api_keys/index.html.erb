@@ -4,7 +4,7 @@
       <h1 class="font-bold font-display text-4xl text-white">API Keys</h1>
       <p class="mt-2 text-gray-400">Manage your API keys for programmatic access</p>
     </div>
-    <%= link_to "New API Key", new_api_key_path, class: "rounded-md px-4 py-2 bg-neon-pink hover:shadow-neon-pink text-white font-medium" %>
+    <%= render ButtonComponent.new(label: "New API Key", behavior: :navigation, link_url: new_api_key_path) %>
   </div>
 
   <% if flash[:api_secret].present? %>

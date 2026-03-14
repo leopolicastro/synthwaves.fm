@@ -8,7 +8,7 @@
 <div class="w-full flex flex-col lg:flex-row gap-6">
   <div class="flex-1 max-w-2xl">
     <div class="mb-6">
-      <%= link_to "&larr; Back".html_safe, tracks_path, class: "text-neon-cyan hover:underline" %>
+      <%= render ButtonComponent.new(label: "← Back", behavior: :navigation, link_url: tracks_path, style: :link) %>
     </div>
 
     <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">

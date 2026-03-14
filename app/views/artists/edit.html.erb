@@ -24,7 +24,7 @@
 
     <div>
       <%= f.submit "Save", class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink cursor-pointer" %>
-      <%= link_to "Cancel", artist_path(@artist), class: "px-4 py-2 text-gray-400 hover:text-neon-cyan" %>
+      <%= render ButtonComponent.new(label: "Cancel", behavior: :navigation, link_url: artist_path(@artist), style: :ghost) %>
     </div>
   <% end %>
 </div>

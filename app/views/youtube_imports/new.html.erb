@@ -1,6 +1,6 @@
 <div class="w-full max-w-lg" data-controller="youtube-search" data-youtube-search-url-value="<%= search_youtube_imports_path %>">
   <div class="mb-6">
-    <%= link_to "&larr; Back to Library".html_safe, library_path, class: "text-neon-cyan hover:underline" %>
+    <%= render ButtonComponent.new(label: "← Back to Library", behavior: :navigation, link_url: library_path, style: :link) %>
   </div>
 
   <h1 class="text-3xl font-bold font-display mb-8">Import from YouTube</h1>
@@ -12,7 +12,7 @@
         data-youtube-search-target="input"
         placeholder="Search for videos..."
         class="block w-full rounded-lg border border-gray-600 bg-gray-900 text-white shadow-sm focus:outline-neon-cyan px-3 py-2">
-      <button type="submit" class="px-4 py-2 bg-neon-pink hover:shadow-neon-pink text-white rounded-lg cursor-pointer whitespace-nowrap">Search</button>
+      <%= render ButtonComponent.new(label: "Search", type: "submit") %>
     </form>
     <turbo-frame id="youtube-search-results" data-youtube-search-target="frame"></turbo-frame>
   </div>

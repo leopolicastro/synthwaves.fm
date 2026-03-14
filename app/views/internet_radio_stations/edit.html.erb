@@ -1,6 +1,6 @@
 <div class="w-full max-w-2xl mx-auto">
   <div class="mb-4">
-    <%= link_to "&larr; Back to station".html_safe, internet_radio_station_path(@station), class: "text-sm text-gray-400 hover:text-neon-cyan transition-colors" %>
+    <%= render ButtonComponent.new(label: "← Back to station", behavior: :navigation, link_url: internet_radio_station_path(@station), style: :link, size: :small) %>
   </div>
 
   <h1 class="text-3xl font-bold font-display mb-6">Edit Station</h1>

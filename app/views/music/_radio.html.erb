@@ -7,7 +7,7 @@
   empty_label: "radio stations"
 ) do |c| %>
   <% c.with_actions do %>
-    <%= link_to "Add Station", new_radio_station_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink text-sm font-medium", data: { turbo_frame: "_top" } %>
+    <%= render ButtonComponent.new(label: "Add Station", behavior: :navigation, link_url: new_radio_station_path, turbo_frame: "_top") %>
   <% end %>
   <% c.with_empty_state do %>
     <div class="text-center py-16 text-gray-400">
@@ -16,7 +16,7 @@
       </svg>
       <p class="text-lg mb-2">No radio stations yet</p>
       <p class="mb-4">Add a YouTube live stream or internet radio station to get started.</p>
-      <%= link_to "Add Station", new_radio_station_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink", data: { turbo_frame: "_top" } %>
+      <%= render ButtonComponent.new(label: "Add Station", behavior: :navigation, link_url: new_radio_station_path, turbo_frame: "_top") %>
     </div>
   <% end %>
   <% @radio_stations.each do |station| %>

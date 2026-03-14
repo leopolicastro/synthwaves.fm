@@ -1,9 +1,7 @@
 <div class="w-full">
   <div class="flex items-center justify-between mb-6">
     <h1 class="text-3xl font-bold font-display">Music</h1>
-    <%= link_to new_track_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink text-sm font-medium" do %>
-      Upload
-    <% end %>
+    <%= render ButtonComponent.new(label: "Upload", behavior: :navigation, link_url: new_track_path) %>
   </div>
 
   <% tab_labels = { "artists" => "Artists", "albums" => "Albums", "tracks" => "Tracks",

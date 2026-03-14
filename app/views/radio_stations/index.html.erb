@@ -1,7 +1,7 @@
 <div class="w-full">
   <div class="flex items-center justify-between mb-8">
     <h1 class="text-3xl font-bold font-display">Radio</h1>
-    <%= link_to "Add Station", new_radio_station_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink" %>
+    <%= render ButtonComponent.new(label: "Add Station", behavior: :navigation, link_url: new_radio_station_path) %>
   </div>
 
   <% if @radio_stations.any? %>
@@ -17,7 +17,7 @@
       </svg>
       <p class="text-lg mb-2">No radio stations yet</p>
       <p class="mb-4">Add a YouTube live stream or internet radio station to get started.</p>
-      <%= link_to "Add Station", new_radio_station_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink" %>
+      <%= render ButtonComponent.new(label: "Add Station", behavior: :navigation, link_url: new_radio_station_path) %>
     </div>
   <% end %>
 </div>

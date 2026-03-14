@@ -1,2 +1,2 @@
-class PipComponent < ViewComponent::Base
+class PIPComponent < ViewComponent::Base
 end

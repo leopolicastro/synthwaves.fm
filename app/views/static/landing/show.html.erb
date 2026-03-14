@@ -11,8 +11,8 @@
     <div class="max-w-7xl mx-auto flex justify-between items-center">
       <%= render(LogoComponent.new(size: :md, icon: true, text: false)) %>
       <div class="flex items-center gap-2 sm:gap-4">
-        <%= link_to "Log In", new_session_path, class: "text-gray-400 hover:text-neon-cyan font-medium transition-colors" %>
-        <%= link_to "Sign Up", new_registration_path, class: "bg-sunset-gradient hover:shadow-neon-pink text-white px-4 py-1.5 sm:px-5 sm:py-2 text-sm sm:text-base rounded-lg font-medium transition-shadow" %>
+        <%= render ButtonComponent.new(label: "Log In", behavior: :navigation, link_url: new_session_path, style: :link) %>
+        <%= render ButtonComponent.new(label: "Sign Up", behavior: :navigation, link_url: new_registration_path, style: :gradient) %>
       </div>
     </div>
   </nav>
@@ -36,9 +36,7 @@
       </p>
       <!-- CTA Buttons -->
       <div class="flex flex-col sm:flex-row gap-4">
-        <%= link_to new_registration_path, class: "bg-sunset-gradient hover:shadow-neon-pink text-white px-8 py-3.5 sm:px-10 sm:py-4 rounded-xl font-semibold text-lg transition-shadow shadow-lg text-center" do %>
-          Start Listening
-        <% end %>
+        <%= render ButtonComponent.new(label: "Start Listening", behavior: :navigation, link_url: new_registration_path, style: :gradient, extra_classes: "shadow-lg") %>
         <a href="#features" class="bg-gray-800/60 backdrop-blur border border-neon-cyan/30 hover:border-neon-cyan/60 hover:shadow-neon-cyan text-neon-cyan px-8 py-3.5 sm:px-10 sm:py-4 rounded-xl font-semibold text-lg transition-all text-center">
           See Features
         </a>
@@ -219,9 +217,7 @@
       <p class="text-gray-400 text-lg mb-10">
         Set up your server, add your media, and start streaming in minutes.
       </p>
-      <%= link_to new_registration_path, class: "inline-block bg-sunset-gradient hover:shadow-neon-pink text-white px-8 py-3.5 sm:px-12 sm:py-4 rounded-xl font-semibold text-lg transition-shadow shadow-lg" do %>
-        Get Started Free
-      <% end %>
+      <%= render ButtonComponent.new(label: "Get Started Free", behavior: :navigation, link_url: new_registration_path, style: :gradient, extra_classes: "shadow-lg") %>
     </div>
   </section>
   <!-- Footer -->

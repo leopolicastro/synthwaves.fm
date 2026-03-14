@@ -1,6 +1,6 @@
 <div class="w-full">
   <div class="mb-6">
-    <%= link_to "&larr; Back".html_safe, tv_path(tab: "videos"), class: "text-neon-cyan hover:underline" %>
+    <%= render ButtonComponent.new(label: "← Back", behavior: :navigation, link_url: tv_path(tab: "videos"), style: :link) %>
   </div>
 
   <div class="flex flex-col sm:flex-row items-start gap-6 mb-8">
@@ -32,7 +32,7 @@
       </div>
       <div class="mt-3 flex flex-wrap items-center gap-2">
         <%= render "favorites/button", favorable: @folder, favorited: Current.user.favorites.exists?(favorable: @folder) %>
-        <%= link_to "Edit", edit_folder_path(@folder), class: "px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600" %>
+        <%= render ButtonComponent.new(label: "Edit", behavior: :navigation, link_url: edit_folder_path(@folder), style: :secondary) %>
         <%= button_to "Delete", folder_path(@folder), method: :delete, data: { turbo_confirm: "Are you sure? Videos will be kept but unlinked." }, class: "px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700" %>
       </div>
     </div>

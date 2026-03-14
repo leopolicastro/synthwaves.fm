@@ -29,7 +29,7 @@
 
     <div>
       <%= f.submit "Save", class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink cursor-pointer" %>
-      <%= link_to "Cancel", video_path(@video), class: "px-4 py-2 text-gray-400 hover:text-neon-cyan" %>
+      <%= render ButtonComponent.new(label: "Cancel", behavior: :navigation, link_url: video_path(@video), style: :ghost) %>
     </div>
   <% end %>
 </div>

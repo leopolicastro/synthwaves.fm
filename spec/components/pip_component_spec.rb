@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe PipComponent, type: :component do
+RSpec.describe PIPComponent, type: :component do
   include ViewComponent::TestHelpers
 
   def render_component

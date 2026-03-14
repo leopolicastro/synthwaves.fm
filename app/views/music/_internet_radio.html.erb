@@ -17,9 +17,7 @@
         <%= form_with url: import_url_internet_radio_stations_path, method: :post, class: "flex flex-col sm:flex-row gap-3" do |f| %>
           <input type="url" name="url" placeholder="Station website URL (e.g. https://big1059.iheart.com/)" value="<%= params[:url] %>"
                  class="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-900 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neon-cyan">
-          <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-neon-pink rounded-lg hover:bg-neon-pink/80 transition-colors">
-            Add Station
-          </button>
+          <%= render ButtonComponent.new(label: "Add Station", type: "submit") %>
         <% end %>
       </div>
 
@@ -30,9 +28,7 @@
                  class="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-900 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neon-cyan">
           <input type="text" name="tag" placeholder="Tag (e.g. rock)" value="<%= params[:tag] %>"
                  class="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-900 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neon-cyan">
-          <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-            Import
-          </button>
+          <%= render ButtonComponent.new(label: "Import", style: :secondary, type: "submit") %>
         <% end %>
       </div>
     </div>

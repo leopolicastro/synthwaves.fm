@@ -1,6 +1,6 @@
 <div class="w-full max-w-2xl">
   <div class="mb-6">
-    <%= link_to "&larr; Recordings".html_safe, recordings_path, class: "text-neon-cyan hover:underline" %>
+    <%= render ButtonComponent.new(label: "← Recordings", behavior: :navigation, link_url: recordings_path, style: :link) %>
   </div>
 
   <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
@@ -61,8 +61,7 @@
 
     <div class="mt-6 flex items-center gap-3">
       <% if @recording.ready? && @recording.file.attached? %>
-        <%= link_to "Download", file_recording_path(@recording),
-              class: "px-4 py-2 text-sm font-medium text-white bg-neon-pink rounded-lg hover:shadow-neon-pink transition-shadow" %>
+        <%= render ButtonComponent.new(label: "Download", behavior: :navigation, link_url: file_recording_path(@recording)) %>
       <% end %>
       <% if @recording.cancellable? %>
         <%= button_to "Cancel", cancel_recording_path(@recording), method: :post,

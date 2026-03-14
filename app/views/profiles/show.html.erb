@@ -28,7 +28,7 @@
   </div>
 
   <div class="mt-6">
-    <%= link_to "Edit Profile", edit_profile_path, class: "rounded-md px-3.5 py-2.5 bg-neon-pink hover:shadow-neon-pink text-white inline-block font-medium" %>
+    <%= render ButtonComponent.new(label: "Edit Profile", behavior: :navigation, link_url: edit_profile_path) %>
   </div>
 
   <% if turbo_native_app? %>

@@ -1,7 +1,7 @@
 <div class="w-full">
   <div class="flex items-center justify-between mb-6">
     <h1 class="text-3xl font-bold font-display">Playlists</h1>
-    <%= link_to "New Playlist", new_playlist_path, class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink" %>
+    <%= render ButtonComponent.new(label: "New Playlist", behavior: :navigation, link_url: new_playlist_path) %>
   </div>
   <%= render CollectionLayoutComponent.new(
     collection: @playlists,

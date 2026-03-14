@@ -30,7 +30,7 @@
       </div>
 
       <div class="flex justify-end gap-3">
-        <%= link_to "Cancel", api_keys_path, class: "px-4 py-2 text-gray-400 hover:text-gray-400" %>
+        <%= render ButtonComponent.new(label: "Cancel", behavior: :navigation, link_url: api_keys_path, style: :ghost) %>
         <%= form.submit "Create API Key", class: "rounded-md px-4 py-2 bg-neon-pink hover:shadow-neon-pink text-white font-medium cursor-pointer" %>
       </div>
     <% end %>

@@ -7,7 +7,7 @@ export default class extends Controller {
     this.audio = document.getElementById("persistent-audio")
     if (!this.audio) return
 
-    this._visible = false
+    this._visible = this.element.classList.contains("translate-y-0")
     this._airplayActive = false
     this._readThemeColors()
 
@@ -37,6 +37,13 @@ export default class extends Controller {
     document.addEventListener("airplay:stateChanged", this._airplayHandler)
 
     this._setActive(!this.audio.paused && !!this.audio.src)
+
+    if (this._visible) {
+      this._initAudioNodes()
+      this._setupCanvas()
+      this._animate()
+      this._startSync()
+    }
   }
 
   disconnect() {
@@ -201,6 +208,8 @@ export default class extends Controller {
     if (this._shadowAudio) {
       this._shadowAudio.pause()
       this._shadowAudio.removeAttribute("src")
+      this._shadowAudio.remove()
+      this._shadowAudio = null
     }
     if (this._audioContext) {
       this._audioContext.close().catch(() => {})

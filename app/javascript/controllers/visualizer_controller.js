@@ -104,8 +104,11 @@ export default class extends Controller {
       const source = ctx.createMediaElementSource(shadow)
       const analyser = ctx.createAnalyser()
       analyser.fftSize = 256
+      const gain = ctx.createGain()
+      gain.gain.value = 0
       source.connect(analyser)
-      analyser.connect(ctx.destination)
+      analyser.connect(gain)
+      gain.connect(ctx.destination)
 
       this._audioContext = ctx
       this._sourceNode = source
@@ -122,7 +125,7 @@ export default class extends Controller {
       shadow.id = "persistent-audio-visualizer"
       shadow.crossOrigin = "anonymous"
       shadow.preload = "auto"
-      shadow.volume = 0
+      shadow.volume = 1
       document.documentElement.appendChild(shadow)
     }
     this._shadowAudio = shadow

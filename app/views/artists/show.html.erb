@@ -7,14 +7,14 @@
 
 <div class="w-full">
   <div class="mb-6">
-    <%= render ButtonComponent.new(label: "← Artists", behavior: :navigation, link_url: artists_path, style: :link) %>
+    <%= render Button::Component.new(label: "← Artists", behavior: :navigation, link_url: artists_path, style: :link) %>
   </div>
 
   <div class="flex items-center gap-3 mb-6">
     <h1 class="text-3xl font-bold font-display"><%= @artist.name %></h1>
     <%= render "favorites/button", favorable: @artist, favorited: Current.user.favorites.exists?(favorable: @artist) %>
     <% if Current.user.admin? %>
-      <%= render ButtonComponent.new(label: "Edit", behavior: :navigation, link_url: edit_artist_path(@artist), style: :secondary, size: :small) %>
+      <%= render Button::Component.new(label: "Edit", behavior: :navigation, link_url: edit_artist_path(@artist), style: :secondary, size: :small) %>
       <%= button_to "Delete", artist_path(@artist), method: :delete, class: "inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-red-400 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors", data: { turbo_confirm: "Delete #{@artist.name}, #{pluralize(@artist.albums.size, 'album')}, and #{pluralize(@artist.tracks.size, 'track')}? This cannot be undone." } %>
     <% end %>
   </div>

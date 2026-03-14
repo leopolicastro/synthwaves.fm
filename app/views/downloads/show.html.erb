@@ -1,6 +1,6 @@
 <div class="w-full max-w-lg">
   <div class="mb-6">
-    <%= render ButtonComponent.new(label: "← Library", behavior: :navigation, link_url: library_path, style: :link) %>
+    <%= render Button::Component.new(label: "← Library", behavior: :navigation, link_url: library_path, style: :link) %>
   </div>
 
   <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
@@ -19,7 +19,7 @@
         <p class="text-sm text-gray-400 mt-2"><%= @download.processed_tracks %>/<%= @download.total_tracks %> tracks processed</p>
       <% elsif @download.ready? %>
         <p class="text-green-400 mb-4">Your download is ready!</p>
-        <%= render ButtonComponent.new(label: "Download File", behavior: :navigation, link_url: file_download_path(@download)) %>
+        <%= render Button::Component.new(label: "Download File", behavior: :navigation, link_url: file_download_path(@download)) %>
       <% elsif @download.failed? %>
         <p class="text-red-400">Download failed.</p>
         <% if @download.error_message.present? %>

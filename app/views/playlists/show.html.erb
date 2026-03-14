@@ -7,7 +7,7 @@
 
 <div class="w-full" data-controller="play-all">
   <div class="mb-6">
-    <%= render ButtonComponent.new(label: "← Playlists", behavior: :navigation, link_url: playlists_path, style: :link) %>
+    <%= render Button::Component.new(label: "← Playlists", behavior: :navigation, link_url: playlists_path, style: :link) %>
   </div>
 
   <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-6">
@@ -16,24 +16,24 @@
       <p class="text-sm text-gray-400 mt-1"><%= pluralize(@playlist_tracks.size, "track") %> · <%= format_duration(@total_duration) %></p>
     </div>
     <div class="flex flex-wrap gap-2" data-controller="clipboard" data-clipboard-content-value="<%= playlist_tracks_as_text(@playlist_tracks) %>">
-      <%= render ButtonComponent.new(data: { action: "play-all#playAll" }, extra_classes: "gap-1") do %>
+      <%= render Button::Component.new(data: { action: "play-all#playAll" }, extra_classes: "gap-1") do %>
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.84A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.27l9.344-5.891a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
         Play All
       <% end %>
-      <%= render ButtonComponent.new(style: :secondary, data: { action: "play-all#shuffleAll" }, extra_classes: "gap-1") do %>
+      <%= render Button::Component.new(style: :secondary, data: { action: "play-all#shuffleAll" }, extra_classes: "gap-1") do %>
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M15.312 3.752a.75.75 0 01.937-.187l.084.058 1.5 1.25a.75.75 0 01.084 1.121l-.084.079-1.5 1.25a.75.75 0 01-1.04-1.065l.056-.056.251-.21H14.5a2.5 2.5 0 00-1.967.96l-.103.145-1.18 1.853-1.25-1.96 .47-.738A4 4 0 0114.5 3.002h1.1l-.251-.21a.75.75 0 01-.098-1l.06-.07zM3.75 4a.75.75 0 01.102 1.493L3.75 5.5H2.75a.75.75 0 01-.102-1.493L2.75 4h1zm12.562 9.248a.75.75 0 01.937-.187l.084.058 1.5 1.25a.75.75 0 01.084 1.121l-.084.079-1.5 1.25a.75.75 0 01-1.04-1.065l.056-.056.251-.21H14.5a4 4 0 01-3.03-1.388l-.16-.197-.56-.78 1.25-1.962.43.675A2.5 2.5 0 0014.5 13h1.1l-.251-.21a.75.75 0 01-.098-1l.06-.07zM3.75 14a.75.75 0 01.102 1.493L3.75 15.5H2.75a.75.75 0 01-.102-1.493L2.75 14h1z" clip-rule="evenodd"/></svg>
         Shuffle All
       <% end %>
       <%= button_to "Download", downloads_path(downloadable_type: "Playlist", downloadable_id: @playlist.id), class: "px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600" %>
-      <%= render ButtonComponent.new(label: "Copy track list", style: :secondary, data: { clipboard_target: "button", action: "clipboard#copy" }) %>
-      <%= render ButtonComponent.new(label: "Edit", behavior: :navigation, link_url: edit_playlist_path(@playlist), style: :secondary) %>
+      <%= render Button::Component.new(label: "Copy track list", style: :secondary, data: { clipboard_target: "button", action: "clipboard#copy" }) %>
+      <%= render Button::Component.new(label: "Edit", behavior: :navigation, link_url: edit_playlist_path(@playlist), style: :secondary) %>
       <%= button_to "Delete", playlist_path(@playlist), method: :delete, data: { turbo_confirm: "Delete this playlist?" }, class: "px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700" %>
     </div>
   </div>
 
   <div class="bg-gray-800 rounded-lg border border-gray-700">
     <% @playlist_tracks.each do |pt| %>
-      <%= render TrackRowComponent.new(track: pt.track, number: pt.position, link_title: true, link_subtitle: true) do |c| %>
+      <%= render TrackRow::Component.new(track: pt.track, number: pt.position, link_title: true, link_subtitle: true) do |c| %>
         <% c.with_trailing do %>
           <% if pt.track.audio_file.attached? %>
             <%= link_to download_track_path(pt.track), class: "text-gray-400 hover:text-neon-cyan", title: "Download" do %>

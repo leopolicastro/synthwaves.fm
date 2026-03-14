@@ -9,10 +9,10 @@
   <!-- Auth Bar -->
   <nav class="relative z-10 w-full py-4 px-4 sm:py-5 sm:px-6">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
-      <%= render(LogoComponent.new(size: :md, icon: true, text: false)) %>
+      <%= render(Logo::Component.new(size: :md, icon: true, text: false)) %>
       <div class="flex items-center gap-2 sm:gap-4">
-        <%= render ButtonComponent.new(label: "Log In", behavior: :navigation, link_url: new_session_path, style: :link) %>
-        <%= render ButtonComponent.new(label: "Sign Up", behavior: :navigation, link_url: new_registration_path, style: :gradient) %>
+        <%= render Button::Component.new(label: "Log In", behavior: :navigation, link_url: new_session_path, style: :link) %>
+        <%= render Button::Component.new(label: "Sign Up", behavior: :navigation, link_url: new_registration_path, style: :gradient) %>
       </div>
     </div>
   </nav>
@@ -21,7 +21,7 @@
     <div class="bg-gray-900/80 backdrop-blur-sm rounded-2xl px-6 py-8 sm:px-10 sm:py-10 flex flex-col items-center">
       <!-- Title -->
       <h1 class="text-center mb-4 sm:mb-6 leading-tight">
-        <%= render(LogoComponent.new(size: :lg)) %>
+        <%= render(Logo::Component.new(size: :lg)) %>
       </h1>
       <!-- Tagline -->
       <p class="text-xl md:text-2xl text-center mb-4 max-w-3xl leading-relaxed">
@@ -36,7 +36,7 @@
       </p>
       <!-- CTA Buttons -->
       <div class="flex flex-col sm:flex-row gap-4">
-        <%= render ButtonComponent.new(label: "Start Listening", behavior: :navigation, link_url: new_registration_path, style: :gradient, extra_classes: "shadow-lg") %>
+        <%= render Button::Component.new(label: "Start Listening", behavior: :navigation, link_url: new_registration_path, style: :gradient, extra_classes: "shadow-lg") %>
         <a href="#features" class="bg-gray-800/60 backdrop-blur border border-neon-cyan/30 hover:border-neon-cyan/60 hover:shadow-neon-cyan text-neon-cyan px-8 py-3.5 sm:px-10 sm:py-4 rounded-xl font-semibold text-lg transition-all text-center">
           See Features
         </a>
@@ -217,14 +217,14 @@
       <p class="text-gray-400 text-lg mb-10">
         Set up your server, add your media, and start streaming in minutes.
       </p>
-      <%= render ButtonComponent.new(label: "Get Started Free", behavior: :navigation, link_url: new_registration_path, style: :gradient, extra_classes: "shadow-lg") %>
+      <%= render Button::Component.new(label: "Get Started Free", behavior: :navigation, link_url: new_registration_path, style: :gradient, extra_classes: "shadow-lg") %>
     </div>
   </section>
   <!-- Footer -->
   <footer class="py-6 px-4 sm:py-10 sm:px-6 bg-gray-800/50 border-t border-neon-purple/20">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
       <div class="flex items-center gap-2">
-        <%= render(LogoComponent.new(size: :sm, icon: true)) %>
+        <%= render(Logo::Component.new(size: :sm, icon: true)) %>
         <span class="text-gray-400 text-sm">&copy; <%= Date.current.year %> synthwaves.fm</span>
       </div>
       <div class="flex items-center gap-4">

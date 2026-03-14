@@ -1,9 +1,9 @@
 <div class="w-full">
   <div class="flex items-center justify-between mb-6">
     <h1 class="text-3xl font-bold font-display">Playlists</h1>
-    <%= render ButtonComponent.new(label: "New Playlist", behavior: :navigation, link_url: new_playlist_path) %>
+    <%= render Button::Component.new(label: "New Playlist", behavior: :navigation, link_url: new_playlist_path) %>
   </div>
-  <%= render CollectionLayoutComponent.new(
+  <%= render CollectionLayout::Component.new(
     collection: @playlists,
     page_key: "playlists",
     form_url: playlists_path,

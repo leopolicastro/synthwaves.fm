@@ -28,7 +28,7 @@
   </div>
 
   <div class="mt-6">
-    <%= render ButtonComponent.new(label: "Edit Profile", behavior: :navigation, link_url: edit_profile_path) %>
+    <%= render Button::Component.new(label: "Edit Profile", behavior: :navigation, link_url: edit_profile_path) %>
   </div>
 
   <% if turbo_native_app? %>

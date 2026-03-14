@@ -4,7 +4,7 @@
     <!-- Header -->
     <div class="mb-12">
       <%= link_to root_path, class: "inline-block mb-8" do %>
-        <%= render(LogoComponent.new(size: :md, icon: true)) %>
+        <%= render(Logo::Component.new(size: :md, icon: true)) %>
       <% end %>
       <h1 class="text-3xl md:text-4xl font-bold font-display text-neon-pink mb-2">Privacy Policy</h1>
       <p class="text-gray-400">Last updated: March 12, 2026</p>
@@ -88,7 +88,7 @@
 <footer class="py-6 px-4 sm:py-10 sm:px-6 bg-gray-800/50 border-t border-neon-purple/20">
   <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
     <div class="flex items-center gap-2">
-      <%= render(LogoComponent.new(size: :sm, icon: true)) %>
+      <%= render(Logo::Component.new(size: :sm, icon: true)) %>
       <span class="text-gray-400 text-sm">&copy; <%= Date.current.year %> synthwaves.fm</span>
     </div>
     <p class="text-gray-400 text-sm">Built with Ruby on Rails</p>

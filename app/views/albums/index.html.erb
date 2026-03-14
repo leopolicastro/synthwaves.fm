@@ -1,6 +1,6 @@
 <div class="w-full">
   <h1 class="text-3xl font-bold font-display mb-6">Albums</h1>
-  <%= render CollectionLayoutComponent.new(
+  <%= render CollectionLayout::Component.new(
     collection: @albums,
     page_key: "albums",
     form_url: albums_path,

@@ -49,7 +49,7 @@
         <%= form.submit "Save Changes", class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-neon-pink hover:shadow-neon-pink text-white inline-block font-medium cursor-pointer" %>
       </div>
       <div class="mt-4 text-sm text-gray-400 sm:mt-0">
-        <%= render ButtonComponent.new(label: "Cancel", behavior: :navigation, link_url: profile_path, style: :link) %>
+        <%= render Button::Component.new(label: "Cancel", behavior: :navigation, link_url: profile_path, style: :link) %>
       </div>
     </div>
   <% end %>

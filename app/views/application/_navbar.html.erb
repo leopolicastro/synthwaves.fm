@@ -4,13 +4,13 @@
       <!-- Left side: App name + nav -->
       <div class="flex items-center space-x-4">
         <%= link_to root_path do %>
-          <%= render(LogoComponent.new(size: :md, icon: true, text: false)) %>
+          <%= render(Logo::Component.new(size: :md, icon: true, text: false)) %>
         <% end %>
         <% if authenticated? %>
           <nav class="hidden md:flex items-center space-x-3 text-sm">
-            <%= render ButtonComponent.new(label: "Listen", behavior: :navigation, link_url: music_path, style: :nav_link) %>
-            <%= render ButtonComponent.new(label: "Watch", behavior: :navigation, link_url: tv_path, style: :nav_link) %>
-            <%= render ButtonComponent.new(label: "Stats", behavior: :navigation, link_url: stats_path, style: :nav_link) %>
+            <%= render Button::Component.new(label: "Listen", behavior: :navigation, link_url: music_path, style: :nav_link) %>
+            <%= render Button::Component.new(label: "Watch", behavior: :navigation, link_url: tv_path, style: :nav_link) %>
+            <%= render Button::Component.new(label: "Stats", behavior: :navigation, link_url: stats_path, style: :nav_link) %>
           </nav>
         <% end %>
       </div>
@@ -44,24 +44,24 @@
             </span>
           <% end %>
           <div class="md:hidden">
-            <%= render ButtonComponent.new(label: "Stats", behavior: :navigation, link_url: stats_path, style: :menu_item) %>
+            <%= render Button::Component.new(label: "Stats", behavior: :navigation, link_url: stats_path, style: :menu_item) %>
             <div class="border-t border-gray-700 my-1"></div>
           </div>
-          <%= render ButtonComponent.new(label: "Profile", behavior: :navigation, link_url: profile_path, style: :menu_item) %>
+          <%= render Button::Component.new(label: "Profile", behavior: :navigation, link_url: profile_path, style: :menu_item) %>
           <% if Current.user.admin? %>
             <div class="border-t border-gray-700 my-1"></div>
-            <%= render ButtonComponent.new(label: "Admin", behavior: :navigation, link_url: "/admin", style: :menu_item) %>
-            <%= render ButtonComponent.new(label: "Jobs", behavior: :navigation, link_url: "/admin/jobs", style: :menu_item) %>
-            <%= render ButtonComponent.new(label: "Feature Flags", behavior: :navigation, link_url: "/admin/flipper", style: :menu_item) %>
-            <%= render ButtonComponent.new(label: "Maintenance", behavior: :navigation, link_url: "/admin/maintenance_tasks", style: :menu_item) %>
+            <%= render Button::Component.new(label: "Admin", behavior: :navigation, link_url: "/admin", style: :menu_item) %>
+            <%= render Button::Component.new(label: "Jobs", behavior: :navigation, link_url: "/admin/jobs", style: :menu_item) %>
+            <%= render Button::Component.new(label: "Feature Flags", behavior: :navigation, link_url: "/admin/flipper", style: :menu_item) %>
+            <%= render Button::Component.new(label: "Maintenance", behavior: :navigation, link_url: "/admin/maintenance_tasks", style: :menu_item) %>
           <% end %>
           <div class="border-t border-gray-700 my-1"></div>
           <%= button_to "Sign Out", session_path, method: :delete, data: { turbo_method: :delete }, class: "w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700" %>
         <% end %>
       <% else %>
         <div class="flex items-center space-x-1">
-          <%= render ButtonComponent.new(label: "Log in", behavior: :navigation, link_url: new_session_path, style: :secondary) %>
-          <%= render ButtonComponent.new(label: "Sign up", behavior: :navigation, link_url: new_registration_path, style: :gradient) %>
+          <%= render Button::Component.new(label: "Log in", behavior: :navigation, link_url: new_session_path, style: :secondary) %>
+          <%= render Button::Component.new(label: "Sign up", behavior: :navigation, link_url: new_registration_path, style: :gradient) %>
         </div>
       <% end %>
     </div>

@@ -1,4 +1,4 @@
-<%= render CollectionLayoutComponent.new(
+<%= render CollectionLayout::Component.new(
   collection: @playlists,
   page_key: "music-playlists",
   form_url: music_path,
@@ -13,7 +13,7 @@
   empty_label: "playlists"
 ) do |c| %>
   <% c.with_actions do %>
-    <%= render ButtonComponent.new(label: "New Playlist", behavior: :navigation, link_url: new_playlist_path, turbo_frame: "_top") %>
+    <%= render Button::Component.new(label: "New Playlist", behavior: :navigation, link_url: new_playlist_path, turbo_frame: "_top") %>
   <% end %>
   <% @playlists.each do |playlist| %>
     <% cover_albums = @cover_albums_by_playlist[playlist.id] || [] %>

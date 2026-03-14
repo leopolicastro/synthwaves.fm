@@ -8,7 +8,7 @@
 <div class="w-full flex flex-col lg:flex-row gap-6">
   <div class="flex-1 max-w-2xl">
     <div class="mb-6">
-      <%= render ButtonComponent.new(label: "← Back", behavior: :navigation, link_url: tracks_path, style: :link) %>
+      <%= render Button::Component.new(label: "← Back", behavior: :navigation, link_url: tracks_path, style: :link) %>
     </div>
 
     <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
@@ -74,7 +74,7 @@
 
   <div class="lg:w-80 lg:mt-12">
     <div class="bg-gray-800 rounded-lg border border-gray-700 p-5">
-      <%= render LyricsComponent.new(track_id: @track.id, show_header: true) %>
+      <%= render Lyrics::Component.new(track_id: @track.id, show_header: true) %>
     </div>
   </div>
 </div>

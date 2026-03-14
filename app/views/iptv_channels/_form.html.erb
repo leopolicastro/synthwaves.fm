@@ -46,6 +46,6 @@
 
   <div class="flex items-center gap-4">
     <%= f.submit class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink text-sm font-medium cursor-pointer" %>
-    <%= render ButtonComponent.new(label: "Cancel", behavior: :navigation, link_url: (@channel.persisted? ? iptv_channel_path(@channel) : tv_path), style: :ghost, size: :small) %>
+    <%= render Button::Component.new(label: "Cancel", behavior: :navigation, link_url: (@channel.persisted? ? iptv_channel_path(@channel) : tv_path), style: :ghost, size: :small) %>
   </div>
 <% end %>

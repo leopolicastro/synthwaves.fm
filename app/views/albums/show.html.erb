@@ -7,7 +7,7 @@
 
 <div class="w-full" data-controller="play-all">
   <div class="mb-6">
-    <%= render ButtonComponent.new(label: "← Albums", behavior: :navigation, link_url: albums_path, style: :link) %>
+    <%= render Button::Component.new(label: "← Albums", behavior: :navigation, link_url: albums_path, style: :link) %>
   </div>
   <div class="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-8">
     <% if @album.cover_image.attached? %>
@@ -28,16 +28,16 @@
       <% end %>
       <p class="text-sm text-gray-400 mt-2"><%= pluralize(@total_tracks, "track") %> · <%= format_duration(@total_duration) %></p>
       <div class="mt-3 flex flex-wrap items-center gap-2">
-        <%= render ButtonComponent.new(size: :small, data: { action: "play-all#playAll" }, extra_classes: "gap-1") do %>
+        <%= render Button::Component.new(size: :small, data: { action: "play-all#playAll" }, extra_classes: "gap-1") do %>
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.84A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.27l9.344-5.891a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
           Play All
         <% end %>
-        <%= render ButtonComponent.new(style: :secondary, size: :small, data: { action: "play-all#shuffleAll" }, extra_classes: "gap-1") do %>
+        <%= render Button::Component.new(style: :secondary, size: :small, data: { action: "play-all#shuffleAll" }, extra_classes: "gap-1") do %>
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M15.312 3.752a.75.75 0 01.937-.187l.084.058 1.5 1.25a.75.75 0 01.084 1.121l-.084.079-1.5 1.25a.75.75 0 01-1.04-1.065l.056-.056.251-.21H14.5a2.5 2.5 0 00-1.967.96l-.103.145-1.18 1.853-1.25-1.96 .47-.738A4 4 0 0114.5 3.002h1.1l-.251-.21a.75.75 0 01-.098-1l.06-.07zM3.75 4a.75.75 0 01.102 1.493L3.75 5.5H2.75a.75.75 0 01-.102-1.493L2.75 4h1zm12.562 9.248a.75.75 0 01.937-.187l.084.058 1.5 1.25a.75.75 0 01.084 1.121l-.084.079-1.5 1.25a.75.75 0 01-1.04-1.065l.056-.056.251-.21H14.5a4 4 0 01-3.03-1.388l-.16-.197-.56-.78 1.25-1.962.43.675A2.5 2.5 0 0014.5 13h1.1l-.251-.21a.75.75 0 01-.098-1l.06-.07zM3.75 14a.75.75 0 01.102 1.493L3.75 15.5H2.75a.75.75 0 01-.102-1.493L2.75 14h1z" clip-rule="evenodd"/></svg>
           Shuffle All
         <% end %>
         <%= render "favorites/button", favorable: @album, favorited: Current.user.favorites.exists?(favorable: @album) %>
-        <%= render BulkPlaylistMenuComponent.new(
+        <%= render BulkPlaylistMenu::Component.new(
               tracks: @all_tracks,
               playlists: current_user_playlists,
               new_playlist_name: @album.title
@@ -51,7 +51,7 @@
           <%= button_to "Download Audio", download_audio_album_path(@album), class: "inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-neon-cyan bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors" %>
         <% end %>
         <% if Current.user.admin? %>
-          <%= render ButtonComponent.new(label: "Edit", behavior: :navigation, link_url: edit_album_path(@album), style: :secondary, size: :small) %>
+          <%= render Button::Component.new(label: "Edit", behavior: :navigation, link_url: edit_album_path(@album), style: :secondary, size: :small) %>
           <%= button_to "Delete", album_path(@album), method: :delete, class: "inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-red-400 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors", data: { turbo_confirm: "Delete \"#{@album.title}\" and all its tracks? This cannot be undone." } %>
           <%= render "albums/merge_menu", album: @album %>
         <% end %>
@@ -83,7 +83,7 @@
 
     <div class="bg-gray-800 rounded-lg border border-gray-700">
       <% @tracks.each do |track| %>
-        <%= render TrackRowComponent.new(track: track, number: (@sort == "disc_number" ? track.track_number : nil), link_title: true, link_subtitle: true, show_album: false, hide_artist_if: @album.artist) do |c| %>
+        <%= render TrackRow::Component.new(track: track, number: (@sort == "disc_number" ? track.track_number : nil), link_title: true, link_subtitle: true, show_album: false, hide_artist_if: @album.artist) do |c| %>
           <% c.with_trailing do %>
             <% if track.audio_file.attached? %>
               <%= link_to download_track_path(track), class: "text-gray-400 hover:text-neon-cyan", title: "Download" do %>

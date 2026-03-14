@@ -43,8 +43,8 @@
     <% end %>
     <%= render 'navbar' unless turbo_native_app? %>
     <%= render 'alerts' %>
-    <%= render TvPlayerComponent.new %>
-    <%= render PIPComponent.new %>
+    <%= render TvPlayer::Component.new %>
+    <%= render PIP::Component.new %>
     <!-- Screensaver -->
     <div class="hidden fixed inset-0 z-[9998] bg-black" data-turbo-permanent data-controller="screensaver">
       <canvas data-screensaver-target="canvas" class="w-full h-full"></canvas>
@@ -54,9 +54,9 @@
     </main>
     <% unless turbo_native_app? %>
       <% if authenticated? %>
-        <%= render BottomTabBarComponent.new(current_path: request.path, user: Current.user) %>
+        <%= render BottomTabBar::Component.new(current_path: request.path, user: Current.user) %>
       <% end %>
-      <%= render PlayerComponent.new %>
+      <%= render Player::Component.new %>
     <% end %>
   </body>
 </html>

@@ -1,4 +1,4 @@
-<%= render CollectionLayoutComponent.new(
+<%= render CollectionLayout::Component.new(
   collection: @videos,
   page_key: "tv-videos",
   form_url: tv_path,
@@ -16,7 +16,7 @@
         <h2 class="text-lg font-bold font-display text-white mb-4">Folders</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 collection-grid" data-view-toggle-target="container">
           <% @folders.each do |folder| %>
-            <%= render FolderCardComponent.new(folder: folder) %>
+            <%= render FolderCard::Component.new(folder: folder) %>
           <% end %>
         </div>
       </div>
@@ -44,6 +44,6 @@
   <% end %>
 
   <% @videos.each do |video| %>
-    <%= render VideoCardComponent.new(video: video) %>
+    <%= render VideoCard::Component.new(video: video) %>
   <% end %>
 <% end %>

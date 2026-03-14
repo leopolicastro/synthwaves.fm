@@ -34,7 +34,7 @@
 
     <div>
       <%= f.submit "Save", class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink cursor-pointer" %>
-      <%= render ButtonComponent.new(label: "Cancel", behavior: :navigation, link_url: album_path(@album), style: :ghost) %>
+      <%= render Button::Component.new(label: "Cancel", behavior: :navigation, link_url: album_path(@album), style: :ghost) %>
     </div>
   <% end %>
 </div>

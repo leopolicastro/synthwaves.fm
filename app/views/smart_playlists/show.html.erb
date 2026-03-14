@@ -11,7 +11,7 @@
 
   <div class="bg-gray-800 rounded-lg border border-gray-700 divide-y divide-gray-700">
     <% @tracks.each_with_index do |track, i| %>
-      <%= render TrackRowComponent.new(
+      <%= render TrackRow::Component.new(
         track: track,
         number: i + 1,
         link_title: true,

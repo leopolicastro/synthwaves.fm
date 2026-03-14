@@ -1,6 +1,6 @@
 <div class="w-full max-w-2xl mx-auto">
   <div class="mb-4">
-    <%= render ButtonComponent.new(label: "← Back to stations", behavior: :navigation, link_url: internet_radio_stations_path, style: :link, size: :small) %>
+    <%= render Button::Component.new(label: "← Back to stations", behavior: :navigation, link_url: internet_radio_stations_path, style: :link, size: :small) %>
   </div>
 
   <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
@@ -43,7 +43,7 @@
 
         <% if @station.homepage_url.present? %>
           <p class="mt-2 text-sm">
-            <%= render ButtonComponent.new(label: "Visit homepage", behavior: :navigation, link_url: @station.homepage_url, style: :link, new_tab: true) %>
+            <%= render Button::Component.new(label: "Visit homepage", behavior: :navigation, link_url: @station.homepage_url, style: :link, new_tab: true) %>
           </p>
         <% end %>
       </div>
@@ -51,7 +51,7 @@
 
     <!-- Actions -->
     <div class="border-t border-gray-700 p-6 flex items-center gap-4">
-      <%= render ButtonComponent.new(
+      <%= render Button::Component.new(
               data: {
                 controller: "song-row",
                 song_row_track_id_value: "0",
@@ -71,7 +71,7 @@
       </div>
 
       <div class="ml-auto flex items-center gap-2">
-        <%= render ButtonComponent.new(label: "Edit", behavior: :navigation, link_url: edit_internet_radio_station_path(@station), style: :secondary) %>
+        <%= render Button::Component.new(label: "Edit", behavior: :navigation, link_url: edit_internet_radio_station_path(@station), style: :secondary) %>
         <%= button_to "Delete", internet_radio_station_path(@station), method: :delete, data: { turbo_confirm: "Remove this station?" }, class: "px-4 py-2 text-sm font-medium text-red-400 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors" %>
       </div>
     </div>

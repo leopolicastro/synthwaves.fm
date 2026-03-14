@@ -129,7 +129,7 @@ song_row_controller  -->  queue_controller  -->  player_controller
 
 ### ViewComponents
 
-`TrackRowComponent` renders a track in list views with configurable options: `link_title`, `link_subtitle`, `show_album`, `hide_artist_if`, `show_duration`, `number`.
+`TrackRow::Component` renders a track in list views with configurable options: `link_title`, `link_subtitle`, `show_album`, `hide_artist_if`, `show_duration`, `number`.
 
 ### Service Objects (app/services/)
 

@@ -1,0 +1,67 @@
+<div class="flex items-center justify-between px-4 py-3 border-b border-gray-700 last:border-0 hover:bg-gray-700/50"
+     data-controller="song-row now-playing"
+     data-song-row-track-id-value="<%= track.id %>"
+     data-now-playing-track-id-value="<%= track.id %>"
+     data-song-row-title-value="<%= track.title %>"
+     data-song-row-artist-value="<%= track.artist.name %>"
+     <% if track.album.cover_image.attached? %>
+     data-song-row-cover-url-value="<%= url_for(track.album.cover_image) %>"
+     <% end %>
+     <% if track.artist.podcast? %>
+     data-song-row-is-podcast-value="true"
+     <% end %>
+     data-song-row-album-title-value="<%= track.album.title %>"
+     data-song-row-duration-value="<%= (track.duration || 0).to_i %>"
+     <% if track.audio_file.attached? %>
+     data-song-row-stream-url-value="<%= stream_track_path(track) %>"
+     <% elsif track.youtube? %>
+     data-song-row-youtube-video-id-value="<%= track.youtube_video_id %>"
+     <% end %>
+     <% if helpers.native_url_builder %>
+     data-song-row-native-stream-url-value="<%= helpers.native_url_builder.stream_url(track) %>"
+     data-song-row-native-cover-art-url-value="<%= helpers.native_url_builder.cover_art_url(track.album) %>"
+     <% end %>>
+  <div class="flex items-center gap-3 min-w-0 flex-1">
+    <button type="button" data-action="song-row#play" class="w-8 text-center text-gray-400 hover:text-neon-pink group/play">
+      <% if number %>
+        <span class="group-hover/play:hidden" data-song-row-target="trackNumber"><%= number %></span>
+      <% end %>
+      <svg class="w-5 h-5 mx-auto <%= 'hidden group-hover/play:block' if number %>" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+    </button>
+    <div class="min-w-0">
+      <div class="font-medium text-white truncate">
+        <% if link_title? %>
+          <%= render Button::Component.new(label: track.title, behavior: :navigation, link_url: track_path(track), style: :inline_link, turbo_frame: "_top") %>
+        <% else %>
+          <%= track.title %>
+        <% end %>
+      </div>
+      <% if show_subtitle? %>
+        <div class="text-sm text-gray-400">
+          <% parts = [] %>
+          <% if show_artist? %>
+            <% if link_subtitle? %>
+              <% parts << render(Button::Component.new(label: track.artist.name, behavior: :navigation, link_url: artist_path(track.artist), style: :inline_link, turbo_frame: "_top")) %>
+            <% else %>
+              <% parts << track.artist.name %>
+            <% end %>
+          <% end %>
+          <% if show_album? %>
+            <% if link_subtitle? %>
+              <% parts << render(Button::Component.new(label: track.album.title, behavior: :navigation, link_url: album_path(track.album), style: :inline_link, turbo_frame: "_top")) %>
+            <% else %>
+              <% parts << track.album.title %>
+            <% end %>
+          <% end %>
+          <%= safe_join(parts, " &middot; ".html_safe) %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+    <% if show_duration? %>
+      <span class="hidden sm:inline text-sm text-gray-400"><%= format_duration(track.duration || 0) %></span>
+    <% end %>
+    <%= trailing if trailing? %>
+  </div>
+</div>

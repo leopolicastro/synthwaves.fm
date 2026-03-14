@@ -1,6 +1,6 @@
 <div class="w-full max-w-2xl">
   <div class="mb-6">
-    <%= render ButtonComponent.new(label: "← Recordings", behavior: :navigation, link_url: recordings_path, style: :link) %>
+    <%= render Button::Component.new(label: "← Recordings", behavior: :navigation, link_url: recordings_path, style: :link) %>
   </div>
 
   <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
@@ -61,7 +61,7 @@
 
     <div class="mt-6 flex items-center gap-3">
       <% if @recording.ready? && @recording.file.attached? %>
-        <%= render ButtonComponent.new(label: "Download", behavior: :navigation, link_url: file_recording_path(@recording)) %>
+        <%= render Button::Component.new(label: "Download", behavior: :navigation, link_url: file_recording_path(@recording)) %>
       <% end %>
       <% if @recording.cancellable? %>
         <%= button_to "Cancel", cancel_recording_path(@recording), method: :post,

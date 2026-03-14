@@ -1,6 +1,6 @@
 <%= turbo_stream_from "recordings_#{Current.user.id}" %>
 
-<%= render CollectionLayoutComponent.new(
+<%= render CollectionLayout::Component.new(
   collection: @recordings,
   page_key: "tv-recordings",
   form_url: tv_path,

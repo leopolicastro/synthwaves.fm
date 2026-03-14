@@ -1,9 +1,9 @@
 <div class="w-full max-w-4xl">
   <div class="mb-6">
     <% if @video.folder %>
-      <%= render ButtonComponent.new(label: "← Back to #{@video.folder.name}", behavior: :navigation, link_url: folder_path(@video.folder), style: :link) %>
+      <%= render Button::Component.new(label: "← Back to #{@video.folder.name}", behavior: :navigation, link_url: folder_path(@video.folder), style: :link) %>
     <% else %>
-      <%= render ButtonComponent.new(label: "← Back", behavior: :navigation, link_url: tv_path(tab: "videos"), style: :link) %>
+      <%= render Button::Component.new(label: "← Back", behavior: :navigation, link_url: tv_path(tab: "videos"), style: :link) %>
     <% end %>
   </div>
 
@@ -78,7 +78,7 @@
 
     <div class="mt-4 flex flex-wrap items-center gap-2">
       <%= render "favorites/button", favorable: @video, favorited: Current.user.favorites.exists?(favorable: @video) %>
-      <%= render ButtonComponent.new(label: "Edit", behavior: :navigation, link_url: edit_video_path(@video), style: :secondary) %>
+      <%= render Button::Component.new(label: "Edit", behavior: :navigation, link_url: edit_video_path(@video), style: :secondary) %>
       <%= button_to "Delete", video_path(@video), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700" %>
     </div>
   </div>

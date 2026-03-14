@@ -4,15 +4,15 @@
       <h1 class="text-3xl font-bold font-display">TV</h1>
       <div class="flex items-center gap-3 flex-wrap">
         <% if @tab == "videos" %>
-          <%= render ButtonComponent.new(label: "Upload Season", behavior: :navigation, link_url: new_folder_path, style: :ghost, turbo_frame: "_top") %>
-          <%= render ButtonComponent.new(label: "Upload Video", behavior: :navigation, link_url: new_video_path, turbo_frame: "_top") %>
+          <%= render Button::Component.new(label: "Upload Season", behavior: :navigation, link_url: new_folder_path, style: :ghost, turbo_frame: "_top") %>
+          <%= render Button::Component.new(label: "Upload Video", behavior: :navigation, link_url: new_video_path, turbo_frame: "_top") %>
         <% elsif @tab == "guide" %>
           <%= form_with url: import_iptv_channels_path, method: :post, class: "flex items-center gap-2", data: { turbo_frame: "_top" } do %>
             <input type="url" name="playlist_url" placeholder="M3U playlist URL..."
                    class="w-36 sm:w-48 lg:w-64 px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan focus:border-transparent placeholder-gray-500">
-            <%= render ButtonComponent.new(label: "Import", style: :ghost, type: "submit") %>
+            <%= render Button::Component.new(label: "Import", style: :ghost, type: "submit") %>
           <% end %>
-          <%= render ButtonComponent.new(label: "Add Channel", behavior: :navigation, link_url: new_iptv_channel_path, turbo_frame: "_top") %>
+          <%= render Button::Component.new(label: "Add Channel", behavior: :navigation, link_url: new_iptv_channel_path, turbo_frame: "_top") %>
         <% end %>
       </div>
     </div>

@@ -23,7 +23,7 @@
           <%# Tracks under this album %>
           <div class="border-t border-gray-700">
             <% play_histories.each do |ph| %>
-              <%= render TrackRowComponent.new(track: ph.track, link_title: true, show_duration: false) do |c| %>
+              <%= render TrackRow::Component.new(track: ph.track, link_title: true, show_duration: false) do |c| %>
                 <% c.with_trailing do %>
                   <span class="text-sm text-gray-400"><%= time_ago_in_words(ph.played_at) %> ago</span>
                 <% end %>

@@ -294,6 +294,7 @@ export default class extends Controller {
     // If crossfade already started playback, skip audio source reset
     if (this._crossfadeJustCompleted) {
       this._crossfadeJustCompleted = false
+      this.updatePlayPauseIcon()
     } else if (this.castActive) {
       document.dispatchEvent(new CustomEvent("cast:loadMedia", {
         detail: { streamUrl, title, artist }

@@ -36,7 +36,7 @@
       <% if authenticated? %>
         <details class="relative">
           <summary class="flex items-center gap-2 text-sm font-medium text-white hover:text-neon-cyan cursor-pointer list-none">
-            <span class="max-w-[120px] sm:max-w-none truncate"><%= Current.user.email_address %></span>
+            <span class="max-w-[120px] sm:max-w-none truncate"><%= Current.user.name || Current.user.email_address %></span>
             <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
             </svg>

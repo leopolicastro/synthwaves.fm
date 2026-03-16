@@ -3,12 +3,12 @@ class API::Import::PlaylistsController < API::Import::BaseController
     name = params[:name]
 
     if name.blank?
-      render json: { error: "name is required" }, status: :unprocessable_entity
+      render json: {error: "name is required"}, status: :unprocessable_entity
       return
     end
 
     if current_user.playlists.exists?(name: name)
-      render json: { error: "Playlist '#{name}' already exists" }, status: :conflict
+      render json: {error: "Playlist '#{name}' already exists"}, status: :conflict
       return
     end
 

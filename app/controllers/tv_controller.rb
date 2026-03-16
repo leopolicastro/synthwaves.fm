@@ -79,9 +79,9 @@ class TvController < ApplicationController
     @sort = sort_column(Recording, default: "created_at")
     @direction = sort_direction(default: "desc")
     scope = Current.user.recordings.includes(:iptv_channel)
-              .search(@query)
-              .by_status(@status)
-              .order(@sort => @direction)
+      .search(@query)
+      .by_status(@status)
+      .order(@sort => @direction)
     @pagy, @recordings = pagy(scope)
   end
 

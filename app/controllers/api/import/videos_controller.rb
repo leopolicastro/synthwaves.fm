@@ -24,9 +24,9 @@ class API::Import::VideosController < API::Import::BaseController
       status: video.status
     }, status: :created
   rescue ActiveSupport::MessageVerifier::InvalidSignature
-    render json: { error: "Invalid signed blob ID" }, status: :unprocessable_entity
+    render json: {error: "Invalid signed blob ID"}, status: :unprocessable_entity
   rescue ActiveRecord::RecordInvalid => e
-    render json: { error: e.message }, status: :unprocessable_entity
+    render json: {error: e.message}, status: :unprocessable_entity
   end
 
   private

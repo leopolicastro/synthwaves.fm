@@ -17,12 +17,12 @@ class API::Import::DirectUploadsController < API::Import::BaseController
       }
     }, status: :created
   rescue ActiveRecord::RecordInvalid => e
-    render json: { error: e.message }, status: :unprocessable_entity
+    render json: {error: e.message}, status: :unprocessable_entity
   end
 
   private
 
   def set_active_storage_url_options
-    ActiveStorage::Current.url_options = { protocol: request.protocol, host: request.host, port: request.port }
+    ActiveStorage::Current.url_options = {protocol: request.protocol, host: request.host, port: request.port}
   end
 end

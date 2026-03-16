@@ -51,7 +51,7 @@ class IPTVChannelSyncService
 
     reset_counter_caches
 
-    { synced: imported }
+    {synced: imported}
   end
 
   private

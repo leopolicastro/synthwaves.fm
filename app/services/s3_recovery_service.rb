@@ -12,7 +12,7 @@ class S3RecoveryService
   def initialize(user_email:, commit: false)
     @user_email = user_email
     @commit = commit
-    @stats = { scanned: 0, audio_created: 0, video_created: 0, existing: 0, skipped: 0, errors: 0 }
+    @stats = {scanned: 0, audio_created: 0, video_created: 0, existing: 0, skipped: 0, errors: 0}
   end
 
   def call
@@ -30,11 +30,11 @@ class S3RecoveryService
   private
 
   def scan_and_categorize
-    categorized = { audio: [], video: [], image: [], unknown: [] }
+    categorized = {audio: [], video: [], image: [], unknown: []}
     continuation_token = nil
 
     loop do
-      params = { bucket: bucket, prefix: "" }
+      params = {bucket: bucket, prefix: ""}
       params[:continuation_token] = continuation_token if continuation_token
 
       response = s3_client.list_objects_v2(**params)
@@ -118,7 +118,7 @@ class S3RecoveryService
           file_format: File.extname(entry[:filename]).delete("."),
           file_size: entry[:size]
         )
-        track.define_singleton_method(:convert_audio_if_needed) { }
+        track.define_singleton_method(:convert_audio_if_needed) {}
         track.save!
 
         blob = ActiveStorage::Blob.create!(
@@ -166,7 +166,7 @@ class S3RecoveryService
         file_format: File.extname(entry[:filename]).delete("."),
         file_size: entry[:size]
       )
-      video.define_singleton_method(:convert_video) { }
+      video.define_singleton_method(:convert_video) {}
       video.save!
 
       blob = ActiveStorage::Blob.create!(

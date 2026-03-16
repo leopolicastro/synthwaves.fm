@@ -37,6 +37,6 @@ module Themeable
   DEFAULT_THEME = "synthwave"
 
   included do
-    validates :theme, inclusion: { in: THEMES.keys }
+    validates :theme, inclusion: {in: THEMES.keys}
   end
 end

@@ -31,13 +31,13 @@ RSpec.describe Maintenance::NormalizeSurroundAudioTask do
       video = create(:video, user: user, audio_channels: 6)
       video.file.attach(io: StringIO.new("fake video"), filename: "test.mp4", content_type: "video/mp4")
 
-      surround_metadata = { audio_channels: 6, audio_codec: "aac", bitrate: 5000 }
-      stereo_metadata = { audio_channels: 2, audio_codec: "aac", bitrate: 3000 }
+      surround_metadata = {audio_channels: 6, audio_codec: "aac", bitrate: 5000}
+      stereo_metadata = {audio_channels: 2, audio_codec: "aac", bitrate: 3000}
 
       allow(VideoMetadataExtractor).to receive(:call).and_return(surround_metadata, stereo_metadata)
       allow(task).to receive(:system) do |*_args|
         # Create the output file that ffmpeg would produce
-        output_path = _args.last(3).first # the arg before out:/err: options
+        _args.last(3).first # the arg before out:/err: options
         # Find the output_path from args (it's the last positional arg before keyword-style args)
         output_file = _args.find { |a| a.is_a?(String) && a.end_with?(".normalized.mp4") }
         File.write(output_file, "converted video") if output_file
@@ -54,7 +54,7 @@ RSpec.describe Maintenance::NormalizeSurroundAudioTask do
       video = create(:video, user: user, audio_channels: nil)
       video.file.attach(io: StringIO.new("fake video"), filename: "test.mp4", content_type: "video/mp4")
 
-      stereo_metadata = { audio_channels: 2, audio_codec: "aac", bitrate: 5000 }
+      stereo_metadata = {audio_channels: 2, audio_codec: "aac", bitrate: 5000}
       allow(VideoMetadataExtractor).to receive(:call).and_return(stereo_metadata)
       allow(task).to receive(:system).and_call_original
 

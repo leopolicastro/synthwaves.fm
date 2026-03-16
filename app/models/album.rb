@@ -32,5 +32,4 @@ class Album < ApplicationRecord
   def reassign_tracks_to_artist
     tracks.update_all(artist_id: artist_id, user_id: user_id)
   end
-
 end

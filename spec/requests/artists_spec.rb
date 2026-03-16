@@ -37,8 +37,8 @@ RSpec.describe "Artists", type: :request do
     end
 
     it "excludes podcast artists from index" do
-      music_artist = create(:artist, name: "Music Band", user: user)
-      podcast_artist = create(:artist, :podcast, name: "Podcast Show", user: user)
+      create(:artist, name: "Music Band", user: user)
+      create(:artist, :podcast, name: "Podcast Show", user: user)
 
       get artists_path
 
@@ -50,7 +50,7 @@ RSpec.describe "Artists", type: :request do
       create(:artist, name: "The Beatles", user: user)
       create(:artist, name: "Led Zeppelin", user: user)
 
-      get artists_path, params: { q: "Beatles" }
+      get artists_path, params: {q: "Beatles"}
 
       expect(response.body).to include("The Beatles")
       expect(response.body).not_to include("Led Zeppelin")
@@ -59,7 +59,7 @@ RSpec.describe "Artists", type: :request do
     it "shows no artists found message when search has no results" do
       create(:artist, name: "The Beatles", user: user)
 
-      get artists_path, params: { q: "Nonexistent" }
+      get artists_path, params: {q: "Nonexistent"}
 
       expect(response.body).to include("No artists found")
       expect(response.body).to include("Nonexistent")
@@ -78,22 +78,22 @@ RSpec.describe "Artists", type: :request do
       create(:artist, name: "Zebra", user: user)
       create(:artist, name: "Alpha", user: user)
 
-      get artists_path, params: { sort: "name", direction: "desc" }
+      get artists_path, params: {sort: "name", direction: "desc"}
 
       expect(response.body.index("Zebra")).to be < response.body.index("Alpha")
     end
 
     it "sorts artists by recently added" do
-      older = create(:artist, name: "Older Artist", user: user, created_at: 2.days.ago)
-      newer = create(:artist, name: "Newer Artist", user: user, created_at: 1.hour.ago)
+      create(:artist, name: "Older Artist", user: user, created_at: 2.days.ago)
+      create(:artist, name: "Newer Artist", user: user, created_at: 1.hour.ago)
 
-      get artists_path, params: { sort: "created_at", direction: "desc" }
+      get artists_path, params: {sort: "created_at", direction: "desc"}
 
       expect(response.body.index("Newer Artist")).to be < response.body.index("Older Artist")
     end
 
     it "paginates results" do
-      26.times { |i| create(:artist, name: "Artist #{i.to_s.rjust(2, '0')}", user: user) }
+      26.times { |i| create(:artist, name: "Artist #{i.to_s.rjust(2, "0")}", user: user) }
 
       get artists_path
 

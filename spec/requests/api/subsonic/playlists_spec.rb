@@ -94,7 +94,7 @@ RSpec.describe "Subsonic Playlists API", type: :request do
     it "returns at most 5 recent episodes per podcast" do
       podcast_artist = create(:artist, :podcast, user: user)
       podcast_album = create(:album, artist: podcast_artist, user: user)
-      tracks = (1..7).map do |i|
+      (1..7).map do |i|
         create(:track, title: "Episode #{i}", album: podcast_album, artist: podcast_artist, user: user,
           created_at: i.days.ago)
       end

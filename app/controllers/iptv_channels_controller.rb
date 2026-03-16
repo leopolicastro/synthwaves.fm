@@ -6,14 +6,14 @@ class IPTVChannelsController < ApplicationController
     @is_favorited = Current.user.favorites.exists?(favorable: @channel)
 
     programme_ids = [@now_playing, *@up_next].compact.map(&:id)
-    if programme_ids.any?
-      @recording_by_programme_id = Current.user.recordings
+    @recording_by_programme_id = if programme_ids.any?
+      Current.user.recordings
         .where(epg_programme_id: programme_ids)
         .where.not(status: %w[failed cancelled])
         .pluck(:epg_programme_id, :status)
         .to_h
     else
-      @recording_by_programme_id = {}
+      {}
     end
   end
 

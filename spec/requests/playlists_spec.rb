@@ -15,7 +15,7 @@ RSpec.describe "Playlists", type: :request do
       create(:playlist, user: user, name: "Chill Vibes")
       create(:playlist, user: user, name: "Rock Anthems")
 
-      get playlists_path, params: { q: "Chill" }
+      get playlists_path, params: {q: "Chill"}
 
       expect(response.body).to include("Chill Vibes")
       expect(response.body).not_to include("Rock Anthems")
@@ -31,10 +31,10 @@ RSpec.describe "Playlists", type: :request do
     end
 
     it "sorts playlists by specified column and direction" do
-      old_playlist = create(:playlist, user: user, name: "Old", created_at: 1.week.ago)
-      new_playlist = create(:playlist, user: user, name: "New", created_at: 1.hour.ago)
+      create(:playlist, user: user, name: "Old", created_at: 1.week.ago)
+      create(:playlist, user: user, name: "New", created_at: 1.hour.ago)
 
-      get playlists_path, params: { sort: "created_at", direction: "desc" }
+      get playlists_path, params: {sort: "created_at", direction: "desc"}
 
       expect(response.body.index("New")).to be < response.body.index("Old")
     end
@@ -115,7 +115,7 @@ RSpec.describe "Playlists", type: :request do
       track2 = create(:track)
 
       expect {
-        post playlists_path, params: { playlist: { name: "Bulk Playlist" }, track_ids: [track1.id, track2.id] }
+        post playlists_path, params: {playlist: {name: "Bulk Playlist"}, track_ids: [track1.id, track2.id]}
       }.to change(Playlist, :count).by(1)
 
       playlist = Playlist.last
@@ -126,7 +126,7 @@ RSpec.describe "Playlists", type: :request do
 
     it "creates a playlist without tracks when track_ids absent" do
       expect {
-        post playlists_path, params: { playlist: { name: "Empty Playlist" } }
+        post playlists_path, params: {playlist: {name: "Empty Playlist"}}
       }.to change(Playlist, :count).by(1)
 
       expect(Playlist.last.tracks).to be_empty

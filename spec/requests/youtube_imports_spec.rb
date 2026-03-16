@@ -81,7 +81,7 @@ RSpec.describe "YoutubeImports", type: :request do
   describe "POST /youtube_imports" do
     context "with audio media type (default)" do
       it "enqueues import job with download flag for playlists" do
-        post youtube_imports_path, params: { youtube_url: "https://www.youtube.com/playlist?list=PLtest123" }
+        post youtube_imports_path, params: {youtube_url: "https://www.youtube.com/playlist?list=PLtest123"}
 
         expect(YoutubeImportJob).to have_been_enqueued.with(
           "https://www.youtube.com/playlist?list=PLtest123",
@@ -114,7 +114,7 @@ RSpec.describe "YoutubeImports", type: :request do
           track = create(:track, album: album, youtube_video_id: "R-FxmoVM7X4")
           allow(YoutubeVideoImportService).to receive(:call).and_return(track)
 
-          post youtube_imports_path, params: { youtube_url: video_url }
+          post youtube_imports_path, params: {youtube_url: video_url}
 
           expect(YoutubeVideoImportService).to have_received(:call).with(video_url, category: "music", api_key: "test_key", user: user)
           expect(MediaDownloadJob).to have_been_enqueued.with(track.id, video_url, user_id: user.id)
@@ -126,7 +126,7 @@ RSpec.describe "YoutubeImports", type: :request do
           track = create(:track, album: album, youtube_video_id: "R-FxmoVM7X4")
           allow(YoutubeVideoImportService).to receive(:call).and_return(track)
 
-          post youtube_imports_path, params: { youtube_url: video_url, category: "podcast" }
+          post youtube_imports_path, params: {youtube_url: video_url, category: "podcast"}
 
           expect(YoutubeVideoImportService).to have_received(:call).with(video_url, category: "podcast", api_key: "test_key", user: user)
         end
@@ -135,14 +135,14 @@ RSpec.describe "YoutubeImports", type: :request do
           allow(YoutubeVideoImportService).to receive(:call)
             .and_raise(YoutubeVideoImportService::Error, "Video not found")
 
-          post youtube_imports_path, params: { youtube_url: video_url }
+          post youtube_imports_path, params: {youtube_url: video_url}
 
           expect(response).to have_http_status(:unprocessable_content)
         end
       end
 
       it "rejects invalid URLs without enqueuing a job" do
-        post youtube_imports_path, params: { youtube_url: "https://example.com" }
+        post youtube_imports_path, params: {youtube_url: "https://example.com"}
 
         expect(YoutubeImportJob).not_to have_been_enqueued
         expect(response).to have_http_status(:unprocessable_content)
@@ -152,7 +152,7 @@ RSpec.describe "YoutubeImports", type: :request do
         it "treats it as a playlist import" do
           url = "https://www.youtube.com/watch?v=R-FxmoVM7X4&list=PLtest123"
 
-          post youtube_imports_path, params: { youtube_url: url }
+          post youtube_imports_path, params: {youtube_url: url}
 
           expect(YoutubeImportJob).to have_been_enqueued.with(
             url, category: "music", download: true, user_id: user.id
@@ -163,7 +163,7 @@ RSpec.describe "YoutubeImports", type: :request do
 
     context "with video media type" do
       it "creates a Video record and enqueues VideoDownloadJob for a single video" do
-        details = { video_id: "dQw4w9WgXcQ", title: "Test Video", channel_name: "Test Channel", duration: 120.0 }
+        details = {video_id: "dQw4w9WgXcQ", title: "Test Video", channel_name: "Test Channel", duration: 120.0}
         api = instance_double(YoutubeAPIService)
         allow(YoutubeAPIService).to receive(:new).and_return(api)
         allow(api).to receive(:fetch_video_details).with(["dQw4w9WgXcQ"]).and_return([details])

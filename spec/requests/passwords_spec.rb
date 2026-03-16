@@ -13,14 +13,14 @@ RSpec.describe "Passwords", type: :request do
       user = create(:user, email_address: "reset@example.com")
 
       expect {
-        post passwords_path, params: { email_address: "reset@example.com" }
+        post passwords_path, params: {email_address: "reset@example.com"}
       }.to have_enqueued_mail(PasswordsMailer, :reset).with(user)
 
       expect(response).to redirect_to(new_session_path)
     end
 
     it "redirects without error for non-existent email" do
-      post passwords_path, params: { email_address: "nobody@example.com" }
+      post passwords_path, params: {email_address: "nobody@example.com"}
 
       expect(response).to redirect_to(new_session_path)
       follow_redirect!

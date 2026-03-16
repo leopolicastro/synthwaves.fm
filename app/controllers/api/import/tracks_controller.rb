@@ -5,7 +5,7 @@ class API::Import::TracksController < API::Import::BaseController
     elsif params[:audio_file].present?
       create_from_multipart
     else
-      render json: { error: "audio_file or signed_blob_id is required" }, status: :unprocessable_entity
+      render json: {error: "audio_file or signed_blob_id is required"}, status: :unprocessable_entity
     end
   end
 
@@ -41,7 +41,7 @@ class API::Import::TracksController < API::Import::BaseController
     }
 
     if params[:cover_art].present? && params[:cover_art_mime_type].present?
-      metadata[:cover_art] = { data: Base64.decode64(params[:cover_art]), mime_type: params[:cover_art_mime_type] }
+      metadata[:cover_art] = {data: Base64.decode64(params[:cover_art]), mime_type: params[:cover_art_mime_type]}
     end
 
     create_track(
@@ -97,7 +97,7 @@ class API::Import::TracksController < API::Import::BaseController
     begin
       yield track
     rescue => e
-      render json: { error: "Upload failed: #{e.message}" }, status: :service_unavailable
+      render json: {error: "Upload failed: #{e.message}"}, status: :service_unavailable
       return
     end
 
@@ -110,7 +110,7 @@ class API::Import::TracksController < API::Import::BaseController
         created: true
       }, status: :created
     else
-      render json: { error: track.errors.full_messages.join(", ") }, status: :unprocessable_entity
+      render json: {error: track.errors.full_messages.join(", ")}, status: :unprocessable_entity
     end
   end
 

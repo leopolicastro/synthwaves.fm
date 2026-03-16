@@ -15,7 +15,7 @@ RSpec.describe "InternetRadioStations", type: :request do
     end
 
     it "lists active stations" do
-      station = create(:internet_radio_station, name: "Cool Jazz FM")
+      create(:internet_radio_station, name: "Cool Jazz FM")
       create(:internet_radio_station, :inactive, name: "Dead Station")
 
       get internet_radio_stations_path

@@ -1,6 +1,7 @@
 class RadioStreamsController < ApplicationController
   include ActionController::Live
   include FeatureFlagged
+
   require_feature :youtube_radio
 
   def show
@@ -32,5 +33,4 @@ class RadioStreamsController < ApplicationController
   ensure
     response.stream.close
   end
-
 end

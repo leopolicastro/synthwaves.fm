@@ -1,14 +1,13 @@
 class RecordingsController < ApplicationController
-
   def index
     @query = params[:q]
     @status = params[:status]
     @sort = sort_column(Recording, default: "created_at")
     @direction = sort_direction(default: "desc")
     scope = Current.user.recordings.includes(:iptv_channel)
-              .search(@query)
-              .by_status(@status)
-              .order(@sort => @direction)
+      .search(@query)
+      .by_status(@status)
+      .order(@sort => @direction)
     @pagy, @recordings = pagy(:offset, scope)
   end
 
@@ -83,5 +82,4 @@ class RecordingsController < ApplicationController
 
     redirect_to rails_blob_path(recording.file, disposition: "attachment", filename: recording.filename), allow_other_host: true
   end
-
 end

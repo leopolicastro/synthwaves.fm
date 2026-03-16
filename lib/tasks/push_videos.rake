@@ -39,7 +39,7 @@ namespace :videos do
 
     video_files.each_with_index do |video_file, index|
       temp_file = nil
-      label = video_files.size > 1 ? "[#{index + 1}/#{video_files.size}] " : ""
+      label = (video_files.size > 1) ? "[#{index + 1}/#{video_files.size}] " : ""
 
       begin
         # Re-authenticate if token is older than 50 minutes
@@ -53,7 +53,7 @@ namespace :videos do
         folder_name = ENV["FOLDER"] || begin
           rel = Pathname.new(video_file).relative_path_from(Pathname.new(video_path)).to_s
           parts = rel.split("/")
-          parts.length > 1 ? parts.first : nil
+          (parts.length > 1) ? parts.first : nil
         end
 
         # 1. Probe input
@@ -209,7 +209,7 @@ def create_video_record(remote_url, token, signed_blob_id, title, folder_name)
   http.open_timeout = 15
   http.read_timeout = 30
 
-  body = { signed_blob_id: signed_blob_id, title: title }
+  body = {signed_blob_id: signed_blob_id, title: title}
   body[:folder_name] = folder_name if folder_name
 
   request = Net::HTTP::Post.new(uri.request_uri)

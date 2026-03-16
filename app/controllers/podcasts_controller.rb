@@ -1,6 +1,6 @@
 class PodcastsController < ApplicationController
   def index
-    @artists = Artist.podcast.includes(albums: { cover_image_attachment: :blob }).order(:name)
+    @artists = Artist.podcast.includes(albums: {cover_image_attachment: :blob}).order(:name)
   end
 
   def show

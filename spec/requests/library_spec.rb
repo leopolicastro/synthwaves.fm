@@ -72,7 +72,7 @@ RSpec.describe "Library", type: :request do
       end
 
       it "shows existing playlists" do
-        playlist = create(:playlist, user: user, name: "My Jams")
+        create(:playlist, user: user, name: "My Jams")
         get library_path
         expect(response.body).to include("My Jams")
       end
@@ -100,7 +100,7 @@ RSpec.describe "Library", type: :request do
     context "Radio Stations section" do
       it "appears when feature flag is enabled and stations exist" do
         Flipper.enable(:youtube_radio, user)
-        station = create(:radio_station, user: user, name: "Lofi Beats")
+        create(:radio_station, user: user, name: "Lofi Beats")
 
         get library_path
         expect(response.body).to include("Radio Stations")
@@ -134,7 +134,7 @@ RSpec.describe "Library", type: :request do
 
     context "Podcasts section" do
       it "appears when podcast artists exist" do
-        podcast_artist = create(:artist, :podcast, name: "Tech Talk", user: user)
+        create(:artist, :podcast, name: "Tech Talk", user: user)
 
         get library_path
         expect(response.body).to include("Podcasts")

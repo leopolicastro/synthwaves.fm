@@ -1,5 +1,6 @@
 class RadioStationsController < ApplicationController
   include FeatureFlagged
+
   require_feature :youtube_radio
 
   def index

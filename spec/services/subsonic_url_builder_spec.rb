@@ -26,7 +26,7 @@ RSpec.describe SubsonicUrlBuilder do
 
       expect(params["u"]).to eq(user.email_address)
       expect(params["s"]).to be_present
-      expect(params["t"]).to eq(Digest::MD5.hexdigest("#{user.subsonic_password}#{params['s']}"))
+      expect(params["t"]).to eq(Digest::MD5.hexdigest("#{user.subsonic_password}#{params["s"]}"))
     end
 
     it "includes API version, client, and format" do
@@ -77,7 +77,7 @@ RSpec.describe SubsonicUrlBuilder do
       params = Rack::Utils.parse_query(URI.parse(url).query)
 
       expect(params["u"]).to eq(user.email_address)
-      expect(params["t"]).to eq(Digest::MD5.hexdigest("#{user.subsonic_password}#{params['s']}"))
+      expect(params["t"]).to eq(Digest::MD5.hexdigest("#{user.subsonic_password}#{params["s"]}"))
     end
   end
 end

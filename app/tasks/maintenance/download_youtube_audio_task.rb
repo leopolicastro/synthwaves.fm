@@ -2,8 +2,8 @@ module Maintenance
   class DownloadYoutubeAudioTask < MaintenanceTasks::Task
     def collection
       Track.where.not(youtube_video_id: [nil, ""])
-           .left_joins(:audio_file_attachment)
-           .where(active_storage_attachments: { id: nil })
+        .left_joins(:audio_file_attachment)
+        .where(active_storage_attachments: {id: nil})
     end
 
     def count

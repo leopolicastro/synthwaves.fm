@@ -18,7 +18,7 @@ RSpec.describe "Music", type: :request do
     it "renders the artists tab" do
       user = create(:user)
       login_user(user)
-      artist = create(:artist, name: "Test Artist", category: :music, user: user)
+      create(:artist, name: "Test Artist", category: :music, user: user)
 
       get music_path(tab: "artists")
 
@@ -30,7 +30,7 @@ RSpec.describe "Music", type: :request do
       user = create(:user)
       login_user(user)
       artist = create(:artist, category: :music, user: user)
-      album = create(:album, title: "Test Album", artist: artist)
+      create(:album, title: "Test Album", artist: artist)
 
       get music_path(tab: "albums")
 
@@ -43,7 +43,7 @@ RSpec.describe "Music", type: :request do
       login_user(user)
       artist = create(:artist, category: :music, user: user)
       album = create(:album, artist: artist)
-      track = create(:track, title: "Test Track", artist: artist, album: album)
+      create(:track, title: "Test Track", artist: artist, album: album)
 
       get music_path(tab: "tracks")
 
@@ -62,7 +62,7 @@ RSpec.describe "Music", type: :request do
     it "renders the playlists tab" do
       user = create(:user)
       login_user(user)
-      playlist = create(:playlist, name: "My Chill Mix", user: user)
+      create(:playlist, name: "My Chill Mix", user: user)
 
       get music_path(tab: "playlists")
 

@@ -15,7 +15,7 @@ RSpec.describe "RadioStations", type: :request do
     end
 
     it "displays radio stations" do
-      station = create(:radio_station, user: user, name: "Lo-Fi Beats")
+      create(:radio_station, user: user, name: "Lo-Fi Beats")
       get radio_stations_path
       expect(response.body).to include("Lo-Fi Beats")
     end
@@ -34,15 +34,15 @@ RSpec.describe "RadioStations", type: :request do
         stub_request(:get, %r{youtube\.com/oembed})
           .to_return(
             status: 200,
-            headers: { "Content-Type" => "application/json" },
-            body: { title: "Lo-Fi Beats", thumbnail_url: "https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg" }.to_json
+            headers: {"Content-Type" => "application/json"},
+            body: {title: "Lo-Fi Beats", thumbnail_url: "https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg"}.to_json
           )
 
         expect {
-          post radio_stations_path, params: { radio_station: {
+          post radio_stations_path, params: {radio_station: {
             source_type: "youtube",
             youtube_url: "https://www.youtube.com/watch?v=jfKfPfyJRdk"
-          } }
+          }}
         }.to change(RadioStation, :count).by(1)
 
         station = RadioStation.last
@@ -56,16 +56,16 @@ RSpec.describe "RadioStations", type: :request do
         stub_request(:get, %r{youtube\.com/oembed})
           .to_return(
             status: 200,
-            headers: { "Content-Type" => "application/json" },
-            body: { title: "Lo-Fi Beats", thumbnail_url: "https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg" }.to_json
+            headers: {"Content-Type" => "application/json"},
+            body: {title: "Lo-Fi Beats", thumbnail_url: "https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg"}.to_json
           )
 
         expect {
-          post radio_stations_path, params: { radio_station: {
+          post radio_stations_path, params: {radio_station: {
             source_type: "youtube",
             youtube_url: "https://www.youtube.com/watch?v=jfKfPfyJRdk",
             name: "My Radio"
-          } }
+          }}
         }.to change(RadioStation, :count).by(1)
 
         station = RadioStation.last
@@ -74,11 +74,11 @@ RSpec.describe "RadioStations", type: :request do
       end
 
       it "rejects invalid URL" do
-        post radio_stations_path, params: { radio_station: {
+        post radio_stations_path, params: {radio_station: {
           source_type: "youtube",
           youtube_url: "https://example.com/not-youtube",
           name: "Bad Station"
-        } }
+        }}
         expect(response).to have_http_status(:unprocessable_content)
       end
     end
@@ -88,16 +88,16 @@ RSpec.describe "RadioStations", type: :request do
         stub_request(:get, "https://radio.example.com/stream")
           .to_return(
             status: 200,
-            headers: { "Content-Type" => "audio/mpeg" },
+            headers: {"Content-Type" => "audio/mpeg"},
             body: "fake audio data"
           )
 
         expect {
-          post radio_stations_path, params: { radio_station: {
+          post radio_stations_path, params: {radio_station: {
             source_type: "stream",
             stream_url: "https://radio.example.com/stream",
             name: "My Stream"
-          } }
+          }}
         }.to change(RadioStation, :count).by(1)
 
         station = RadioStation.last
@@ -118,7 +118,7 @@ RSpec.describe "RadioStations", type: :request do
         stub_request(:get, "https://example.com/station.pls")
           .to_return(
             status: 200,
-            headers: { "Content-Type" => "audio/x-scpls" },
+            headers: {"Content-Type" => "audio/x-scpls"},
             body: pls_body
           )
 
@@ -126,10 +126,10 @@ RSpec.describe "RadioStations", type: :request do
           .to_return(status: 200)
 
         expect {
-          post radio_stations_path, params: { radio_station: {
+          post radio_stations_path, params: {radio_station: {
             source_type: "stream",
             stream_url: "https://example.com/station.pls"
-          } }
+          }}
         }.to change(RadioStation, :count).by(1)
 
         station = RadioStation.last
@@ -142,20 +142,20 @@ RSpec.describe "RadioStations", type: :request do
         stub_request(:get, "https://example.com/broken")
           .to_raise(HTTP::ConnectionError.new("Connection refused"))
 
-        post radio_stations_path, params: { radio_station: {
+        post radio_stations_path, params: {radio_station: {
           source_type: "stream",
           stream_url: "https://example.com/broken",
           name: "Broken Stream"
-        } }
+        }}
 
         expect(response).to have_http_status(:unprocessable_content)
       end
 
       it "rejects a stream station without a stream_url" do
-        post radio_stations_path, params: { radio_station: {
+        post radio_stations_path, params: {radio_station: {
           source_type: "stream",
           name: "No URL"
-        } }
+        }}
 
         expect(response).to have_http_status(:unprocessable_content)
       end

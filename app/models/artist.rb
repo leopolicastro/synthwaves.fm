@@ -6,7 +6,7 @@ class Artist < ApplicationRecord
   has_many :tracks, dependent: :destroy
   has_many :favorites, as: :favorable, dependent: :destroy
 
-  enum :category, { music: "music", podcast: "podcast" }, default: "music"
+  enum :category, {music: "music", podcast: "podcast"}, default: "music"
 
   CATEGORIES = categories.keys
 
@@ -15,7 +15,7 @@ class Artist < ApplicationRecord
     "created_at" => "Recently Added"
   }.freeze
 
-  validates :name, presence: true, uniqueness: { scope: :user_id }
+  validates :name, presence: true, uniqueness: {scope: :user_id}
 
   after_update_commit :reindex_tracks_search, if: :saved_change_to_name?
 
@@ -24,5 +24,4 @@ class Artist < ApplicationRecord
   }
 
   private
-
 end

@@ -8,7 +8,7 @@ RSpec.describe "Subsonic Search API", type: :request do
     it "returns matching results" do
       artist = create(:artist, name: "The Beatles", user: user)
       album = create(:album, title: "Abbey Road", artist: artist, user: user)
-      track = create(:track, title: "Come Together", album: album, artist: artist, user: user)
+      create(:track, title: "Come Together", album: album, artist: artist, user: user)
 
       get "/api/rest/search3.view", params: auth_params.merge(query: "Beatles")
       json = JSON.parse(response.body)
@@ -18,8 +18,8 @@ RSpec.describe "Subsonic Search API", type: :request do
     it "excludes YouTube tracks from song results" do
       artist = create(:artist, name: "Test Artist", user: user)
       album = create(:album, title: "Test Album", artist: artist, user: user)
-      streamable = create(:track, title: "Test Streamable", album: album, artist: artist, user: user)
-      youtube = create(:track, :youtube, title: "Test YouTube", album: album, artist: artist, user: user)
+      create(:track, title: "Test Streamable", album: album, artist: artist, user: user)
+      create(:track, :youtube, title: "Test YouTube", album: album, artist: artist, user: user)
 
       get "/api/rest/search3.view", params: auth_params.merge(query: "Test")
       json = JSON.parse(response.body)

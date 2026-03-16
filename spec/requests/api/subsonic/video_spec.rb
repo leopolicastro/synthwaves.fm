@@ -6,8 +6,8 @@ RSpec.describe "Subsonic Video API", type: :request do
 
   describe "getVideos" do
     it "returns all ready videos" do
-      video1 = create(:video, user: user, title: "Video One")
-      video2 = create(:video, user: user, title: "Video Two")
+      create(:video, user: user, title: "Video One")
+      create(:video, user: user, title: "Video Two")
       create(:video, user: user, title: "Processing", status: "processing")
 
       get "/api/rest/getVideos", params: auth_params
@@ -275,8 +275,8 @@ RSpec.describe "Subsonic Video API", type: :request do
   describe "getFolder" do
     it "returns folder with its videos" do
       folder = create(:folder, user: user, name: "My Series")
-      video1 = create(:video, user: user, folder: folder, title: "Ep 1", season_number: 1, episode_number: 1)
-      video2 = create(:video, user: user, folder: folder, title: "Ep 2", season_number: 1, episode_number: 2)
+      create(:video, user: user, folder: folder, title: "Ep 1", season_number: 1, episode_number: 1)
+      create(:video, user: user, folder: folder, title: "Ep 2", season_number: 1, episode_number: 2)
       create(:video, :processing, user: user, folder: folder, title: "Ep 3")
 
       get "/api/rest/getFolder", params: auth_params.merge(id: folder.id)

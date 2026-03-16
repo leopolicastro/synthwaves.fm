@@ -43,7 +43,7 @@ module IPTVChannelsHelper
         streamUrl: channel.stream_url,
         logoUrl: channel.logo_url,
         programmes: programmes.map { |p|
-          { title: p.title, subtitle: p.subtitle, startsAt: p.starts_at.to_i, endsAt: p.ends_at.to_i }
+          {title: p.title, subtitle: p.subtitle, startsAt: p.starts_at.to_i, endsAt: p.ends_at.to_i}
         }
       }
     end.to_json

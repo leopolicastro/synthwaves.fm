@@ -1,5 +1,6 @@
 class InternetRadioStationsController < ApplicationController
   include FeatureFlagged
+
   require_feature :internet_radio
 
   def index

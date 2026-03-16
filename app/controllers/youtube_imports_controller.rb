@@ -1,5 +1,6 @@
 class YoutubeImportsController < ApplicationController
   include FeatureFlagged
+
   require_feature :youtube_import
 
   def new
@@ -75,5 +76,4 @@ class YoutubeImportsController < ApplicationController
     VideoDownloadJob.perform_later(video.id, url, user_id: Current.user.id)
     redirect_to video_path(video), notice: "Video import started! It will be ready once the download completes."
   end
-
 end

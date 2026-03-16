@@ -42,7 +42,7 @@ RSpec.describe "Subsonic Browsing API", type: :request do
   describe "GET /api/rest/getArtist.view" do
     it "returns artist with albums" do
       artist = create(:artist, user: user)
-      album = create(:album, artist: artist, user: user)
+      create(:album, artist: artist, user: user)
 
       get "/api/rest/getArtist.view", params: auth_params.merge(id: artist.id)
       json = JSON.parse(response.body)
@@ -59,7 +59,7 @@ RSpec.describe "Subsonic Browsing API", type: :request do
   describe "GET /api/rest/getAlbum.view" do
     it "returns album with tracks" do
       album = create(:album, user: user)
-      track = create(:track, album: album, artist: album.artist, user: user)
+      create(:track, album: album, artist: album.artist, user: user)
 
       get "/api/rest/getAlbum.view", params: auth_params.merge(id: album.id)
       json = JSON.parse(response.body)
@@ -69,8 +69,8 @@ RSpec.describe "Subsonic Browsing API", type: :request do
 
     it "excludes YouTube tracks from song list" do
       album = create(:album, user: user)
-      streamable = create(:track, album: album, artist: album.artist, title: "Streamable", user: user)
-      youtube = create(:track, :youtube, album: album, artist: album.artist, title: "YouTube Only", user: user)
+      create(:track, album: album, artist: album.artist, title: "Streamable", user: user)
+      create(:track, :youtube, album: album, artist: album.artist, title: "YouTube Only", user: user)
 
       get "/api/rest/getAlbum.view", params: auth_params.merge(id: album.id)
       json = JSON.parse(response.body)

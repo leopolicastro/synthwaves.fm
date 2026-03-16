@@ -19,7 +19,7 @@ RSpec.describe StreamUrlResolver do
       stub_request(:get, "https://example.com/station.pls")
         .to_return(
           status: 200,
-          headers: { "Content-Type" => "audio/x-scpls" },
+          headers: {"Content-Type" => "audio/x-scpls"},
           body: pls_body
         )
 
@@ -40,7 +40,7 @@ RSpec.describe StreamUrlResolver do
       stub_request(:get, "https://example.com/listen.pls")
         .to_return(
           status: 200,
-          headers: { "Content-Type" => "text/plain" },
+          headers: {"Content-Type" => "text/plain"},
           body: pls_body
         )
 
@@ -60,7 +60,7 @@ RSpec.describe StreamUrlResolver do
       stub_request(:get, "https://example.com/station.m3u")
         .to_return(
           status: 200,
-          headers: { "Content-Type" => "audio/x-mpegurl" },
+          headers: {"Content-Type" => "audio/x-mpegurl"},
           body: m3u_body
         )
 
@@ -80,7 +80,7 @@ RSpec.describe StreamUrlResolver do
       stub_request(:get, "https://example.com/listen.m3u")
         .to_return(
           status: 200,
-          headers: { "Content-Type" => "audio/mpegurl" },
+          headers: {"Content-Type" => "audio/mpegurl"},
           body: m3u_body
         )
 
@@ -95,7 +95,7 @@ RSpec.describe StreamUrlResolver do
       stub_request(:get, "https://radio.example.com/stream")
         .to_return(
           status: 200,
-          headers: { "Content-Type" => "audio/mpeg" },
+          headers: {"Content-Type" => "audio/mpeg"},
           body: "fake audio data"
         )
 
@@ -117,14 +117,14 @@ RSpec.describe StreamUrlResolver do
       stub_request(:get, "https://example.com/redirect.pls")
         .to_return(
           status: 200,
-          headers: { "Content-Type" => "audio/x-scpls" },
+          headers: {"Content-Type" => "audio/x-scpls"},
           body: pls_body
         )
 
       stub_request(:head, "http://radio.example.com/stream")
         .to_return(
           status: 301,
-          headers: { "Location" => "https://radio.example.com/stream" }
+          headers: {"Location" => "https://radio.example.com/stream"}
         )
 
       result = described_class.call("https://example.com/redirect.pls")
@@ -147,7 +147,7 @@ RSpec.describe StreamUrlResolver do
       stub_request(:get, "https://example.com/empty.pls")
         .to_return(
           status: 200,
-          headers: { "Content-Type" => "audio/x-scpls" },
+          headers: {"Content-Type" => "audio/x-scpls"},
           body: "[playlist]\nNumberOfEntries=0\n"
         )
 
@@ -161,7 +161,7 @@ RSpec.describe StreamUrlResolver do
       stub_request(:get, "https://example.com/empty.m3u")
         .to_return(
           status: 200,
-          headers: { "Content-Type" => "audio/x-mpegurl" },
+          headers: {"Content-Type" => "audio/x-mpegurl"},
           body: "#EXTM3U\n"
         )
 

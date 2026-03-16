@@ -1,6 +1,7 @@
 class InternetRadioStreamsController < ApplicationController
   include ActionController::Live
   include FeatureFlagged
+
   require_feature :internet_radio
 
   def show
@@ -33,5 +34,4 @@ class InternetRadioStreamsController < ApplicationController
   ensure
     response.stream.close
   end
-
 end

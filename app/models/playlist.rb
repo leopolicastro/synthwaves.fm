@@ -12,11 +12,10 @@ class Playlist < ApplicationRecord
   def cover_albums(limit = 4)
     Album.where(id:
       playlist_tracks
-        .joins(track: { album: :cover_image_attachment })
+        .joins(track: {album: :cover_image_attachment})
         .order(:position)
         .select("DISTINCT albums.id")
-        .limit(limit)
-    ).includes(cover_image_attachment: :blob)
+        .limit(limit)).includes(cover_image_attachment: :blob)
   end
 
   def self.preload_cover_albums(playlists, limit: 4)
@@ -26,7 +25,7 @@ class Playlist < ApplicationRecord
     # Load playlist_tracks with album ids, ordered by position
     rows = PlaylistTrack
       .where(playlist_id: playlist_ids)
-      .joins(track: { album: :cover_image_attachment })
+      .joins(track: {album: :cover_image_attachment})
       .order(:playlist_id, :position)
       .pluck(:playlist_id, "albums.id")
 

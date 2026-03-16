@@ -36,7 +36,7 @@ class Track < ApplicationRecord
 
   scope :search, ->(query) {
     if query.present?
-      sanitized = query.gsub(/["\*\(\)]/, "")
+      sanitized = query.gsub(/["*()]/, "")
       fts_query = sanitized.split.map { |term| "\"#{term}\"*" }.join(" ")
       where("tracks.id IN (SELECT CAST(track_id AS INTEGER) FROM tracks_search WHERE tracks_search MATCH ?)", fts_query)
     end

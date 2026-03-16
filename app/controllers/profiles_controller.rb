@@ -13,12 +13,12 @@ class ProfilesController < ApplicationController
     if @user.update(user_params)
       respond_to do |format|
         format.html { redirect_to profile_path, notice: "Profile updated successfully." }
-        format.json { render json: { status: "ok", theme: @user.theme } }
+        format.json { render json: {status: "ok", theme: @user.theme} }
       end
     else
       respond_to do |format|
         format.html { render :edit, status: :unprocessable_content }
-        format.json { render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity }
+        format.json { render json: {errors: @user.errors.full_messages}, status: :unprocessable_entity }
       end
     end
   end

@@ -5,7 +5,7 @@ class FavoritesController < ApplicationController
 
   def create
     favorable = find_favorable
-    favorite = Current.user.favorites.find_or_create_by(favorable: favorable)
+    Current.user.favorites.find_or_create_by(favorable: favorable)
 
     respond_to do |format|
       format.turbo_stream { render turbo_stream: turbo_stream.replace("favorite_#{favorable.class.name.downcase}_#{favorable.id}", partial: "favorites/button", locals: {favorable: favorable, favorited: true}) }

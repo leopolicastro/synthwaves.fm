@@ -43,7 +43,7 @@ class SearchService
   def search_albums(pattern)
     return [] unless @types.include?(:album)
     scope = base_scope(Album).includes(:artist).where("albums.title LIKE ?", pattern)
-    scope = scope.joins(:artist).where(artists: { category: @category }) if @category.present?
+    scope = scope.joins(:artist).where(artists: {category: @category}) if @category.present?
     scope = scope.where(genre: @genre) if @genre.present?
     scope = scope.where("year >= ?", @year_from) if @year_from
     scope = scope.where("year <= ?", @year_to) if @year_to
@@ -54,7 +54,7 @@ class SearchService
   def search_tracks(pattern)
     return [] unless @types.include?(:track)
     scope = base_scope(Track).includes(:artist, :album).where("tracks.title LIKE ?", pattern)
-    scope = scope.joins(:artist).where(artists: { category: @category }) if @category.present?
+    scope = scope.joins(:artist).where(artists: {category: @category}) if @category.present?
     if @genre.present? || @year_from || @year_to
       scope = scope.joins(:album)
       scope = scope.where(albums: {genre: @genre}) if @genre.present?

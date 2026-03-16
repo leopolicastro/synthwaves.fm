@@ -303,7 +303,7 @@ RSpec.describe "Albums", type: :request do
     it "enqueues MediaDownloadJob for YouTube tracks without audio" do
       album = create(:album, artist: create(:artist, user: user))
       yt_track = create(:track, album: album, youtube_video_id: "abc123")
-      local_track = create(:track, album: album)
+      create(:track, album: album)
 
       expect {
         post download_audio_album_path(album)

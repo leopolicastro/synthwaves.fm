@@ -13,7 +13,7 @@ class LibraryController < ApplicationController
 
     @favorite_tracks = Current.user.favorites
       .where(favorable_type: "Track")
-      .includes(favorable: [ :artist, :album ])
+      .includes(favorable: [:artist, :album])
       .order(created_at: :desc)
       .limit(10)
 
@@ -52,7 +52,7 @@ class LibraryController < ApplicationController
 
   def recently_played_albums
     Current.user.albums.joins(tracks: :play_histories)
-      .where(play_histories: { user_id: Current.user.id })
+      .where(play_histories: {user_id: Current.user.id})
       .select("albums.*, MAX(play_histories.played_at) AS last_played_at")
       .group("albums.id")
       .order("last_played_at DESC")

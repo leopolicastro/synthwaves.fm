@@ -23,7 +23,7 @@ class DatabaseBackupService
       key = upload(gz_path)
       prune_old_backups
 
-      { key: key, size: File.size(gz_path) }
+      {key: key, size: File.size(gz_path)}
     end
   end
 

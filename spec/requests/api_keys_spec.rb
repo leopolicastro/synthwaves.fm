@@ -8,7 +8,7 @@ RSpec.describe "APIKeys", type: :request do
 
   describe "GET /api_keys" do
     it "lists the current user's API keys" do
-      key = create(:api_key, user: user, name: "My Key")
+      create(:api_key, user: user, name: "My Key")
       create(:api_key, user: other_user, name: "Other Key")
 
       get api_keys_path
@@ -29,7 +29,7 @@ RSpec.describe "APIKeys", type: :request do
   describe "POST /api_keys" do
     it "creates a new API key and shows the secret" do
       expect {
-        post api_keys_path, params: { api_key: { name: "Production" } }
+        post api_keys_path, params: {api_key: {name: "Production"}}
       }.to change(APIKey, :count).by(1)
 
       expect(response).to redirect_to(api_keys_path)
@@ -38,7 +38,7 @@ RSpec.describe "APIKeys", type: :request do
     end
 
     it "assigns the key to the current user" do
-      post api_keys_path, params: { api_key: { name: "My Key" } }
+      post api_keys_path, params: {api_key: {name: "My Key"}}
       expect(APIKey.last.user).to eq(user)
     end
   end

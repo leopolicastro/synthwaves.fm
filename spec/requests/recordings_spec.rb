@@ -38,7 +38,7 @@ RSpec.describe "Recordings", type: :request do
       match = create_recording_for(user, title: "Evening News")
       no_match = create_recording_for(user, title: "Morning Show")
 
-      get recordings_path, params: { q: "News" }
+      get recordings_path, params: {q: "News"}
 
       expect(response.body).to include("recording_#{match.id}")
       expect(response.body).not_to include("recording_#{no_match.id}")
@@ -49,14 +49,14 @@ RSpec.describe "Recordings", type: :request do
       match = create_recording_for(user, iptv_channel: channel)
       no_match = create_recording_for(user, title: "Other Show")
 
-      get recordings_path, params: { q: "BBC" }
+      get recordings_path, params: {q: "BBC"}
 
       expect(response.body).to include("recording_#{match.id}")
       expect(response.body).not_to include("recording_#{no_match.id}")
     end
 
     it "shows empty state with query context" do
-      get recordings_path, params: { q: "nonexistent" }
+      get recordings_path, params: {q: "nonexistent"}
 
       expect(response.body).to include("No recordings found")
       expect(response.body).to include("nonexistent")
@@ -66,7 +66,7 @@ RSpec.describe "Recordings", type: :request do
       scheduled = create_recording_for(user, status: "scheduled")
       ready = create_recording_for(user, **attributes_for(:recording, :ready))
 
-      get recordings_path, params: { status: "scheduled" }
+      get recordings_path, params: {status: "scheduled"}
 
       expect(response.body).to include("recording_#{scheduled.id}")
       expect(response.body).not_to include("recording_#{ready.id}")
@@ -76,7 +76,7 @@ RSpec.describe "Recordings", type: :request do
       bravo = create_recording_for(user, title: "Bravo Show")
       alpha = create_recording_for(user, title: "Alpha Show")
 
-      get recordings_path, params: { sort: "title", direction: "asc" }
+      get recordings_path, params: {sort: "title", direction: "asc"}
 
       expect(response.body.index("recording_#{alpha.id}")).to be < response.body.index("recording_#{bravo.id}")
     end
@@ -95,7 +95,6 @@ RSpec.describe "Recordings", type: :request do
       get recordings_path
       expect(response).to redirect_to(new_session_path)
     end
-
   end
 
   describe "GET /recordings/:id" do

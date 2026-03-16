@@ -3,8 +3,8 @@ require "rails_helper"
 RSpec.describe "API Import Videos", type: :request do
   let(:user) { create(:user) }
   let(:api_key) { create(:api_key, user: user) }
-  let(:token) { JWTService.encode({ user_id: user.id, api_key_id: api_key.id }) }
-  let(:auth_headers) { { "Authorization" => "Bearer #{token}" } }
+  let(:token) { JWTService.encode({user_id: user.id, api_key_id: api_key.id}) }
+  let(:auth_headers) { {"Authorization" => "Bearer #{token}"} }
 
   describe "POST /api/import/videos" do
     let(:blob) do
@@ -18,7 +18,7 @@ RSpec.describe "API Import Videos", type: :request do
     it "creates a video from a signed blob ID" do
       expect {
         post api_import_videos_path,
-          params: { signed_blob_id: blob.signed_id, title: "My Video" },
+          params: {signed_blob_id: blob.signed_id, title: "My Video"},
           headers: auth_headers
       }.to change(Video, :count).by(1)
 
@@ -32,7 +32,7 @@ RSpec.describe "API Import Videos", type: :request do
 
     it "defaults title to blob filename" do
       post api_import_videos_path,
-        params: { signed_blob_id: blob.signed_id },
+        params: {signed_blob_id: blob.signed_id},
         headers: auth_headers
 
       expect(response).to have_http_status(:created)
@@ -66,7 +66,7 @@ RSpec.describe "API Import Videos", type: :request do
 
       expect {
         post api_import_videos_path,
-          params: { signed_blob_id: blob.signed_id, title: "EP1", folder_name: "Existing Show" },
+          params: {signed_blob_id: blob.signed_id, title: "EP1", folder_name: "Existing Show"},
           headers: auth_headers
       }.not_to change(Folder, :count)
 
@@ -76,14 +76,14 @@ RSpec.describe "API Import Videos", type: :request do
     it "enqueues VideoConversionJob" do
       expect {
         post api_import_videos_path,
-          params: { signed_blob_id: blob.signed_id, title: "Convert Me" },
+          params: {signed_blob_id: blob.signed_id, title: "Convert Me"},
           headers: auth_headers
       }.to have_enqueued_job(VideoConversionJob)
     end
 
     it "returns unprocessable_entity for invalid signed blob ID" do
       post api_import_videos_path,
-        params: { signed_blob_id: "invalid", title: "Bad" },
+        params: {signed_blob_id: "invalid", title: "Bad"},
         headers: auth_headers
 
       expect(response).to have_http_status(:unprocessable_entity)
@@ -93,14 +93,14 @@ RSpec.describe "API Import Videos", type: :request do
 
     it "returns unauthorized without valid credentials" do
       post api_import_videos_path,
-        params: { signed_blob_id: blob.signed_id },
-        headers: { "Authorization" => "Bearer invalid" }
+        params: {signed_blob_id: blob.signed_id},
+        headers: {"Authorization" => "Bearer invalid"}
 
       expect(response).to have_http_status(:unauthorized)
     end
 
     it "returns unauthorized without any credentials" do
-      post api_import_videos_path, params: { signed_blob_id: blob.signed_id }
+      post api_import_videos_path, params: {signed_blob_id: blob.signed_id}
 
       expect(response).to have_http_status(:unauthorized)
     end

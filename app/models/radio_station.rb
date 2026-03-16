@@ -4,7 +4,7 @@ class RadioStation < ApplicationRecord
   belongs_to :user
 
   validates :name, presence: true
-  validates :source_type, presence: true, inclusion: { in: %w[youtube stream] }
+  validates :source_type, presence: true, inclusion: {in: %w[youtube stream]}
 
   validates :youtube_url, presence: true, if: :youtube?
   validate :youtube_url_must_contain_video_id, if: :youtube?

@@ -4,7 +4,7 @@ RSpec.describe SortHelper, type: :helper do
   describe "#sort_link" do
     def stub_params(**overrides)
       params = ActionController::Parameters.new(
-        { controller: "albums", action: "index" }.merge(overrides)
+        {controller: "albums", action: "index"}.merge(overrides)
       ).permit!
 
       allow(helper).to receive(:params).and_return(params)

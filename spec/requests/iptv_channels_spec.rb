@@ -22,7 +22,7 @@ RSpec.describe "IPTVChannels", type: :request do
     it "filters by category" do
       news = create(:iptv_category, name: "News", slug: "news")
       music = create(:iptv_category, name: "Music", slug: "music")
-      cnn = create(:iptv_channel, name: "CNN", iptv_category: news)
+      create(:iptv_channel, name: "CNN", iptv_category: news)
       _mtv = create(:iptv_channel, name: "MTV", iptv_category: music)
 
       get tv_path(tab: "guide", category: "news")
@@ -65,7 +65,7 @@ RSpec.describe "IPTVChannels", type: :request do
     end
 
     it "displays EPG programme data in the guide" do
-      channel = create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
+      create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
       create(:epg_programme, :current, channel_id: "espn.us", title: "NHL Hockey")
 
       get tv_path
@@ -83,7 +83,7 @@ RSpec.describe "IPTVChannels", type: :request do
       channel = create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
       programme = create(:epg_programme, :current, channel_id: "espn.us", title: "NHL Hockey")
       recording = create(:recording, iptv_channel: channel, epg_programme: programme, status: "scheduled",
-                          title: programme.title, starts_at: programme.starts_at, ends_at: programme.ends_at)
+        title: programme.title, starts_at: programme.starts_at, ends_at: programme.ends_at)
       create(:user_recording, user: user, recording: recording)
 
       get tv_path
@@ -102,7 +102,7 @@ RSpec.describe "IPTVChannels", type: :request do
       channel = create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
       programme = create(:epg_programme, :current, channel_id: "espn.us", title: "NHL Hockey")
       recording = create(:recording, :failed, iptv_channel: channel, epg_programme: programme,
-                          title: programme.title, starts_at: programme.starts_at, ends_at: programme.ends_at)
+        title: programme.title, starts_at: programme.starts_at, ends_at: programme.ends_at)
       create(:user_recording, user: user, recording: recording)
 
       get tv_path
@@ -180,7 +180,7 @@ RSpec.describe "IPTVChannels", type: :request do
       channel = create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
       programme = create(:epg_programme, :current, channel_id: "espn.us", title: "NHL Hockey")
       recording = create(:recording, iptv_channel: channel, epg_programme: programme, status: "scheduled",
-                          title: programme.title, starts_at: programme.starts_at, ends_at: programme.ends_at)
+        title: programme.title, starts_at: programme.starts_at, ends_at: programme.ends_at)
       create(:user_recording, user: user, recording: recording)
 
       get iptv_channel_path(channel)
@@ -191,7 +191,7 @@ RSpec.describe "IPTVChannels", type: :request do
       channel = create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
       programme = create(:epg_programme, :current, channel_id: "espn.us", title: "NHL Hockey")
       recording = create(:recording, :recording_now, iptv_channel: channel, epg_programme: programme,
-                          title: programme.title, starts_at: programme.starts_at, ends_at: programme.ends_at)
+        title: programme.title, starts_at: programme.starts_at, ends_at: programme.ends_at)
       create(:user_recording, user: user, recording: recording)
 
       get iptv_channel_path(channel)
@@ -202,7 +202,7 @@ RSpec.describe "IPTVChannels", type: :request do
       channel = create(:iptv_channel, name: "ESPN", tvg_id: "espn.us")
       programme = create(:epg_programme, :current, channel_id: "espn.us", title: "NHL Hockey")
       recording = create(:recording, :ready, iptv_channel: channel, epg_programme: programme,
-                          title: programme.title, starts_at: programme.starts_at, ends_at: programme.ends_at)
+        title: programme.title, starts_at: programme.starts_at, ends_at: programme.ends_at)
       create(:user_recording, user: user, recording: recording)
 
       get iptv_channel_path(channel)
@@ -220,17 +220,17 @@ RSpec.describe "IPTVChannels", type: :request do
   describe "POST /tv/channels" do
     it "creates a channel" do
       expect {
-        post iptv_channels_path, params: { iptv_channel: {
+        post iptv_channels_path, params: {iptv_channel: {
           name: "Test Channel",
           stream_url: "https://stream.example.com/live.m3u8"
-        } }
+        }}
       }.to change(IPTVChannel, :count).by(1)
 
       expect(response).to redirect_to(iptv_channel_path(IPTVChannel.last))
     end
 
     it "rejects invalid channel" do
-      post iptv_channels_path, params: { iptv_channel: { name: "", stream_url: "" } }
+      post iptv_channels_path, params: {iptv_channel: {name: "", stream_url: ""}}
       expect(response).to have_http_status(:unprocessable_content)
     end
   end
@@ -246,7 +246,7 @@ RSpec.describe "IPTVChannels", type: :request do
   describe "PATCH /tv/channels/:id" do
     it "updates the channel" do
       channel = create(:iptv_channel, name: "Old Name")
-      patch iptv_channel_path(channel), params: { iptv_channel: { name: "New Name" } }
+      patch iptv_channel_path(channel), params: {iptv_channel: {name: "New Name"}}
 
       expect(channel.reload.name).to eq("New Name")
       expect(response).to redirect_to(iptv_channel_path(channel))
@@ -273,7 +273,7 @@ RSpec.describe "IPTVChannels", type: :request do
         .to_return(status: 200, body: playlist)
 
       expect {
-        post import_iptv_channels_path, params: { playlist_url: "https://example.com/playlist.m3u" }
+        post import_iptv_channels_path, params: {playlist_url: "https://example.com/playlist.m3u"}
       }.to change(IPTVChannel, :count).by(1)
 
       expect(response).to redirect_to(tv_path)
@@ -282,7 +282,7 @@ RSpec.describe "IPTVChannels", type: :request do
     end
 
     it "handles missing URL" do
-      post import_iptv_channels_path, params: { playlist_url: "" }
+      post import_iptv_channels_path, params: {playlist_url: ""}
       expect(response).to redirect_to(tv_path)
     end
 
@@ -290,9 +290,8 @@ RSpec.describe "IPTVChannels", type: :request do
       stub_request(:get, "https://example.com/bad.m3u")
         .to_raise(HTTP::ConnectionError.new("Connection refused"))
 
-      post import_iptv_channels_path, params: { playlist_url: "https://example.com/bad.m3u" }
+      post import_iptv_channels_path, params: {playlist_url: "https://example.com/bad.m3u"}
       expect(response).to redirect_to(tv_path)
     end
   end
-
 end

@@ -23,7 +23,7 @@ RSpec.describe "RadioStreams", type: :request do
       stub_request(:get, "https://radio.example.com/stream")
         .to_return(
           status: 200,
-          headers: { "Content-Type" => "audio/mpeg" },
+          headers: {"Content-Type" => "audio/mpeg"},
           body: "fake audio data"
         )
 

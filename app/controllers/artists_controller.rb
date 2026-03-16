@@ -8,9 +8,9 @@ class ArtistsController < ApplicationController
     @query = params[:q]
     @sort = sort_column(Artist, default: "created_at")
     @direction = sort_direction
-    scope = Current.user.artists.music.includes(albums: { cover_image_attachment: :blob })
-              .search(@query)
-              .order(@sort => @direction)
+    scope = Current.user.artists.music.includes(albums: {cover_image_attachment: :blob})
+      .search(@query)
+      .order(@sort => @direction)
     @pagy, @artists = pagy(:offset, scope)
   end
 

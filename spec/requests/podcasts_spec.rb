@@ -20,7 +20,7 @@ RSpec.describe "Podcasts", type: :request do
 
     it "displays the podcast's albums" do
       artist = create(:artist, :podcast)
-      album = create(:album, title: "Season 1", artist: artist)
+      create(:album, title: "Season 1", artist: artist)
 
       get podcast_path(artist)
 

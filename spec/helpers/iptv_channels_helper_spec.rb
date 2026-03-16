@@ -19,7 +19,7 @@ RSpec.describe IPTVChannelsHelper, type: :helper do
       channel = create(:iptv_channel, tvg_id: "cnn.us")
       programme = create(:epg_programme, channel_id: "cnn.us", title: "Breaking News", subtitle: "Live Coverage")
 
-      programmes_by_channel = { "cnn.us" => [programme] }
+      programmes_by_channel = {"cnn.us" => [programme]}
       result = JSON.parse(helper.retro_tv_channels_json([channel], programmes_by_channel))
 
       prog = result.first["programmes"].first

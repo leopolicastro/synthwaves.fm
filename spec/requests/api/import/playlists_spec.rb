@@ -3,9 +3,9 @@ require "rails_helper"
 RSpec.describe "API Import Playlists", type: :request do
   let(:user) { create(:user) }
   let(:api_key) { create(:api_key, user: user) }
-  let(:token) { JWTService.encode({ user_id: user.id, api_key_id: api_key.id }) }
+  let(:token) { JWTService.encode({user_id: user.id, api_key_id: api_key.id}) }
   let(:auth_headers) do
-    { "Authorization" => "Bearer #{token}", "Content-Type" => "application/json" }
+    {"Authorization" => "Bearer #{token}", "Content-Type" => "application/json"}
   end
 
   let(:artist) { create(:artist, name: "The Beatles", user: user) }
@@ -19,8 +19,8 @@ RSpec.describe "API Import Playlists", type: :request do
       post api_import_playlists_path, params: {
         name: "Beatles Favorites",
         tracks: [
-          { title: "Come Together", artist: "The Beatles", album: "Abbey Road" },
-          { title: "Something", artist: "The Beatles", album: "Abbey Road" }
+          {title: "Come Together", artist: "The Beatles", album: "Abbey Road"},
+          {title: "Something", artist: "The Beatles", album: "Abbey Road"}
         ]
       }.to_json, headers: auth_headers
 
@@ -42,8 +42,8 @@ RSpec.describe "API Import Playlists", type: :request do
       post api_import_playlists_path, params: {
         name: "Mixed",
         tracks: [
-          { title: "Come Together", artist: "The Beatles", album: "Abbey Road" },
-          { title: "Nonexistent Song", artist: "Nobody", album: "Nothing" }
+          {title: "Come Together", artist: "The Beatles", album: "Abbey Road"},
+          {title: "Nonexistent Song", artist: "Nobody", album: "Nothing"}
         ]
       }.to_json, headers: auth_headers
 
@@ -52,7 +52,7 @@ RSpec.describe "API Import Playlists", type: :request do
       expect(json["tracks_matched"]).to eq(1)
       expect(json["tracks_not_found"]).to eq(1)
       expect(json["not_found"]).to contain_exactly(
-        { "title" => "Nonexistent Song", "artist" => "Nobody", "album" => "Nothing" }
+        {"title" => "Nonexistent Song", "artist" => "Nobody", "album" => "Nothing"}
       )
     end
 
@@ -80,7 +80,7 @@ RSpec.describe "API Import Playlists", type: :request do
     it "returns 401 without auth" do
       post api_import_playlists_path, params: {
         name: "Test", tracks: []
-      }.to_json, headers: { "Content-Type" => "application/json" }
+      }.to_json, headers: {"Content-Type" => "application/json"}
 
       expect(response).to have_http_status(:unauthorized)
     end
@@ -91,7 +91,7 @@ RSpec.describe "API Import Playlists", type: :request do
       post api_import_playlists_path, params: {
         name: "Case Test",
         tracks: [
-          { title: "come together", artist: "the beatles", album: "abbey road" }
+          {title: "come together", artist: "the beatles", album: "abbey road"}
         ]
       }.to_json, headers: auth_headers
 
@@ -119,9 +119,9 @@ RSpec.describe "API Import Playlists", type: :request do
       post api_import_playlists_path, params: {
         name: "Gapped",
         tracks: [
-          { title: "Come Together", artist: "The Beatles", album: "Abbey Road" },
-          { title: "Missing Track", artist: "Nobody", album: "Nothing" },
-          { title: "Something", artist: "The Beatles", album: "Abbey Road" }
+          {title: "Come Together", artist: "The Beatles", album: "Abbey Road"},
+          {title: "Missing Track", artist: "Nobody", album: "Nothing"},
+          {title: "Something", artist: "The Beatles", album: "Abbey Road"}
         ]
       }.to_json, headers: auth_headers
 

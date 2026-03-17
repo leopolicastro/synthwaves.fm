@@ -21,6 +21,14 @@ RSpec.describe "Static::Landing", type: :request do
         expect(response.body).not_to include("AI Assistant")
       end
 
+      it "displays mobile apps coming soon section" do
+        expect(response.body).to include("Take it")
+        expect(response.body).to include("everywhere")
+        expect(response.body).to include("Coming Soon")
+        expect(response.body).to include("iOS")
+        expect(response.body).to include("Android")
+      end
+
       it "uses media-focused copy instead of music-only" do
         expect(response.body).to include("Self-hosted media streaming")
         expect(response.body).to include("Your Media, Your Server")

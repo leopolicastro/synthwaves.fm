@@ -145,33 +145,93 @@
       </div>
     </div>
   </section>
+  <!-- Mobile Apps Coming Soon Section -->
+  <section class="py-12 sm:py-16 md:py-24 px-4 sm:px-6 border-t border-neon-purple/10 relative overflow-hidden">
+    <div class="absolute inset-0 retro-grid opacity-15"></div>
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);"></div>
+    <div class="relative z-10 max-w-3xl mx-auto text-center">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4 font-display">
+        <span class="text-neon-cyan">Take it</span> <span class="text-neon-pink">everywhere</span>
+      </h2>
+      <p class="text-gray-400 text-lg mb-8 sm:mb-12 max-w-2xl mx-auto">
+        Native apps for iOS and Android are on the way. Your music, your server &mdash; in your pocket.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+        <!-- iOS Card -->
+        <div class="group relative">
+          <!-- Glow border -->
+          <div class="absolute -inset-1 bg-gradient-to-r from-neon-cyan/30 to-neon-purple/30 rounded-3xl blur-xl opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="relative bg-gray-900 border border-neon-cyan/20 group-hover:border-neon-cyan/40 rounded-3xl p-6 sm:p-8 transition-colors duration-300">
+            <!-- Phone silhouette -->
+            <div class="mx-auto w-32 h-56 bg-gray-800 rounded-[1.5rem] border-2 border-gray-700 relative mb-6 overflow-hidden">
+              <!-- Dynamic Island -->
+              <div class="absolute top-2 left-1/2 -translate-x-1/2 w-16 h-4 bg-gray-900 rounded-full"></div>
+              <!-- Screen content area -->
+              <div class="absolute inset-4 top-8 bottom-6 rounded-lg bg-gradient-to-b from-neon-cyan/5 to-neon-purple/5 flex items-center justify-center">
+                <!-- Apple logo -->
+                <svg class="w-10 h-10 text-neon-cyan/40" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                </svg>
+              </div>
+              <!-- Home indicator -->
+              <div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-12 h-1 bg-gray-600 rounded-full"></div>
+            </div>
+            <!-- Coming Soon pill -->
+            <div class="inline-flex items-center gap-2 bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan px-4 py-1.5 rounded-full text-sm font-semibold mb-3">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-cyan opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-neon-cyan"></span>
+              </span>
+              Coming Soon
+            </div>
+            <h3 class="text-xl font-bold text-white mb-1">iOS</h3>
+            <p class="text-gray-400 text-sm">Native SwiftUI app with offline sync</p>
+          </div>
+        </div>
+        <!-- Android Card -->
+        <div class="group relative">
+          <!-- Glow border -->
+          <div class="absolute -inset-1 bg-gradient-to-r from-neon-pink/30 to-neon-purple/30 rounded-3xl blur-xl opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="relative bg-gray-900 border border-neon-pink/20 group-hover:border-neon-pink/40 rounded-3xl p-6 sm:p-8 transition-colors duration-300">
+            <!-- Phone silhouette -->
+            <div class="mx-auto w-32 h-56 bg-gray-800 rounded-[1.5rem] border-2 border-gray-700 relative mb-6 overflow-hidden">
+              <!-- Camera punch-hole -->
+              <div class="absolute top-3 left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-900 rounded-full"></div>
+              <!-- Screen content area -->
+              <div class="absolute inset-4 top-8 bottom-6 rounded-lg bg-gradient-to-b from-neon-pink/5 to-neon-purple/5 flex items-center justify-center">
+                <!-- Google Play logo -->
+                <svg class="w-10 h-10 text-neon-pink/40" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 2.302a1 1 0 010 1.38l-2.302 2.302L15.394 12l2.304-2.492zM5.864 2.658L16.8 8.99l-2.302 2.302L5.864 2.658z"/>
+                </svg>
+              </div>
+              <!-- Home indicator -->
+              <div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-12 h-1 bg-gray-600 rounded-full"></div>
+            </div>
+            <!-- Coming Soon pill -->
+            <div class="inline-flex items-center gap-2 bg-neon-pink/10 border border-neon-pink/30 text-neon-pink px-4 py-1.5 rounded-full text-sm font-semibold mb-3">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-pink opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-neon-pink"></span>
+              </span>
+              Coming Soon
+            </div>
+            <h3 class="text-xl font-bold text-white mb-1">Android</h3>
+            <p class="text-gray-400 text-sm">Material You design with background playback</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
   <!-- Subsonic Compatibility Section -->
   <section class="py-12 sm:py-16 md:py-24 px-4 sm:px-6 border-t border-neon-purple/10">
     <div class="max-w-5xl mx-auto text-center">
-      <h2 class="text-3xl md:text-4xl font-bold mb-4 font-display">
-        Built for <a href="https://github.com/bjarneo/cliamp" target="_blank" rel="noopener noreferrer" class="text-laser-green hover:underline">cliamp</a>
-      </h2>
       <p class="text-gray-400 text-lg mb-8 sm:mb-12 max-w-2xl mx-auto">
-        synthwaves.fm was built to stream music to <a href="https://github.com/bjarneo/cliamp" target="_blank" rel="noopener noreferrer" class="text-laser-green hover:underline">cliamp</a>, a Subsonic-compatible CLI music player.
-        But it works with any Subsonic client &mdash;
+        synthwaves.fm was built to stream music to any Subsonic-compatible CLI music player.
         <span class="text-neon-pink">DSub</span>,
         <span class="text-neon-cyan">play:Sub</span>,
         <span class="text-neon-purple">Ultrasonic</span>,
         and more.
       </p>
-      <!-- Terminal mockup -->
-      <div class="max-w-lg mx-auto mb-8 sm:mb-12 bg-gray-900/80 border border-laser-green/20 rounded-xl overflow-hidden">
-        <div class="flex items-center gap-2 px-4 py-3 border-b border-gray-700/50">
-          <div class="w-3 h-3 rounded-full bg-red-500"></div>
-          <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-          <div class="w-3 h-3 rounded-full bg-green-500"></div>
-        </div>
-        <div class="p-5 font-mono text-sm text-left space-y-1">
-          <p class="text-gray-400">$ cliamp</p>
-          <p class="text-laser-green">Connected to synthwaves.fm. 1,247 tracks ready.</p>
-          <p class="text-gray-400">> playing: Kavinsky &mdash; Nightcall</p>
-        </div>
-      </div>
       <div class="grid grid-cols-3 gap-3 sm:gap-6 max-w-3xl mx-auto">
         <div class="bg-gray-800/60 border border-neon-purple/15 rounded-xl p-3 sm:p-6">
           <div class="text-xl sm:text-3xl font-display text-neon-pink mb-1 sm:mb-2">22</div>

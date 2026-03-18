@@ -19,6 +19,7 @@ export default class extends Controller {
       this.shuffleEnabled = false
       this.youtubeCurrentTime = 0
       this.youtubeDuration = 0
+      this.hasScrobbled = false
 
       this.audio.addEventListener("timeupdate", () => this.onTimeUpdate())
       this.audio.addEventListener("ended", () => this.onEnded())
@@ -318,9 +319,7 @@ export default class extends Controller {
       navigator.mediaSession.metadata = new MediaMetadata(metadata)
     }
 
-    if (!isLive) {
-      this.recordPlay(trackId)
-    }
+    this.hasScrobbled = false
   }
 
   playYouTube({ trackId, title, artist, youtubeVideoId, isLive, coverUrl }) {
@@ -358,9 +357,7 @@ export default class extends Controller {
       navigator.mediaSession.metadata = new MediaMetadata(metadata)
     }
 
-    if (!isLive && trackId) {
-      this.recordPlay(trackId)
-    }
+    this.hasScrobbled = false
   }
 
   toggle() {
@@ -517,6 +514,15 @@ export default class extends Controller {
       this.progressTarget.style.width = `${percent}%`
       this.currentTimeTarget.textContent = this.formatTime(this.audio.currentTime)
 
+      // Scrobble: record play after min(50% of duration, 4 minutes)
+      if (!this.hasScrobbled && this.currentTrackId) {
+        const threshold = Math.min(this.audio.duration * 0.5, 240)
+        if (this.audio.currentTime >= threshold) {
+          this.hasScrobbled = true
+          this.recordPlay(this.currentTrackId)
+        }
+      }
+
       // Crossfade trigger: start crossfade when remaining time <= crossfade duration
       const remaining = this.audio.duration - this.audio.currentTime
       const cfDuration = this.crossfadeDuration
@@ -585,6 +591,15 @@ export default class extends Controller {
       this.progressTarget.style.width = `${percent}%`
       this.currentTimeTarget.textContent = this.formatTime(currentTime)
       this.durationTarget.textContent = this.formatTime(duration)
+
+      // Scrobble: record play after min(50% of duration, 4 minutes)
+      if (!this.hasScrobbled && this.currentTrackId) {
+        const threshold = Math.min(duration * 0.5, 240)
+        if (currentTime >= threshold) {
+          this.hasScrobbled = true
+          this.recordPlay(this.currentTrackId)
+        }
+      }
     }
   }
 

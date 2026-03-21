@@ -250,7 +250,9 @@ docker run -d \
 
 Visit `http://localhost:3000` and log in with `admin@example.com` / `abc123`.
 
-Data is persisted in the `synthwaves_fm_storage` volume. To stop and restart:
+On first boot, the app auto-generates encryption credentials and saves them to the storage volume. All data — databases, uploads, and encryption keys — lives in the `synthwaves_fm_storage` volume. This volume persists across container restarts and image upgrades. Do not delete it.
+
+To stop and restart:
 
 ```bash
 docker stop synthwaves_fm

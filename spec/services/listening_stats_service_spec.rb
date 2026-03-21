@@ -23,7 +23,7 @@ RSpec.describe ListeningStatsService do
     it "returns tracks ordered by play count" do
       track2 = create(:track, album: album, artist: artist, title: "Midnight Drive")
       3.times { create(:play_history, user: user, track: track, played_at: 1.day.ago) }
-      1.times { create(:play_history, user: user, track: track2, played_at: 1.day.ago) }
+      create(:play_history, user: user, track: track2, played_at: 1.day.ago)
 
       result = described_class.call(user: user)
       top = result[:top_tracks]
@@ -63,7 +63,7 @@ RSpec.describe ListeningStatsService do
       track2 = create(:track, album: album2, artist: artist)
 
       3.times { create(:play_history, user: user, track: track, played_at: 1.day.ago) }
-      1.times { create(:play_history, user: user, track: track2, played_at: 1.day.ago) }
+      create(:play_history, user: user, track: track2, played_at: 1.day.ago)
 
       result = described_class.call(user: user)
       expect(result[:top_genres].first.genre).to eq("Synthwave")

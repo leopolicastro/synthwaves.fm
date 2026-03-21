@@ -19,7 +19,7 @@ RSpec.describe SmartPlaylistService do
       track2 = create(:track, album: album, artist: artist, title: "One-Hit Wonder")
 
       5.times { create(:play_history, user: user, track: track1) }
-      1.times { create(:play_history, user: user, track: track2) }
+      create(:play_history, user: user, track: track2)
 
       result = described_class.call(user: user, playlist_id: :most_played)
       expect(result.first.title).to eq("Hit Song")
@@ -82,7 +82,7 @@ RSpec.describe SmartPlaylistService do
       cold_track = create(:track, album: album, artist: artist)
 
       4.times { create(:play_history, user: user, track: hot_track, played_at: 1.week.ago) }
-      1.times { create(:play_history, user: user, track: cold_track, played_at: 1.week.ago) }
+      create(:play_history, user: user, track: cold_track, played_at: 1.week.ago)
 
       result = described_class.call(user: user, playlist_id: :heavy_rotation)
       expect(result.map(&:id)).to include(hot_track.id)

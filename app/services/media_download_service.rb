@@ -18,8 +18,8 @@ class MediaDownloadService
   end
 
   def fetch_metadata(url)
-    json, status = Open3.capture2e("yt-dlp", "--dump-json", "--no-download", "--no-playlist", url)
-    raise Error, "Failed to fetch video metadata" unless status.success?
+    json, stderr, status = Open3.capture3("yt-dlp", "--dump-json", "--no-download", "--no-playlist", url)
+    raise Error, "Failed to fetch video metadata: #{stderr.truncate(500)}" unless status.success?
 
     data = JSON.parse(json)
     raise Error, "Cannot download a live stream" if data["is_live"] == true
@@ -36,8 +36,8 @@ class MediaDownloadService
   end
 
   def fetch_playlist_metadata(url)
-    json, status = Open3.capture2e("yt-dlp", "--flat-playlist", "--dump-single-json", "--no-download", url)
-    raise Error, "Failed to fetch playlist metadata" unless status.success?
+    json, stderr, status = Open3.capture3("yt-dlp", "--flat-playlist", "--dump-single-json", "--no-download", url)
+    raise Error, "Failed to fetch playlist metadata: #{stderr.truncate(500)}" unless status.success?
 
     data = JSON.parse(json)
 
@@ -90,7 +90,7 @@ class MediaDownloadService
   private
 
   def reject_live_stream!(url)
-    metadata_json, status = Open3.capture2e("yt-dlp", "--dump-json", "--no-download", url)
+    metadata_json, _stderr, status = Open3.capture3("yt-dlp", "--dump-json", "--no-download", url)
     return unless status.success?
 
     metadata = JSON.parse(metadata_json)

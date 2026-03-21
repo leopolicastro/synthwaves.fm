@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Prepare database
+        run: bin/rails db:prepare
+
+      - name: Run tests
+        run: bundle exec rspec
+
+      - name: Lint
+        run: bundle exec standardrb
+
+      - name: Security - Gem audit
+        run: bin/bundler-audit
+
+      - name: Security - Importmap audit
+        run: bin/importmap audit
+
+      - name: Security - Brakeman
+        run: bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error

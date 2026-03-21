@@ -206,10 +206,10 @@ RSpec.describe YoutubePlaylistImportService do
       entries: entries
     }.to_json
 
-    allow(Open3).to receive(:capture2e).with(
+    allow(Open3).to receive(:capture3).with(
       "yt-dlp", "--flat-playlist", "--dump-single-json", "--no-download",
       "https://www.youtube.com/playlist?list=PLtest123"
-    ).and_return([json, instance_double(Process::Status, success?: true)])
+    ).and_return([json, "", instance_double(Process::Status, success?: true)])
 
     stub_request(:get, "https://i.ytimg.com/vi/abc/hqdefault.jpg")
       .to_return(status: 200, body: "fake_image_data", headers: {"Content-Type" => "image/jpeg"})

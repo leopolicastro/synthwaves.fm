@@ -220,10 +220,10 @@ RSpec.describe YoutubeVideoImportService do
       is_live: false
     }.to_json
 
-    allow(Open3).to receive(:capture2e).with(
+    allow(Open3).to receive(:capture3).with(
       "yt-dlp", "--dump-json", "--no-download", "--no-playlist",
       "https://www.youtube.com/watch?v=#{video_id}"
-    ).and_return([json, instance_double(Process::Status, success?: true)])
+    ).and_return([json, "", instance_double(Process::Status, success?: true)])
 
     stub_request(:get, "https://i.ytimg.com/vi/#{video_id}/maxresdefault.jpg")
       .to_return(status: 200, body: "fake_image_data", headers: {"Content-Type" => "image/jpeg"})

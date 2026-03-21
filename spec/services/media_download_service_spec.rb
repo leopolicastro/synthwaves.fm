@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe MediaDownloadService do
   let(:service) { described_class.new }
   let(:temp_dir) { Dir.mktmpdir }
-  let(:not_live_metadata) { ['{"is_live": false}', instance_double(Process::Status, success?: true)] }
+  let(:not_live_metadata) { ['{"is_live": false}', "", instance_double(Process::Status, success?: true)] }
 
   after { FileUtils.rm_rf(temp_dir) }
 
@@ -12,7 +12,7 @@ RSpec.describe MediaDownloadService do
       mp3_path = File.join(temp_dir, "abc123.mp3")
       FileUtils.touch(mp3_path)
 
-      expect(Open3).to receive(:capture2e).with(
+      expect(Open3).to receive(:capture3).with(
         "yt-dlp", "--dump-json", "--no-download",
         "https://youtube.com/watch?v=abc123"
       ).and_return(not_live_metadata)
@@ -30,7 +30,7 @@ RSpec.describe MediaDownloadService do
     end
 
     it "raises Error when yt-dlp fails" do
-      allow(Open3).to receive(:capture2e).with(
+      allow(Open3).to receive(:capture3).with(
         "yt-dlp", "--dump-json", "--no-download", anything
       ).and_return(not_live_metadata)
 
@@ -46,7 +46,7 @@ RSpec.describe MediaDownloadService do
     end
 
     it "raises Error when no mp3 file is found after download" do
-      allow(Open3).to receive(:capture2e).with(
+      allow(Open3).to receive(:capture3).with(
         "yt-dlp", "--dump-json", "--no-download", anything
       ).and_return(not_live_metadata)
 
@@ -62,9 +62,9 @@ RSpec.describe MediaDownloadService do
     end
 
     it "raises Error for live streams" do
-      live_metadata = ['{"is_live": true}', instance_double(Process::Status, success?: true)]
+      live_metadata = ['{"is_live": true}', "", instance_double(Process::Status, success?: true)]
 
-      expect(Open3).to receive(:capture2e).with(
+      expect(Open3).to receive(:capture3).with(
         "yt-dlp", "--dump-json", "--no-download", anything
       ).and_return(live_metadata)
 
@@ -79,7 +79,7 @@ RSpec.describe MediaDownloadService do
       mp4_path = File.join(temp_dir, "abc123.mp4")
       FileUtils.touch(mp4_path)
 
-      expect(Open3).to receive(:capture2e).with(
+      expect(Open3).to receive(:capture3).with(
         "yt-dlp", "--dump-json", "--no-download",
         "https://youtube.com/watch?v=abc123"
       ).and_return(not_live_metadata)
@@ -98,7 +98,7 @@ RSpec.describe MediaDownloadService do
     end
 
     it "raises Error when yt-dlp fails" do
-      allow(Open3).to receive(:capture2e).with(
+      allow(Open3).to receive(:capture3).with(
         "yt-dlp", "--dump-json", "--no-download", anything
       ).and_return(not_live_metadata)
 
@@ -114,9 +114,9 @@ RSpec.describe MediaDownloadService do
     end
 
     it "raises Error for live streams" do
-      live_metadata = ['{"is_live": true}', instance_double(Process::Status, success?: true)]
+      live_metadata = ['{"is_live": true}', "", instance_double(Process::Status, success?: true)]
 
-      expect(Open3).to receive(:capture2e).with(
+      expect(Open3).to receive(:capture3).with(
         "yt-dlp", "--dump-json", "--no-download", anything
       ).and_return(live_metadata)
 
@@ -140,10 +140,10 @@ RSpec.describe MediaDownloadService do
     end
 
     it "returns structured metadata from yt-dlp" do
-      allow(Open3).to receive(:capture2e).with(
+      allow(Open3).to receive(:capture3).with(
         "yt-dlp", "--dump-json", "--no-download", "--no-playlist",
         "https://youtube.com/watch?v=R-FxmoVM7X4"
-      ).and_return([ytdlp_json, instance_double(Process::Status, success?: true)])
+      ).and_return([ytdlp_json, "", instance_double(Process::Status, success?: true)])
 
       result = described_class.fetch_metadata("https://youtube.com/watch?v=R-FxmoVM7X4")
 
@@ -158,9 +158,9 @@ RSpec.describe MediaDownloadService do
 
     it "falls back to uploader when channel is absent" do
       json = {id: "abc", title: "Test", uploader: "UploaderName", duration: 60, is_live: false}.to_json
-      allow(Open3).to receive(:capture2e).with(
+      allow(Open3).to receive(:capture3).with(
         "yt-dlp", "--dump-json", "--no-download", "--no-playlist", anything
-      ).and_return([json, instance_double(Process::Status, success?: true)])
+      ).and_return([json, "", instance_double(Process::Status, success?: true)])
 
       result = described_class.fetch_metadata("https://youtube.com/watch?v=abc")
 
@@ -168,20 +168,20 @@ RSpec.describe MediaDownloadService do
     end
 
     it "raises Error when yt-dlp fails" do
-      allow(Open3).to receive(:capture2e).with(
+      allow(Open3).to receive(:capture3).with(
         "yt-dlp", "--dump-json", "--no-download", "--no-playlist", anything
-      ).and_return(["ERROR\n", instance_double(Process::Status, success?: false)])
+      ).and_return(["", "ERROR\n", instance_double(Process::Status, success?: false)])
 
       expect {
         described_class.fetch_metadata("https://youtube.com/watch?v=bad")
-      }.to raise_error(MediaDownloadService::Error, "Failed to fetch video metadata")
+      }.to raise_error(MediaDownloadService::Error, /Failed to fetch video metadata/)
     end
 
     it "raises Error for live streams" do
       json = {id: "live1", title: "Live Stream", is_live: true}.to_json
-      allow(Open3).to receive(:capture2e).with(
+      allow(Open3).to receive(:capture3).with(
         "yt-dlp", "--dump-json", "--no-download", "--no-playlist", anything
-      ).and_return([json, instance_double(Process::Status, success?: true)])
+      ).and_return([json, "", instance_double(Process::Status, success?: true)])
 
       expect {
         described_class.fetch_metadata("https://youtube.com/watch?v=live1")
@@ -189,13 +189,28 @@ RSpec.describe MediaDownloadService do
     end
 
     it "raises Error when JSON is unparseable" do
-      allow(Open3).to receive(:capture2e).with(
+      allow(Open3).to receive(:capture3).with(
         "yt-dlp", "--dump-json", "--no-download", "--no-playlist", anything
-      ).and_return(["not json", instance_double(Process::Status, success?: true)])
+      ).and_return(["not json", "", instance_double(Process::Status, success?: true)])
 
       expect {
         described_class.fetch_metadata("https://youtube.com/watch?v=abc")
       }.to raise_error(MediaDownloadService::Error, "Failed to parse video metadata")
+    end
+
+    it "parses JSON correctly when stderr contains warnings" do
+      allow(Open3).to receive(:capture3).with(
+        "yt-dlp", "--dump-json", "--no-download", "--no-playlist", anything
+      ).and_return([
+        ytdlp_json,
+        "WARNING: Unable to extract uploader id\nWARNING: Falling back to another extractor\n",
+        instance_double(Process::Status, success?: true)
+      ])
+
+      result = described_class.fetch_metadata("https://youtube.com/watch?v=R-FxmoVM7X4")
+
+      expect(result[:video_id]).to eq("R-FxmoVM7X4")
+      expect(result[:title]).to eq("Daft Punk - Around The World (Official Video)")
     end
   end
 
@@ -218,9 +233,9 @@ RSpec.describe MediaDownloadService do
     end
 
     it "returns structured playlist metadata from yt-dlp" do
-      allow(Open3).to receive(:capture2e).with(
+      allow(Open3).to receive(:capture3).with(
         "yt-dlp", "--flat-playlist", "--dump-single-json", "--no-download", anything
-      ).and_return([ytdlp_playlist_json, instance_double(Process::Status, success?: true)])
+      ).and_return([ytdlp_playlist_json, "", instance_double(Process::Status, success?: true)])
 
       result = described_class.fetch_playlist_metadata("https://youtube.com/playlist?list=PLtest123")
 
@@ -233,9 +248,9 @@ RSpec.describe MediaDownloadService do
     end
 
     it "selects the highest-preference thumbnail" do
-      allow(Open3).to receive(:capture2e).with(
+      allow(Open3).to receive(:capture3).with(
         "yt-dlp", "--flat-playlist", "--dump-single-json", "--no-download", anything
-      ).and_return([ytdlp_playlist_json, instance_double(Process::Status, success?: true)])
+      ).and_return([ytdlp_playlist_json, "", instance_double(Process::Status, success?: true)])
 
       result = described_class.fetch_playlist_metadata("https://youtube.com/playlist?list=PLtest123")
 
@@ -244,9 +259,9 @@ RSpec.describe MediaDownloadService do
 
     it "returns nil thumbnail when thumbnails array is absent" do
       json = {id: "PL1", title: "Test", entries: []}.to_json
-      allow(Open3).to receive(:capture2e).with(
+      allow(Open3).to receive(:capture3).with(
         "yt-dlp", "--flat-playlist", "--dump-single-json", "--no-download", anything
-      ).and_return([json, instance_double(Process::Status, success?: true)])
+      ).and_return([json, "", instance_double(Process::Status, success?: true)])
 
       result = described_class.fetch_playlist_metadata("https://youtube.com/playlist?list=PL1")
 
@@ -254,23 +269,38 @@ RSpec.describe MediaDownloadService do
     end
 
     it "raises Error when yt-dlp fails" do
-      allow(Open3).to receive(:capture2e).with(
+      allow(Open3).to receive(:capture3).with(
         "yt-dlp", "--flat-playlist", "--dump-single-json", "--no-download", anything
-      ).and_return(["ERROR\n", instance_double(Process::Status, success?: false)])
+      ).and_return(["", "ERROR\n", instance_double(Process::Status, success?: false)])
 
       expect {
         described_class.fetch_playlist_metadata("https://youtube.com/playlist?list=PLbad")
-      }.to raise_error(MediaDownloadService::Error, "Failed to fetch playlist metadata")
+      }.to raise_error(MediaDownloadService::Error, /Failed to fetch playlist metadata/)
     end
 
     it "raises Error when JSON is unparseable" do
-      allow(Open3).to receive(:capture2e).with(
+      allow(Open3).to receive(:capture3).with(
         "yt-dlp", "--flat-playlist", "--dump-single-json", "--no-download", anything
-      ).and_return(["not json", instance_double(Process::Status, success?: true)])
+      ).and_return(["not json", "", instance_double(Process::Status, success?: true)])
 
       expect {
         described_class.fetch_playlist_metadata("https://youtube.com/playlist?list=PL1")
       }.to raise_error(MediaDownloadService::Error, "Failed to parse playlist metadata")
+    end
+
+    it "parses JSON correctly when stderr contains warnings" do
+      allow(Open3).to receive(:capture3).with(
+        "yt-dlp", "--flat-playlist", "--dump-single-json", "--no-download", anything
+      ).and_return([
+        ytdlp_playlist_json,
+        "WARNING: [youtube] Skipping player responses from android clients\n",
+        instance_double(Process::Status, success?: true)
+      ])
+
+      result = described_class.fetch_playlist_metadata("https://youtube.com/playlist?list=PLtest123")
+
+      expect(result[:title]).to eq("Synthwave Essentials")
+      expect(result[:entries].length).to eq(2)
     end
   end
 
@@ -279,9 +309,9 @@ RSpec.describe MediaDownloadService do
       mp3_path = File.join(temp_dir, "abc123.mp3")
       FileUtils.touch(mp3_path)
 
-      expect(Open3).to receive(:capture2e).with(
+      expect(Open3).to receive(:capture3).with(
         "yt-dlp", "--dump-json", "--no-download", anything
-      ).and_return(["ERROR\n", instance_double(Process::Status, success?: false)])
+      ).and_return(["", "ERROR\n", instance_double(Process::Status, success?: false)])
 
       expect(Open3).to receive(:capture2e).with(
         "yt-dlp", "-x", any_args
@@ -295,9 +325,9 @@ RSpec.describe MediaDownloadService do
       mp3_path = File.join(temp_dir, "abc123.mp3")
       FileUtils.touch(mp3_path)
 
-      expect(Open3).to receive(:capture2e).with(
+      expect(Open3).to receive(:capture3).with(
         "yt-dlp", "--dump-json", "--no-download", anything
-      ).and_return(["not json", instance_double(Process::Status, success?: true)])
+      ).and_return(["not json", "", instance_double(Process::Status, success?: true)])
 
       expect(Open3).to receive(:capture2e).with(
         "yt-dlp", "-x", any_args

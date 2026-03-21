@@ -11,7 +11,7 @@ bin/rspec spec/models/   # Run model specs only
 bin/rails db:migrate     # Run migrations
 bin/rails db:seed        # Seed database
 bin/setup                # Install deps, prepare DB, start server
-bundle exec rubocop      # Lint Ruby code
+bundle exec standardrb   # Lint Ruby code
 bundle exec brakeman     # Security scan
 ```
 

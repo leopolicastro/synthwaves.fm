@@ -259,7 +259,7 @@ A [`config/deploy.yml`](config/deploy.yml) is included for deployment with [Kama
 
 ```bash
 bin/rspec              # Run test suite
-bundle exec rubocop    # Lint Ruby code
+bundle exec standardrb # Lint Ruby code
 bundle exec brakeman   # Security scan
 ```
 

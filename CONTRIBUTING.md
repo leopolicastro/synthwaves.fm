@@ -17,7 +17,7 @@ This installs dependencies, prepares the database, and starts the dev server.
 ```bash
 bin/dev              # Start dev server
 bin/rspec            # Run tests
-bundle exec rubocop  # Lint
+bundle exec standardrb  # Lint
 ```
 
 ## Submitting Changes
@@ -25,7 +25,7 @@ bundle exec rubocop  # Lint
 1. Open an issue first for large changes so we can discuss the approach
 2. Fork the repo and create a branch from `main`
 3. Include tests for new behavior
-4. Make sure `bin/rspec` and `bundle exec rubocop` pass
+4. Make sure `bin/rspec` and `bundle exec standardrb` pass
 5. Open a pull request
 
 ## Reporting Bugs

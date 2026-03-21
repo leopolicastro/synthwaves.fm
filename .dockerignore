@@ -10,9 +10,10 @@
 # Ignore all environment files.
 /.env*
 
-# Ignore all default key files.
+# Ignore all default key files and encrypted credentials (self-hosters generate their own on first boot).
 /config/master.key
 /config/credentials/*.key
+/config/credentials/*.yml.enc
 
 # Ignore all logfiles and tempfiles.
 /log/*

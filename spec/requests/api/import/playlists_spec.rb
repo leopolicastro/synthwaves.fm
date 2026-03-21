@@ -74,7 +74,7 @@ RSpec.describe "API Import Playlists", type: :request do
         tracks: []
       }.to_json, headers: auth_headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "returns 401 without auth" do

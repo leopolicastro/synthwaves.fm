@@ -86,7 +86,7 @@ RSpec.describe "API Import Videos", type: :request do
         params: {signed_blob_id: "invalid", title: "Bad"},
         headers: auth_headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       json = JSON.parse(response.body)
       expect(json["error"]).to eq("Invalid signed blob ID")
     end

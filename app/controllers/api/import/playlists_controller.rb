@@ -3,7 +3,7 @@ class API::Import::PlaylistsController < API::Import::BaseController
     name = params[:name]
 
     if name.blank?
-      render json: {error: "name is required"}, status: :unprocessable_entity
+      render json: {error: "name is required"}, status: :unprocessable_content
       return
     end
 

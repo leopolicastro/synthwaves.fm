@@ -1,0 +1,51 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Dynamic Render Path",
+      "fingerprint": "ef63bc459c68ea3c1fcd1a16c0b3363d58f422dfb5d421a3dd28cae29a32cf15",
+      "check_name": "Render",
+      "message": "Render path contains parameter value",
+      "file": "app/views/music/show.html.erb",
+      "line": 20,
+      "note": "Tab parameter is validated via presence_in(available_tabs) in the controller"
+    },
+    {
+      "warning_type": "Dynamic Render Path",
+      "fingerprint": "407e852769f82d617a8b231864e4d83c6be34fe1b8d86dbeb2feeecf4a75b9dc",
+      "check_name": "Render",
+      "message": "Render path contains parameter value",
+      "file": "app/views/tv/show.html.erb",
+      "line": 31,
+      "note": "Tab parameter is validated via presence_in(available_tabs) in the controller"
+    },
+    {
+      "warning_type": "File Access",
+      "fingerprint": "6d49915a300eff0e2af7a8901369c30f7eac5c0dac0129ba8cb72bc9b4df3fe9",
+      "check_name": "FileAccess",
+      "message": "Model attribute used in file name",
+      "file": "app/jobs/stream_recording_job.rb",
+      "line": 15,
+      "note": "Path uses recording.id (integer primary key), not user input"
+    },
+    {
+      "warning_type": "File Access",
+      "fingerprint": "8250b899642220a664a3cdf21a4bcc47ab1e620c7888728b71bfbd0a5efb3539",
+      "check_name": "FileAccess",
+      "message": "Model attribute used in file name",
+      "file": "app/jobs/stream_recording_job.rb",
+      "line": 32,
+      "note": "Path uses recording.id (integer primary key), not user input"
+    },
+    {
+      "warning_type": "Redirect",
+      "fingerprint": "946264337a34d57b977c3de9aafa55b4fffbd9b7824da30f1a0e61604673995a",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/tracks_controller.rb",
+      "line": 100,
+      "note": "Redirects to signed Active Storage URL, not user input"
+    }
+  ],
+  "updated": "2026-03-21",
+  "brakeman_version": "8.0.4"
+}

@@ -154,6 +154,16 @@ song_row_controller  -->  queue_controller  -->  player_controller
 - `/admin` - Madmin admin panel
 - `/jobs` - Mission Control Jobs dashboard
 
+## Git Workflow
+
+Branch protection is enabled on `main` — direct pushes are not allowed. All changes must go through a pull request.
+
+1. Create a feature branch from `main`
+2. Commit changes to the branch
+3. Push the branch and open a PR
+4. CI must pass (tests, lint, security scans)
+5. Merge via PR
+
 ## Testing
 
 RSpec with FactoryBot, shoulda-matchers, and webmock. Test directories mirror app structure: `spec/{models,requests,services,jobs,components,helpers,factories}/`.

@@ -2,12 +2,14 @@
 # development, test). The code here should be idempotent so that it can be executed at any point in every environment.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
 
-# Create admin user
-admin = User.find_or_create_by!(email_address: "admin@example.com") do |u|
-  u.password = "abc123"
+# Create admin user (configurable via ENV for self-hosting)
+admin_email = ENV.fetch("ADMIN_EMAIL", "admin@example.com")
+admin_password = ENV.fetch("ADMIN_PASSWORD", "abc123")
+admin = User.find_or_create_by!(email_address: admin_email) do |u|
+  u.password = admin_password
   u.admin = true
 end
-puts "Admin user: admin@example.com / abc123"
+puts "Admin user: #{admin_email} / #{admin_password}"
 
 def seed_album_dir(artist:, album_dir:)
   mp3_files = album_dir.glob("*.mp3").sort

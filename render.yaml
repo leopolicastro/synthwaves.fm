@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: synthwaves
+    runtime: docker
+    plan: starter
+    healthCheckPath: /up
+    disk:
+      name: storage
+      mountPath: /rails/storage
+      sizeGB: 10
+    envVars:
+      - key: ASSUME_SSL
+        value: "true"
+      - key: SOLID_QUEUE_IN_PUMA
+        value: "true"
+      - key: STORAGE_SERVICE
+        value: local

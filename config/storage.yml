@@ -26,6 +26,15 @@ local:
 #   primary: local
 #   mirrors: [ amazon, google, microsoft ]
 
+# Generic S3-compatible storage for self-hosting (set STORAGE_SERVICE=s3)
+s3:
+  service: S3
+  access_key_id: <%= ENV["S3_ACCESS_KEY_ID"] %>
+  secret_access_key: <%= ENV["S3_SECRET_ACCESS_KEY"] %>
+  region: <%= ENV.fetch("S3_REGION", "us-east-1") %>
+  bucket: <%= ENV["S3_BUCKET"] %>
+  endpoint: <%= ENV["S3_ENDPOINT"] %>
+
 # Linode Object Storage (S3-compatible) for production
 # Configure credentials via: bin/rails credentials:edit
 linode:

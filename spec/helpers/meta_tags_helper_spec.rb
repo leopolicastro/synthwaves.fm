@@ -13,7 +13,7 @@ RSpec.describe MetaTagsHelper, type: :helper do
       expect(output).to include('name="description"')
       expect(output).to include("Self-hosted music streaming")
       expect(output).to include('property="og:title" content="synthwaves.fm"')
-      expect(output).to match(/property="og:image" content="https:\/\/synthwaves\.fm\/assets\/hero-[a-f0-9]+\.jpg"/)
+      expect(output).to match(/property="og:image" content="https:\/\/synthwaves\.fm\/assets\/hero2-[a-f0-9]+\.jpg"/)
       expect(output).to include('property="og:url" content="https://synthwaves.fm/artists/1"')
       expect(output).to include('property="og:type" content="website"')
       expect(output).to include('property="og:site_name" content="synthwaves.fm"')

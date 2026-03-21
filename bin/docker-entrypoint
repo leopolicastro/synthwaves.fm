@@ -1,8 +1,27 @@
 #!/bin/bash -e
 
-# If running the rails server then create or migrate existing database
+# If running the rails server then prepare the database and credentials
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
+  MASTER_KEY_PATH="/rails/storage/.master_key"
+
+  # Load persisted master key from the storage volume if no env var is set
+  if [ -z "$RAILS_MASTER_KEY" ] && [ -f "$MASTER_KEY_PATH" ]; then
+    export RAILS_MASTER_KEY=$(cat "$MASTER_KEY_PATH")
+  fi
+
+  # Auto-generate credentials on first boot
+  if [ -z "$RAILS_MASTER_KEY" ]; then
+    echo "No RAILS_MASTER_KEY found. Generating fresh credentials..."
+    export RAILS_MASTER_KEY=$(ruby -e "require 'securerandom'; print SecureRandom.hex(16)")
+    echo "$RAILS_MASTER_KEY" > "$MASTER_KEY_PATH"
+    chmod 600 "$MASTER_KEY_PATH"
+    RAILS_ENV=production bin/rails credentials:edit --environment production <<< ""
+    echo "Master key saved to $MASTER_KEY_PATH (persisted in storage volume)"
+    echo "IMPORTANT: Back up this key! Without it, encrypted data cannot be recovered."
+  fi
+
   ./bin/rails db:prepare
+  ./bin/rails setup:admin
 fi
 
 exec "${@}"

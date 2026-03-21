@@ -44,5 +44,6 @@
 # Dolt database files (added by bd init)
 .dolt/
 *.db
+db/*.sqlite3
 .beads/dolt-monitor.pid.lock
 .claude/prove_it

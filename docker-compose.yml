@@ -1,0 +1,39 @@
+# synthwaves.fm - Self-hosted music streaming
+# Quick start: docker compose up -d
+# Configuration: copy .env.example to .env and customize as needed
+
+services:
+  web:
+    image: ghcr.io/leopolicastro/synthwaves:latest
+    ports:
+      - "${PORT:-3000}:80"
+    volumes:
+      - storage:/rails/storage
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - SOLID_QUEUE_IN_PUMA=true
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/up"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # Uncomment to run background jobs in a separate container (for larger deployments)
+  # worker:
+  #   image: ghcr.io/leopolicastro/synthwaves:latest
+  #   command: bin/jobs
+  #   volumes:
+  #     - storage:/rails/storage
+  #   env_file:
+  #     - path: .env
+  #       required: false
+  #   environment:
+  #     - SOLID_QUEUE_IN_PUMA=false
+  #   restart: unless-stopped
+
+volumes:
+  storage:

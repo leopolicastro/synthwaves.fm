@@ -7,12 +7,12 @@ namespace :videos do
     require "base64"
     require "open3"
 
-    groovy = Rails.application.credentials.groovy
-    abort "groovy credentials not configured" unless groovy
+    synthwaves = Rails.application.credentials.synthwaves
+    abort "synthwaves credentials not configured" unless synthwaves
 
-    remote_url = groovy[:url] || abort("groovy.url is required in credentials")
-    client_id = groovy[:client_id] || abort("groovy.client_id is required in credentials")
-    secret_key = groovy[:secret_key] || abort("groovy.secret_key is required in credentials")
+    remote_url = synthwaves[:url] || abort("synthwaves.url is required in credentials")
+    client_id = synthwaves[:client_id] || abort("synthwaves.client_id is required in credentials")
+    secret_key = synthwaves[:secret_key] || abort("synthwaves.secret_key is required in credentials")
     video_path = File.expand_path(ENV.fetch("VIDEO_PATH", "~/Movies"))
     exclude_path = File.expand_path(ENV.fetch("EXCLUDE_PATH", "~/Movies/Transmissions"))
     abort "Not found: #{video_path}" unless File.exist?(video_path)

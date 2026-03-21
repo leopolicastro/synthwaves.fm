@@ -7,9 +7,9 @@ namespace :playlists do
     require "uri"
     require "json"
 
-    remote_url = ENV.fetch("GROOVY_REMOTE_URL") { abort "GROOVY_REMOTE_URL is required" }
-    client_id = ENV.fetch("GROOVY_CLIENT_ID") { abort "GROOVY_CLIENT_ID is required" }
-    secret_key = ENV.fetch("GROOVY_SECRET_KEY") { abort "GROOVY_SECRET_KEY is required" }
+    remote_url = ENV.fetch("SYNTHWAVES_REMOTE_URL") { abort "SYNTHWAVES_REMOTE_URL is required" }
+    client_id = ENV.fetch("SYNTHWAVES_CLIENT_ID") { abort "SYNTHWAVES_CLIENT_ID is required" }
+    secret_key = ENV.fetch("SYNTHWAVES_SECRET_KEY") { abort "SYNTHWAVES_SECRET_KEY is required" }
     playlists_path = ENV.fetch("CLIAMP_PLAYLISTS_PATH", File.expand_path("~/.config/cliamp/playlists"))
 
     token = RemoteAPI.authenticate(remote_url, client_id, secret_key)

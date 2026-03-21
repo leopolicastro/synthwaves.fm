@@ -68,6 +68,30 @@ synthwaves.fm is a self-hosted music and video streaming server built with Rails
 - Instant client-side switching with no page reload
 - Theme preference synced to your account
 
+### Playback Extras
+
+- Sleep timer with configurable presets (15, 30, 60, 90, 120 minutes)
+- Audio visualizer with theme-aware colors
+- Keyboard shortcuts for hands-free control
+- Picture-in-picture mode for video
+
+### Casting
+
+- AirPlay support for compatible speakers and devices
+- Chromecast support (feature-flagged)
+
+### Live TV
+
+- Import IPTV channels from M3U playlists
+- Electronic Program Guide (EPG) with schedules
+- Record live streams
+- Retro TV channel-surfing interface
+
+### Listening Stats
+
+- Dashboard with play counts, listening time, and streaks
+- Filter by week, month, year, or all time
+
 ### Progressive Web App
 
 - Install on mobile or desktop for a native app experience
@@ -103,7 +127,7 @@ The app runs out of the box with no configuration for local development. For pro
 
 Production deployments need an S3-compatible bucket for audio files, cover art, and video storage. In development, files are stored on local disk — no S3 needed.
 
-Run `bin/rails credentials:edit` and add your bucket credentials:
+Run `bin/rails credentials:edit --environment=production` and add your bucket credentials:
 
 ```yaml
 linode:
@@ -124,12 +148,12 @@ Get a key from the [Google Cloud Console](https://console.cloud.google.com/) und
 
 ### Rails Credentials
 
-Manage with `bin/rails credentials:edit`:
+Manage with `bin/rails credentials:edit --environment=production`:
 
 | Credential | Purpose | Required? |
 |---|---|---|
 | `linode.*` | S3 storage for uploads | Yes, for production |
-| `groovy.*` | Remote upload rake tasks | Only for rake tasks |
+| `synthwaves.*` | Remote upload rake tasks | Only for rake tasks |
 | `secret_key_base` | JWT signing, sessions | Auto-generated |
 
 ### Environment Variables
@@ -149,7 +173,7 @@ Manage with `bin/rails credentials:edit`:
 
 ### Push Music
 
-Upload a directory of audio files. Uses Rails credentials (`groovy.*`) for authentication:
+Upload a directory of audio files. Uses Rails credentials (`synthwaves.*`) for authentication:
 
 ```
 MUSIC_PATH=/path/to/music bundle exec rake library:push
@@ -162,9 +186,9 @@ MUSIC_PATH=/path/to/music bundle exec rake library:push
 Upload playlists from cliamp's TOML playlist files. Uses environment variables for authentication:
 
 ```
-GROOVY_REMOTE_URL=https://groovy.example.com \
-GROOVY_CLIENT_ID=bc_xxxx \
-GROOVY_SECRET_KEY=xxxx \
+SYNTHWAVES_REMOTE_URL=https://synthwaves.example.com \
+SYNTHWAVES_CLIENT_ID=bc_xxxx \
+SYNTHWAVES_SECRET_KEY=xxxx \
 bundle exec rake playlists:push
 ```
 
@@ -172,7 +196,7 @@ Tracks are matched against your existing library by title, artist, and album.
 
 ### Push Videos
 
-Upload a directory of video files. Uses Rails credentials (`groovy.*`) for authentication:
+Upload a directory of video files. Uses Rails credentials (`synthwaves.*`) for authentication:
 
 ```
 VIDEO_PATH=/path/to/videos bundle exec rake videos:push

@@ -35,11 +35,11 @@ RSpec.describe Maintenance::NormalizeSurroundAudioTask do
       stereo_metadata = {audio_channels: 2, audio_codec: "aac", bitrate: 3000}
 
       allow(VideoMetadataExtractor).to receive(:call).and_return(surround_metadata, stereo_metadata)
-      allow(task).to receive(:system) do |*_args|
+      allow(task).to receive(:system) do |*args|
         # Create the output file that ffmpeg would produce
-        _args.last(3).first # the arg before out:/err: options
+        args.last(3).first # the arg before out:/err: options
         # Find the output_path from args (it's the last positional arg before keyword-style args)
-        output_file = _args.find { |a| a.is_a?(String) && a.end_with?(".normalized.mp4") }
+        output_file = args.find { |a| a.is_a?(String) && a.end_with?(".normalized.mp4") }
         File.write(output_file, "converted video") if output_file
         true
       end

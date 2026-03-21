@@ -103,7 +103,7 @@ class S3RecoveryService
         if @user.tracks.exists?(title: title, album: album, artist: artist)
           @stats[:skipped] += 1
           log "SKIP (duplicate): #{artist_name} - #{title}"
-          return
+          return nil
         end
 
         track = Track.new(

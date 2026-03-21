@@ -16,7 +16,7 @@ module Maintenance
         channels = metadata[:audio_channels]
 
         video.update!(audio_channels: channels)
-        return unless channels && channels > 2
+        return nil unless channels && channels > 2
 
         output_path = "#{source_file.path}.normalized.mp4"
 

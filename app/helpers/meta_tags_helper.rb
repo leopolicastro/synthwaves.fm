@@ -8,7 +8,7 @@ module MetaTagsHelper
     image = content_for(:meta_image).presence || "#{request.base_url}#{ActionController::Base.helpers.asset_path("hero2.jpg")}"
     url = content_for(:meta_url).presence || request.original_url
     type = content_for(:meta_type).presence || "website"
-    card_type = content_for(:meta_image).present? ? "summary_large_image" : "summary_large_image"
+    card_type = "summary_large_image"
 
     safe_join([
       tag.meta(name: "description", content: description),

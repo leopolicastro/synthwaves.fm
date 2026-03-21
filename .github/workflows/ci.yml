@@ -26,7 +26,7 @@ jobs:
         run: echo "${{ secrets.RAILS_TEST_KEY }}" > config/credentials/test.key
 
       - name: Prepare database
-        run: bin/rails db:prepare
+        run: bin/rails db:test:prepare
 
       - name: Run tests
         run: bundle exec rspec

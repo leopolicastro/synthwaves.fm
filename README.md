@@ -16,7 +16,7 @@ synthwaves.fm is a self-hosted music and video streaming server built with Rails
 |---|---|---|
 | ![Home](docs/screenshots/home.png) | ![Album](docs/screenshots/album.png) | ![Library](docs/screenshots/library.png) |
 | ![Lyrics](docs/screenshots/lyrics.png) | ![TV Guide](docs/screenshots/tv-guide.png) | ![Live TV](docs/screenshots/live-tv.png) |
-| ![Podcasts](docs/screenshots/podcasts.png) | | |
+| ![Podcasts](docs/screenshots/podcasts.png) | ![Videos](docs/screenshots/videos.png) | ![Video Player](docs/screenshots/video-player.png) |
 
 ## Features
 

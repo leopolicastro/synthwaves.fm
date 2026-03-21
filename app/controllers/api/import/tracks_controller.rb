@@ -5,7 +5,7 @@ class API::Import::TracksController < API::Import::BaseController
     elsif params[:audio_file].present?
       create_from_multipart
     else
-      render json: {error: "audio_file or signed_blob_id is required"}, status: :unprocessable_entity
+      render json: {error: "audio_file or signed_blob_id is required"}, status: :unprocessable_content
     end
   end
 
@@ -110,7 +110,7 @@ class API::Import::TracksController < API::Import::BaseController
         created: true
       }, status: :created
     else
-      render json: {error: track.errors.full_messages.join(", ")}, status: :unprocessable_entity
+      render json: {error: track.errors.full_messages.join(", ")}, status: :unprocessable_content
     end
   end
 

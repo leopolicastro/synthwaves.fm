@@ -40,7 +40,7 @@ RSpec.describe "API Import Tracks", type: :request do
     it "returns unprocessable_entity without a file" do
       post api_import_tracks_path, headers: auth_headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       json = JSON.parse(response.body)
       expect(json["error"]).to eq("audio_file or signed_blob_id is required")
     end

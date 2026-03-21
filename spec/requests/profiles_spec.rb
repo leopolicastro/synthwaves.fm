@@ -118,7 +118,7 @@ RSpec.describe "Profiles", type: :request do
 
         patch profile_path, params: {user: {theme: "invalid"}}, as: :json
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         body = JSON.parse(response.body)
         expect(body["errors"]).to be_present
       end

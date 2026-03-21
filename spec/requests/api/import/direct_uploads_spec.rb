@@ -43,7 +43,7 @@ RSpec.describe "API Import Direct Uploads", type: :request do
         params: {filename: "test.mp4"},
         headers: auth_headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "returns unauthorized without valid credentials" do

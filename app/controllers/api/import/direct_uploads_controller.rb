@@ -17,7 +17,7 @@ class API::Import::DirectUploadsController < API::Import::BaseController
       }
     }, status: :created
   rescue ActiveRecord::RecordInvalid => e
-    render json: {error: e.message}, status: :unprocessable_entity
+    render json: {error: e.message}, status: :unprocessable_content
   end
 
   private

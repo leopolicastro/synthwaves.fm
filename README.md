@@ -237,13 +237,32 @@ synthwaves.fm implements the Subsonic API, so you can connect dedicated music ap
 
 ### Docker
 
-ffmpeg and yt-dlp are included in the Docker image.
+A pre-built image is available on GitHub Container Registry. ffmpeg and yt-dlp are included.
+
+```bash
+docker pull ghcr.io/leopolicastro/synthwaves.fm:latest
+docker run -d \
+  -p 3000:80 \
+  -v synthwaves_fm_storage:/rails/storage \
+  --name synthwaves_fm \
+  ghcr.io/leopolicastro/synthwaves.fm:latest
+```
+
+Visit `http://localhost:3000` and log in with `admin@example.com` / `abc123`.
+
+Data is persisted in the `synthwaves_fm_storage` volume. To stop and restart:
+
+```bash
+docker stop synthwaves_fm
+docker start synthwaves_fm
+```
+
+To build from source instead:
 
 ```bash
 docker build -t synthwaves_fm .
 docker run -d \
-  -p 80:80 \
-  -e RAILS_MASTER_KEY=<your-master-key> \
+  -p 3000:80 \
   -v synthwaves_fm_storage:/rails/storage \
   --name synthwaves_fm \
   synthwaves_fm

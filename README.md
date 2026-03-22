@@ -243,6 +243,7 @@ A pre-built image is available on GitHub Container Registry. ffmpeg and yt-dlp a
 docker pull ghcr.io/leopolicastro/synthwaves.fm:latest
 docker run -d \
   -p 3000:80 \
+  -e SOLID_QUEUE_IN_PUMA=true \
   -v synthwaves_fm_storage:/rails/storage \
   --name synthwaves_fm \
   ghcr.io/leopolicastro/synthwaves.fm:latest
@@ -265,6 +266,7 @@ To build from source instead:
 docker build -t synthwaves_fm .
 docker run -d \
   -p 3000:80 \
+  -e SOLID_QUEUE_IN_PUMA=true \
   -v synthwaves_fm_storage:/rails/storage \
   --name synthwaves_fm \
   synthwaves_fm
@@ -288,7 +290,7 @@ Admin panel at `/admin`. Job dashboard at `/jobs`.
 
 ## License
 
-[O'Saasy License](LICENSE.md)
+[MIT License](LICENSE.md)
 
 ---
 

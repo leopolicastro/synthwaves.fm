@@ -233,6 +233,14 @@ Full documentation is in [`docs/api/`](docs/api/).
 
 synthwaves.fm implements the Subsonic API, so you can connect dedicated music apps and stream your library from any platform. Compatible apps include DSub, play:Sub, Submariner, Clementine, Symfonium, and many more.
 
+## Mobile Apps
+
+### iOS
+
+synthwaves.fm is available as a native iOS app.
+
+[![Download on the App Store](https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg)](https://apps.apple.com/app/synthwaves-fm/id6760940326)
+
 ## Deployment
 
 ### Docker

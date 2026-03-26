@@ -1,4 +1,4 @@
-class ExternalStreamStreamsController < ApplicationController
+class ExternalStreamProxyController < ApplicationController
   include ActionController::Live
   include FeatureFlagged
 

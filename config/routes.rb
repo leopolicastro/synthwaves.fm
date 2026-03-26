@@ -37,7 +37,7 @@ Rails.application.routes.draw do
   end
   resources :podcasts, only: [:show]
   resources :external_streams, only: [:index, :new, :create, :destroy] do
-    resource :stream, only: [:show], controller: "external_stream_streams"
+    resource :stream, only: [:show], controller: "external_stream_proxy"
   end
   get :tv, to: "tv#show"
   resources :iptv_channels, only: [:show, :new, :create, :edit, :update, :destroy], path: "tv/channels" do

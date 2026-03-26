@@ -100,7 +100,7 @@ RSpec.describe "Library", type: :request do
     context "Radio Stations section" do
       it "appears when feature flag is enabled and stations exist" do
         Flipper.enable(:youtube_radio, user)
-        create(:radio_station, user: user, name: "Lofi Beats")
+        create(:external_stream, user: user, name: "Lofi Beats")
 
         get library_path
         expect(response.body).to include("Radio Stations")
@@ -109,7 +109,7 @@ RSpec.describe "Library", type: :request do
 
       it "is hidden when feature flag is disabled" do
         Flipper.disable(:youtube_radio, user)
-        create(:radio_station, user: user)
+        create(:external_stream, user: user)
 
         get library_path
         expect(response.body).not_to include("Radio Stations")

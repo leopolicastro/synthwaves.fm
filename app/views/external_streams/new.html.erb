@@ -1,16 +1,16 @@
 <div class="w-full max-w-lg">
   <div class="mb-6">
-    <%= link_to "&larr; Back to Radio".html_safe, radio_stations_path, class: "text-neon-cyan hover:underline" %>
+    <%= link_to "&larr; Back to Radio".html_safe, external_streams_path, class: "text-neon-cyan hover:underline" %>
   </div>
 
   <h1 class="text-3xl font-bold font-display mb-8">Add Radio Station</h1>
 
   <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
-    <%= form_with model: @radio_station, class: "space-y-4", data: { controller: "radio-form", action: "submit->radio-form#submit" } do |f| %>
-      <% if @radio_station.errors.any? %>
+    <%= form_with model: @external_stream, class: "space-y-4", data: { controller: "external-stream-form", action: "submit->external-stream-form#submit" } do |f| %>
+      <% if @external_stream.errors.any? %>
         <div class="bg-red-900/20 border border-red-800 rounded-lg p-4">
           <ul class="text-sm text-red-400 list-disc list-inside">
-            <% @radio_station.errors.full_messages.each do |message| %>
+            <% @external_stream.errors.full_messages.each do |message| %>
               <li><%= message %></li>
             <% end %>
           </ul>
@@ -19,21 +19,21 @@
 
       <fieldset>
         <legend class="block text-sm font-medium text-gray-400 mb-3">Source type</legend>
-        <div class="grid grid-cols-2 gap-3" data-radio-form-target="tabs">
+        <div class="grid grid-cols-2 gap-3" data-external-stream-form-target="tabs">
           <label class="relative flex flex-col items-center gap-2 p-4 rounded-lg border-2 cursor-pointer transition-colors has-[:checked]:border-neon-pink has-[:checked]:bg-neon-pink/10 border-gray-600 hover:border-gray-500">
-            <%= f.radio_button :source_type, "youtube", checked: @radio_station.source_type != "stream", data: { action: "radio-form#toggle" }, class: "sr-only" %>
+            <%= f.radio_button :source_type, "youtube", checked: @external_stream.source_type != "stream", data: { action: "external-stream-form#toggle" }, class: "sr-only" %>
             <svg class="w-6 h-6 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.546 12 3.546 12 3.546s-7.505 0-9.377.504A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.504 9.376.504 9.376.504s7.505 0 9.377-.504a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
             <span class="text-sm font-medium text-gray-200">YouTube</span>
           </label>
           <label class="relative flex flex-col items-center gap-2 p-4 rounded-lg border-2 cursor-pointer transition-colors has-[:checked]:border-neon-pink has-[:checked]:bg-neon-pink/10 border-gray-600 hover:border-gray-500">
-            <%= f.radio_button :source_type, "stream", checked: @radio_station.source_type == "stream", data: { action: "radio-form#toggle" }, class: "sr-only" %>
+            <%= f.radio_button :source_type, "stream", checked: @external_stream.source_type == "stream", data: { action: "external-stream-form#toggle" }, class: "sr-only" %>
             <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 14.828a4 4 0 010-5.656m5.656 0a4 4 0 010 5.656M12 12h.01"/></svg>
             <span class="text-sm font-medium text-gray-200">Internet Radio</span>
           </label>
         </div>
       </fieldset>
 
-      <div data-radio-form-target="youtubeFields" class="<%= 'hidden' if @radio_station.source_type == 'stream' %>">
+      <div data-external-stream-form-target="youtubeFields" class="<%= 'hidden' if @external_stream.source_type == 'stream' %>">
         <div>
           <%= f.label :youtube_url, "YouTube URL", class: "block text-sm font-medium text-gray-400 mb-1" %>
           <%= f.text_field :youtube_url, placeholder: "https://youtube.com/watch?v=...", class: "w-full rounded-lg bg-gray-800 border-gray-700 text-white focus:outline-neon-cyan" %>
@@ -41,7 +41,7 @@
         </div>
       </div>
 
-      <div data-radio-form-target="streamFields" class="<%= 'hidden' unless @radio_station.source_type == 'stream' %>">
+      <div data-external-stream-form-target="streamFields" class="<%= 'hidden' unless @external_stream.source_type == 'stream' %>">
         <div>
           <%= f.label :stream_url, "Stream URL", class: "block text-sm font-medium text-gray-400 mb-1" %>
           <%= f.text_field :stream_url, placeholder: "https://radio.example.com/stream or .pls/.m3u URL", class: "w-full rounded-lg bg-gray-800 border-gray-700 text-white focus:outline-neon-cyan" %>

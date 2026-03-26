@@ -86,7 +86,7 @@ RSpec.describe "Music", type: :request do
       user = create(:user)
       Flipper.enable(:youtube_radio, user)
       login_user(user)
-      create(:radio_station, name: "Lofi Beats", user: user)
+      create(:external_stream, name: "Lofi Beats", user: user)
 
       get music_path(tab: "radio")
 

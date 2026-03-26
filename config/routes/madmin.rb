@@ -13,7 +13,7 @@ constraints AdminConstraint.new do
     resources :play_histories
     resources :playlist_tracks
     resources :playlists
-    resources :radio_stations
+    resources :external_streams
     resources :sessions
     resources :tool_calls
     resources :tracks

@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :radio_station do
+  factory :external_stream do
     user
     sequence(:name) { |n| "Radio Station #{n}" }
     source_type { "youtube" }

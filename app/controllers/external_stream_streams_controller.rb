@@ -1,11 +1,11 @@
-class RadioStreamsController < ApplicationController
+class ExternalStreamStreamsController < ApplicationController
   include ActionController::Live
   include FeatureFlagged
 
   require_feature :youtube_radio
 
   def show
-    station = RadioStation.find(params[:radio_station_id])
+    station = ExternalStream.find(params[:external_stream_id])
 
     unless station.stream?
       head :not_found

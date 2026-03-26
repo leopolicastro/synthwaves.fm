@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "RadioStreams", type: :request do
+RSpec.describe "ExternalStreamStreams", type: :request do
   let(:user) { create(:user) }
 
   before do
@@ -8,17 +8,17 @@ RSpec.describe "RadioStreams", type: :request do
     Flipper.enable(:youtube_radio)
   end
 
-  describe "GET /radio_stations/:id/stream" do
+  describe "GET /external_streams/:id/stream" do
     it "returns 404 for youtube-type stations" do
-      station = create(:radio_station, user: user, source_type: "youtube")
+      station = create(:external_stream, user: user, source_type: "youtube")
 
-      get radio_station_stream_path(station)
+      get external_stream_stream_path(station)
 
       expect(response).to have_http_status(:not_found)
     end
 
     it "proxies the audio stream for stream-type stations" do
-      station = create(:radio_station, :stream, user: user, stream_url: "https://radio.example.com/stream")
+      station = create(:external_stream, :stream, user: user, stream_url: "https://radio.example.com/stream")
 
       stub_request(:get, "https://radio.example.com/stream")
         .to_return(
@@ -27,7 +27,7 @@ RSpec.describe "RadioStreams", type: :request do
           body: "fake audio data"
         )
 
-      get radio_station_stream_path(station)
+      get external_stream_stream_path(station)
 
       expect(response).to have_http_status(:ok)
       expect(response.headers["Content-Type"]).to eq("audio/mpeg")
@@ -36,12 +36,12 @@ RSpec.describe "RadioStreams", type: :request do
     end
 
     it "returns 502 when upstream stream fails" do
-      station = create(:radio_station, :stream, user: user, stream_url: "https://radio.example.com/broken")
+      station = create(:external_stream, :stream, user: user, stream_url: "https://radio.example.com/broken")
 
       stub_request(:get, "https://radio.example.com/broken")
         .to_raise(HTTP::ConnectionError.new("Connection refused"))
 
-      get radio_station_stream_path(station)
+      get external_stream_stream_path(station)
 
       expect(response).to have_http_status(:bad_gateway)
     end

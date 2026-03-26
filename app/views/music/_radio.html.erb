@@ -1,5 +1,5 @@
 <%= render CollectionLayout::Component.new(
-  collection: @radio_stations,
+  collection: @external_streams,
   page_key: "music-radio",
   search: false,
   view_toggle: true,
@@ -7,7 +7,7 @@
   empty_label: "radio stations"
 ) do |c| %>
   <% c.with_actions do %>
-    <%= render Button::Component.new(label: "Add Station", behavior: :navigation, link_url: new_radio_station_path, turbo_frame: "_top") %>
+    <%= render Button::Component.new(label: "Add Station", behavior: :navigation, link_url: new_external_stream_path, turbo_frame: "_top") %>
   <% end %>
   <% c.with_empty_state do %>
     <div class="text-center py-16 text-gray-400">
@@ -16,12 +16,12 @@
       </svg>
       <p class="text-lg mb-2">No radio stations yet</p>
       <p class="mb-4">Add a YouTube live stream or internet radio station to get started.</p>
-      <%= render Button::Component.new(label: "Add Station", behavior: :navigation, link_url: new_radio_station_path, turbo_frame: "_top") %>
+      <%= render Button::Component.new(label: "Add Station", behavior: :navigation, link_url: new_external_stream_path, turbo_frame: "_top") %>
     </div>
   <% end %>
-  <% @radio_stations.each do |station| %>
+  <% @external_streams.each do |station| %>
     <div class="collection-card">
-      <%= render "radio_stations/radio_station", station: station %>
+      <%= render "external_streams/external_stream", station: station %>
     </div>
   <% end %>
 <% end %>

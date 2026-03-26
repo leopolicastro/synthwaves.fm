@@ -69,7 +69,7 @@ class MusicController < ApplicationController
   end
 
   def load_radio
-    @radio_stations = Current.user.radio_stations.order(created_at: :desc)
+    @external_streams = Current.user.external_streams.order(created_at: :desc)
   end
 
   def load_internet_radio

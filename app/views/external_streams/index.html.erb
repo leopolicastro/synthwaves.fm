@@ -1,13 +1,13 @@
 <div class="w-full">
   <div class="flex items-center justify-between mb-8">
     <h1 class="text-3xl font-bold font-display">Radio</h1>
-    <%= render Button::Component.new(label: "Add Station", behavior: :navigation, link_url: new_radio_station_path) %>
+    <%= render Button::Component.new(label: "Add Station", behavior: :navigation, link_url: new_external_stream_path) %>
   </div>
 
-  <% if @radio_stations.any? %>
+  <% if @external_streams.any? %>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <% @radio_stations.each do |station| %>
-        <%= render "radio_station", station: station %>
+      <% @external_streams.each do |station| %>
+        <%= render "external_stream", station: station %>
       <% end %>
     </div>
   <% else %>
@@ -17,7 +17,7 @@
       </svg>
       <p class="text-lg mb-2">No radio stations yet</p>
       <p class="mb-4">Add a YouTube live stream or internet radio station to get started.</p>
-      <%= render Button::Component.new(label: "Add Station", behavior: :navigation, link_url: new_radio_station_path) %>
+      <%= render Button::Component.new(label: "Add Station", behavior: :navigation, link_url: new_external_stream_path) %>
     </div>
   <% end %>
 </div>

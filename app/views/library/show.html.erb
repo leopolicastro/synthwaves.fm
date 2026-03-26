@@ -26,7 +26,7 @@
         Downloads
       <% end %>
       <% if Flipper.enabled?(:youtube_radio, Current.user) %>
-        <%= link_to new_radio_station_path, class: "inline-flex items-center gap-1.5 px-3 py-1.5 bg-neon-purple/30 text-white rounded-full text-sm font-medium hover:bg-neon-purple/50 transition-colors" do %>
+        <%= link_to new_external_stream_path, class: "inline-flex items-center gap-1.5 px-3 py-1.5 bg-neon-purple/30 text-white rounded-full text-sm font-medium hover:bg-neon-purple/50 transition-colors" do %>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 14.828a4 4 0 010-5.656m5.656 0a4 4 0 010 5.656M12 12h.01"/></svg>
           Add Radio Station
         <% end %>
@@ -60,10 +60,10 @@
     <% end %>
   <% end %>
 
-  <%# Radio Stations %>
-  <% if @radio_stations&.any? %>
-    <%= render "library/section", title: "Radio Stations", see_all_path: radio_stations_path do %>
-      <% @radio_stations.each do |station| %>
+  <%# External Streams %>
+  <% if @external_streams&.any? %>
+    <%= render "library/section", title: "Radio Stations", see_all_path: external_streams_path do %>
+      <% @external_streams.each do |station| %>
         <%= render "library/radio_card", station: station %>
       <% end %>
     <% end %>

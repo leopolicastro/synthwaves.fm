@@ -36,8 +36,8 @@ Rails.application.routes.draw do
     resources :tracks, controller: "playlist_tracks", only: [:create, :destroy], as: :tracks
   end
   resources :podcasts, only: [:show]
-  resources :radio_stations, only: [:index, :new, :create, :destroy] do
-    resource :stream, only: [:show], controller: "radio_streams"
+  resources :external_streams, only: [:index, :new, :create, :destroy] do
+    resource :stream, only: [:show], controller: "external_stream_streams"
   end
   get :tv, to: "tv#show"
   resources :iptv_channels, only: [:show, :new, :create, :edit, :update, :destroy], path: "tv/channels" do

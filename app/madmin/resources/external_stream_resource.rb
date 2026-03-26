@@ -1,4 +1,4 @@
-class RadioStationResource < Madmin::Resource
+class ExternalStreamResource < Madmin::Resource
   attribute :id, form: false
   attribute :name
   attribute :user

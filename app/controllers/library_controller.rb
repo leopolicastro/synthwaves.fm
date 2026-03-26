@@ -18,7 +18,7 @@ class LibraryController < ApplicationController
       .limit(10)
 
     if Flipper.enabled?(:youtube_radio, Current.user)
-      @radio_stations = Current.user.radio_stations.order(created_at: :desc).limit(10)
+      @external_streams = Current.user.external_streams.order(created_at: :desc).limit(10)
     end
 
     @recently_added_albums = Current.user.albums.music

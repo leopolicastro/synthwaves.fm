@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "RadioStations", type: :request do
+RSpec.describe "ExternalStreams", type: :request do
   let(:user) { create(:user) }
 
   before do
@@ -8,29 +8,29 @@ RSpec.describe "RadioStations", type: :request do
     Flipper.enable(:youtube_radio)
   end
 
-  describe "GET /radio_stations" do
+  describe "GET /external_streams" do
     it "returns success" do
-      get radio_stations_path
+      get external_streams_path
       expect(response).to have_http_status(:ok)
     end
 
-    it "displays radio stations" do
-      create(:radio_station, user: user, name: "Lo-Fi Beats")
-      get radio_stations_path
+    it "displays external streams" do
+      create(:external_stream, user: user, name: "Lo-Fi Beats")
+      get external_streams_path
       expect(response.body).to include("Lo-Fi Beats")
     end
   end
 
-  describe "GET /radio_stations/new" do
+  describe "GET /external_streams/new" do
     it "returns success" do
-      get new_radio_station_path
+      get new_external_stream_path
       expect(response).to have_http_status(:ok)
     end
   end
 
-  describe "POST /radio_stations" do
+  describe "POST /external_streams" do
     context "youtube source type" do
-      it "creates a radio station with valid YouTube URL" do
+      it "creates an external stream with valid YouTube URL" do
         stub_request(:get, %r{youtube\.com/oembed})
           .to_return(
             status: 200,
@@ -39,20 +39,20 @@ RSpec.describe "RadioStations", type: :request do
           )
 
         expect {
-          post radio_stations_path, params: {radio_station: {
+          post external_streams_path, params: {external_stream: {
             source_type: "youtube",
             youtube_url: "https://www.youtube.com/watch?v=jfKfPfyJRdk"
           }}
-        }.to change(RadioStation, :count).by(1)
+        }.to change(ExternalStream, :count).by(1)
 
-        station = RadioStation.last
+        station = ExternalStream.last
         expect(station.source_type).to eq("youtube")
         expect(station.youtube_video_id).to eq("jfKfPfyJRdk")
         expect(station.name).to eq("Lo-Fi Beats")
-        expect(response).to redirect_to(radio_stations_path)
+        expect(response).to redirect_to(external_streams_path)
       end
 
-      it "creates a radio station with manual name and still fetches thumbnail" do
+      it "creates an external stream with manual name and still fetches thumbnail" do
         stub_request(:get, %r{youtube\.com/oembed})
           .to_return(
             status: 200,
@@ -61,20 +61,20 @@ RSpec.describe "RadioStations", type: :request do
           )
 
         expect {
-          post radio_stations_path, params: {radio_station: {
+          post external_streams_path, params: {external_stream: {
             source_type: "youtube",
             youtube_url: "https://www.youtube.com/watch?v=jfKfPfyJRdk",
             name: "My Radio"
           }}
-        }.to change(RadioStation, :count).by(1)
+        }.to change(ExternalStream, :count).by(1)
 
-        station = RadioStation.last
+        station = ExternalStream.last
         expect(station.name).to eq("My Radio")
         expect(station.thumbnail_url).to eq("https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg")
       end
 
       it "rejects invalid URL" do
-        post radio_stations_path, params: {radio_station: {
+        post external_streams_path, params: {external_stream: {
           source_type: "youtube",
           youtube_url: "https://example.com/not-youtube",
           name: "Bad Station"
@@ -93,18 +93,18 @@ RSpec.describe "RadioStations", type: :request do
           )
 
         expect {
-          post radio_stations_path, params: {radio_station: {
+          post external_streams_path, params: {external_stream: {
             source_type: "stream",
             stream_url: "https://radio.example.com/stream",
             name: "My Stream"
           }}
-        }.to change(RadioStation, :count).by(1)
+        }.to change(ExternalStream, :count).by(1)
 
-        station = RadioStation.last
+        station = ExternalStream.last
         expect(station.source_type).to eq("stream")
         expect(station.stream_url).to eq("https://radio.example.com/stream")
         expect(station.name).to eq("My Stream")
-        expect(response).to redirect_to(radio_stations_path)
+        expect(response).to redirect_to(external_streams_path)
       end
 
       it "creates a stream station from a .pls URL and resolves it" do
@@ -126,13 +126,13 @@ RSpec.describe "RadioStations", type: :request do
           .to_return(status: 200)
 
         expect {
-          post radio_stations_path, params: {radio_station: {
+          post external_streams_path, params: {external_stream: {
             source_type: "stream",
             stream_url: "https://example.com/station.pls"
           }}
-        }.to change(RadioStation, :count).by(1)
+        }.to change(ExternalStream, :count).by(1)
 
-        station = RadioStation.last
+        station = ExternalStream.last
         expect(station.stream_url).to eq("https://radio.example.com/actual-stream")
         expect(station.original_url).to eq("https://example.com/station.pls")
         expect(station.name).to eq("Cool Radio")
@@ -142,7 +142,7 @@ RSpec.describe "RadioStations", type: :request do
         stub_request(:get, "https://example.com/broken")
           .to_raise(HTTP::ConnectionError.new("Connection refused"))
 
-        post radio_stations_path, params: {radio_station: {
+        post external_streams_path, params: {external_stream: {
           source_type: "stream",
           stream_url: "https://example.com/broken",
           name: "Broken Stream"
@@ -152,7 +152,7 @@ RSpec.describe "RadioStations", type: :request do
       end
 
       it "rejects a stream station without a stream_url" do
-        post radio_stations_path, params: {radio_station: {
+        post external_streams_path, params: {external_stream: {
           source_type: "stream",
           name: "No URL"
         }}
@@ -162,24 +162,24 @@ RSpec.describe "RadioStations", type: :request do
     end
   end
 
-  describe "DELETE /radio_stations/:id" do
+  describe "DELETE /external_streams/:id" do
     it "deletes the user's own station" do
-      station = create(:radio_station, user: user)
+      station = create(:external_stream, user: user)
 
       expect {
-        delete radio_station_path(station)
-      }.to change(RadioStation, :count).by(-1)
+        delete external_stream_path(station)
+      }.to change(ExternalStream, :count).by(-1)
 
-      expect(response).to redirect_to(radio_stations_path)
+      expect(response).to redirect_to(external_streams_path)
     end
 
     it "does not delete another user's station" do
       other_user = create(:user)
-      station = create(:radio_station, user: other_user)
+      station = create(:external_stream, user: other_user)
 
       expect {
-        delete radio_station_path(station)
-      }.not_to change(RadioStation, :count)
+        delete external_stream_path(station)
+      }.not_to change(ExternalStream, :count)
     end
   end
 end

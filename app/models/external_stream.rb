@@ -1,4 +1,4 @@
-class RadioStation < ApplicationRecord
+class ExternalStream < ApplicationRecord
   include Streamable
 
   belongs_to :user

@@ -12,6 +12,7 @@ module API
         result = NextTrackService.call(station)
 
         if result
+          station.broadcast_now_playing
           render json: {
             url: result.url,
             track_id: result.track.id,

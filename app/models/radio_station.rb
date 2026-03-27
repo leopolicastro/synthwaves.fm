@@ -38,6 +38,15 @@ class RadioStation < ApplicationRecord
     )
   end
 
+  def broadcast_now_playing
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "radio_stations_#{user_id}",
+      target: "now_playing_#{id}",
+      partial: "radio_stations/now_playing",
+      locals: {station: self}
+    )
+  end
+
   private
 
   def generate_mount_point

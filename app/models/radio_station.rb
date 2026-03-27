@@ -20,8 +20,13 @@ class RadioStation < ApplicationRecord
 
   def listen_url
     host = ENV.fetch("ICECAST_HOST", "localhost")
+    protocol = ENV.fetch("ICECAST_PROTOCOL", "http")
     port = ENV.fetch("ICECAST_PORT", "8000")
-    "http://#{host}:#{port}#{mount_point}"
+    if port == "443" || port == "80"
+      "#{protocol}://#{host}#{mount_point}"
+    else
+      "#{protocol}://#{host}:#{port}#{mount_point}"
+    end
   end
 
   def broadcast_status

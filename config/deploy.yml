@@ -52,7 +52,8 @@ env:
 
     # Icecast streaming (for radio station URLs)
     ICECAST_HOST: radio.synthwaves.fm
-    ICECAST_PORT: "8000"
+    ICECAST_PROTOCOL: https
+    ICECAST_PORT: "443"
 
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
     # When you start using multiple servers, you should split out job processing to a dedicated machine.

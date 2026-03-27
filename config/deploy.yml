@@ -51,7 +51,7 @@ env:
     STORAGE_SERVICE: linode
 
     # Icecast streaming (for radio station URLs)
-    ICECAST_HOST: <%= ENV["DEPLOY_HOST"] %>
+    ICECAST_HOST: radio.synthwaves.fm
     ICECAST_PORT: "8000"
 
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
@@ -130,7 +130,7 @@ accessories:
       clear:
         RAILS_HOST: synthwaves.fm
         RAILS_PROTOCOL: https
-        ICECAST_HOST: <%= ENV["DEPLOY_HOST"] %>
+        ICECAST_HOST: radio.synthwaves.fm
         ICECAST_PORT: "8000"
     volumes:
       - "groovy_tunes_storage:/rails/storage:ro"

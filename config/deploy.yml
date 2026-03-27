@@ -131,8 +131,8 @@ accessories:
       clear:
         RAILS_HOST: synthwaves.fm
         RAILS_PROTOCOL: https
-        ICECAST_HOST: radio.synthwaves.fm
-        ICECAST_PORT: "8000"
+        ICECAST_INTERNAL_HOST: synthwaves_fm-icecast
+        ICECAST_INTERNAL_PORT: "8000"
     volumes:
       - "groovy_tunes_storage:/rails/storage:ro"
     cmd: liquidsoap /rails/storage/liquidsoap/radio.liq

@@ -32,8 +32,8 @@ class LiquidsoapConfigService
       rails_host = environment.get(default="localhost:3000", "RAILS_HOST")
       rails_protocol = environment.get(default="http", "RAILS_PROTOCOL")
       auth_token = environment.get(default="", "LIQUIDSOAP_API_TOKEN")
-      icecast_host = environment.get(default="localhost", "ICECAST_HOST")
-      icecast_port = int_of_string(environment.get(default="8000", "ICECAST_PORT"))
+      icecast_host = environment.get(default="localhost", "ICECAST_INTERNAL_HOST")
+      icecast_port = int_of_string(environment.get(default="8000", "ICECAST_INTERNAL_PORT"))
       icecast_password = environment.get(default="hackme", "ICECAST_SOURCE_PASSWORD")
     LIQ
   end

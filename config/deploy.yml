@@ -50,9 +50,11 @@ env:
     APP_PROTOCOL: https
     STORAGE_SERVICE: linode
 
-    # Icecast streaming (for radio station URLs)
+    # Icecast streaming (public URLs + internal Docker access)
     ICECAST_HOST: radio.synthwaves.fm
     ICECAST_PROTOCOL: https
+    ICECAST_INTERNAL_HOST: synthwaves_fm-icecast
+    ICECAST_INTERNAL_PORT: "8000"
     ICECAST_PORT: "443"
 
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.

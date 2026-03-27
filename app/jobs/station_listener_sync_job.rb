@@ -22,8 +22,8 @@ class StationListenerSyncJob < ApplicationJob
   private
 
   def fetch_icecast_stats
-    host = ENV.fetch("ICECAST_HOST", "localhost")
-    port = ENV.fetch("ICECAST_PORT", "8000")
+    host = ENV.fetch("ICECAST_INTERNAL_HOST", "localhost")
+    port = ENV.fetch("ICECAST_INTERNAL_PORT", "8000")
     url = format(ICECAST_STATUS_URL, host: host, port: port)
 
     response = Net::HTTP.get_response(URI(url))

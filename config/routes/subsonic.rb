@@ -30,7 +30,8 @@ SUBSONIC_ENDPOINTS = {
   "savePlaybackPosition" => "video#save_playback_position",
   "getPlaybackPosition" => "video#get_playback_position",
   "getFolders" => "video#get_folders",
-  "getFolder" => "video#get_folder"
+  "getFolder" => "video#get_folder",
+  "getInternetRadioStations" => "radio#get_internet_radio_stations"
 }.freeze
 
 SUBSONIC_ROUTES = lambda do

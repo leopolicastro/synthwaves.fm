@@ -41,6 +41,7 @@ registry:
 env:
   secret:
     - RAILS_MASTER_KEY
+    - LIQUIDSOAP_API_TOKEN
   clear:
     # SSL settings (explicit for Kamal deploy; defaults are off for self-hosters)
     ASSUME_SSL: true
@@ -103,25 +104,31 @@ builder:
 #   user: app
 
 # Use accessory services (secrets come from .kamal/secrets).
-# accessories:
-#   db:
-#     image: mysql:8.0
-#     host: 192.168.0.2
-#     # Change to 3306 to expose port to the world instead of just local network.
-#     port: "127.0.0.1:3306:3306"
-#     env:
-#       clear:
-#         MYSQL_ROOT_HOST: '%'
-#       secret:
-#         - MYSQL_ROOT_PASSWORD
-#     files:
-#       - config/mysql/production.cnf:/etc/mysql/my.cnf
-#       - db/production.sql:/docker-entrypoint-initdb.d/setup.sql
-#     directories:
-#       - data:/var/lib/mysql
-#   redis:
-#     image: valkey/valkey:8
-#     host: 192.168.0.2
-#     port: 6379
-#     directories:
-#       - data:/data
+accessories:
+  icecast:
+    image: libretime/icecast:2.4.4
+    host: <%= ENV["DEPLOY_HOST"] %>
+    port:
+      - "8000:8000"
+    env:
+      secret:
+        - ICECAST_SOURCE_PASSWORD
+        - ICECAST_ADMIN_PASSWORD
+    files:
+      - config/icecast/icecast.xml:/etc/icecast.xml
+
+  liquidsoap:
+    image: savonet/liquidsoap:v2.3.2
+    host: <%= ENV["DEPLOY_HOST"] %>
+    env:
+      secret:
+        - LIQUIDSOAP_API_TOKEN
+        - ICECAST_SOURCE_PASSWORD
+      clear:
+        RAILS_HOST: synthwaves.fm
+        RAILS_PROTOCOL: https
+        ICECAST_HOST: <%= ENV["DEPLOY_HOST"] %>
+        ICECAST_PORT: "8000"
+    volumes:
+      - "groovy_tunes_storage:/rails/storage:ro"
+    cmd: liquidsoap /rails/storage/liquidsoap/radio.liq

@@ -1,0 +1,41 @@
+<div class="bg-gray-800 rounded-lg border border-gray-700 p-5">
+  <div class="flex items-start justify-between mb-3">
+    <div class="min-w-0">
+      <%= link_to station, class: "block" do %>
+        <h3 class="font-medium text-white truncate text-lg"><%= station.playlist.name %></h3>
+      <% end %>
+      <p class="text-sm text-gray-400"><%= station.playlist.tracks.count %> tracks</p>
+    </div>
+    <%= render "radio_stations/status_badge", station: station %>
+  </div>
+
+  <% if station.current_track %>
+    <div class="mb-3 p-2 bg-gray-700/50 rounded text-sm">
+      <span class="text-gray-400">Now playing:</span>
+      <span class="text-white"><%= station.current_track.title %></span>
+      <span class="text-gray-400">by</span>
+      <span class="text-gray-300"><%= station.current_track.artist.name %></span>
+    </div>
+  <% end %>
+
+  <div class="flex items-center gap-2">
+    <% if station.stopped? %>
+      <%= button_to start_radio_station_path(station), class: "px-3 py-1.5 bg-neon-pink text-white rounded-lg text-sm hover:shadow-neon-pink" do %>
+        Start
+      <% end %>
+    <% else %>
+      <%= button_to stop_radio_station_path(station), class: "px-3 py-1.5 bg-gray-600 text-white rounded-lg text-sm hover:bg-gray-500" do %>
+        Stop
+      <% end %>
+      <%= button_to skip_radio_station_path(station), class: "px-3 py-1.5 bg-gray-700 text-gray-300 rounded-lg text-sm hover:bg-gray-600" do %>
+        Skip
+      <% end %>
+    <% end %>
+    <%= link_to edit_radio_station_path(station), class: "px-3 py-1.5 bg-gray-700 text-gray-300 rounded-lg text-sm hover:bg-gray-600" do %>
+      Settings
+    <% end %>
+    <%= button_to radio_station_path(station), method: :delete, data: { turbo_confirm: "Remove this station?" }, class: "ml-auto text-gray-400 hover:text-red-500" do %>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+    <% end %>
+  </div>
+</div>

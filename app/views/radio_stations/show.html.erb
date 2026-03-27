@@ -1,0 +1,90 @@
+<div class="w-full max-w-3xl">
+  <div class="mb-6">
+    <%= link_to "&larr; Radio Stations".html_safe, radio_stations_path, class: "text-neon-cyan hover:underline" %>
+  </div>
+
+  <div class="flex items-start justify-between mb-6">
+    <div>
+      <h1 class="text-3xl font-bold font-display"><%= @station.playlist.name %></h1>
+      <p class="text-gray-400 mt-1"><%= @station.playlist.tracks.count %> tracks &middot; <%= @station.playback_mode.capitalize %></p>
+    </div>
+    <%= render "radio_stations/status_badge", station: @station %>
+  </div>
+
+  <%# Controls %>
+  <div class="flex items-center gap-3 mb-6">
+    <% if @station.stopped? %>
+      <%= button_to start_radio_station_path(@station), class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink font-medium" do %>
+        Start Station
+      <% end %>
+    <% else %>
+      <%= button_to stop_radio_station_path(@station), class: "px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 font-medium" do %>
+        Stop
+      <% end %>
+      <%= button_to skip_radio_station_path(@station), class: "px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 font-medium" do %>
+        Skip Track
+      <% end %>
+    <% end %>
+    <%= link_to "Settings", edit_radio_station_path(@station), class: "px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 font-medium" %>
+  </div>
+
+  <%# Stream URL + Player %>
+  <% unless @station.stopped? %>
+    <div class="bg-gray-800 rounded-lg border border-gray-700 p-5 mb-6">
+      <h2 class="text-sm font-medium text-gray-400 mb-2">Stream URL</h2>
+      <div class="flex items-center gap-2 mb-4">
+        <code class="flex-1 bg-gray-900 px-3 py-2 rounded text-sm text-neon-cyan font-mono truncate"><%= @station.listen_url %></code>
+        <button type="button"
+                class="px-3 py-2 bg-gray-700 text-gray-300 rounded hover:bg-gray-600 text-sm"
+                data-controller="clipboard"
+                data-clipboard-text-value="<%= @station.listen_url %>"
+                data-action="clipboard#copy">
+          Copy
+        </button>
+      </div>
+      <audio controls preload="none" src="<%= @station.listen_url %>" class="w-full"></audio>
+    </div>
+  <% end %>
+
+  <%# Now Playing %>
+  <% if @station.current_track %>
+    <div class="bg-gray-800 rounded-lg border border-gray-700 p-5 mb-6">
+      <h2 class="text-sm font-medium text-gray-400 mb-2">Now Playing</h2>
+      <div class="flex items-center gap-3">
+        <% if @station.current_track.album.cover_image.attached? %>
+          <%= image_tag @station.current_track.album.cover_image, class: "w-12 h-12 rounded object-cover" %>
+        <% end %>
+        <div>
+          <p class="text-white font-medium"><%= @station.current_track.title %></p>
+          <p class="text-sm text-gray-400"><%= @station.current_track.artist.name %> &middot; <%= @station.current_track.album.title %></p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Error %>
+  <% if @station.error? && @station.error_message.present? %>
+    <div class="bg-red-900/20 border border-red-800 rounded-lg p-4 mb-6">
+      <p class="text-sm text-red-400"><%= @station.error_message %></p>
+    </div>
+  <% end %>
+
+  <%# Station Info %>
+  <div class="bg-gray-800 rounded-lg border border-gray-700 p-5">
+    <h2 class="text-sm font-medium text-gray-400 mb-3">Station Details</h2>
+    <dl class="grid grid-cols-2 gap-y-2 text-sm">
+      <dt class="text-gray-400">Mount Point</dt>
+      <dd class="text-white font-mono"><%= @station.mount_point %></dd>
+      <dt class="text-gray-400">Bitrate</dt>
+      <dd class="text-white"><%= @station.bitrate %> kbps</dd>
+      <dt class="text-gray-400">Crossfade</dt>
+      <dd class="text-white"><%= @station.crossfade? ? "#{@station.crossfade_duration}s" : "Off" %></dd>
+      <dt class="text-gray-400">Listeners</dt>
+      <dd class="text-white"><%= @station.listener_count %></dd>
+      <% if @station.started_at %>
+        <dt class="text-gray-400">Started</dt>
+        <dd class="text-white"><%= time_ago_in_words(@station.started_at) %> ago</dd>
+      <% end %>
+    </dl>
+  </div>
+</div>

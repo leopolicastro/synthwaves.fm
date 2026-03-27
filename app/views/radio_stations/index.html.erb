@@ -1,0 +1,23 @@
+<div class="w-full">
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="text-3xl font-bold font-display">Radio Stations</h1>
+  </div>
+
+  <% if @stations.any? %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% @stations.each do |station| %>
+        <div id="<%= dom_id(station) %>">
+          <%= render "station", station: station %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-16 text-gray-400">
+      <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 14.828a4 4 0 010-5.656m5.656 0a4 4 0 010 5.656M12 12h.01"/>
+      </svg>
+      <p class="text-lg mb-2">No radio stations yet</p>
+      <p class="mb-4">Create a radio station from any playlist to start streaming.</p>
+    </div>
+  <% end %>
+</div>

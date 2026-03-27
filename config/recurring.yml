@@ -31,3 +31,6 @@ production:
   database_backup:
     class: DatabaseBackupJob
     schedule: at 3am every day
+  station_listener_sync:
+    class: StationListenerSyncJob
+    schedule: every 30 seconds

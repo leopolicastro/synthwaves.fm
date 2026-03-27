@@ -44,11 +44,15 @@ class NextTrackService
   end
 
   def pick_shuffle(tracks)
-    if tracks.count > 1 && @station.current_track_id
-      tracks.where.not(id: @station.current_track_id).order("RANDOM()").first
-    else
-      tracks.order("RANDOM()").first
-    end
+    total = tracks.count
+    return tracks.order("RANDOM()").first if total <= 1
+
+    # Exclude current track, then pick randomly
+    candidates = tracks.where.not(id: @station.current_track_id)
+
+    # Pick using random offset for better distribution than ORDER BY RANDOM()
+    count = candidates.count
+    candidates.offset(rand(count)).first
   end
 
   def pick_sequential(tracks)

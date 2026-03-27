@@ -19,8 +19,8 @@ class RadioStation < ApplicationRecord
   STATUSES.each { |s| define_method(:"#{s}?") { status == s } }
 
   def listen_url
-    host = Rails.application.config.x.icecast.fetch(:host, "localhost")
-    port = Rails.application.config.x.icecast.fetch(:port, 8000)
+    host = ENV.fetch("ICECAST_HOST", "localhost")
+    port = ENV.fetch("ICECAST_PORT", "8000")
     "http://#{host}:#{port}#{mount_point}"
   end
 

@@ -32,12 +32,11 @@
   <% unless @station.stopped? %>
     <div class="bg-gray-800 rounded-lg border border-gray-700 p-5 mb-6">
       <h2 class="text-sm font-medium text-gray-400 mb-2">Stream URL</h2>
-      <div class="flex items-center gap-2 mb-4">
+      <div class="flex items-center gap-2 mb-4" data-controller="clipboard" data-clipboard-content-value="<%= @station.listen_url %>">
         <code class="flex-1 bg-gray-900 px-3 py-2 rounded text-sm text-neon-cyan font-mono truncate"><%= @station.listen_url %></code>
         <button type="button"
                 class="px-3 py-2 bg-gray-700 text-gray-300 rounded hover:bg-gray-600 text-sm"
-                data-controller="clipboard"
-                data-clipboard-text-value="<%= @station.listen_url %>"
+                data-clipboard-target="button"
                 data-action="clipboard#copy">
           Copy
         </button>

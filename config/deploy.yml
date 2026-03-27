@@ -50,6 +50,10 @@ env:
     APP_PROTOCOL: https
     STORAGE_SERVICE: linode
 
+    # Icecast streaming (for radio station URLs)
+    ICECAST_HOST: <%= ENV["DEPLOY_HOST"] %>
+    ICECAST_PORT: "8000"
+
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
     # When you start using multiple servers, you should split out job processing to a dedicated machine.
     SOLID_QUEUE_IN_PUMA: true

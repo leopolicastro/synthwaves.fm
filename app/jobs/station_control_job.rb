@@ -41,11 +41,8 @@ class StationControlJob < ApplicationJob
   end
 
   def restart_liquidsoap
-    # In production, restart the Liquidsoap container via Kamal
-    # This is a no-op in development/test
-    return unless Rails.env.production?
-
-    system("kamal accessory restart liquidsoap") ||
-      Rails.logger.warn("Failed to restart Liquidsoap container")
+    # Liquidsoap must be restarted manually after config changes:
+    #   bin/kamal accessory restart liquidsoap
+    Rails.logger.info("Liquidsoap config updated. Restart required: bin/kamal accessory restart liquidsoap")
   end
 end

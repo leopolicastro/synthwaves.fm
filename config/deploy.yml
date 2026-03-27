@@ -108,8 +108,7 @@ accessories:
   icecast:
     image: libretime/icecast:2.4.4
     host: <%= ENV["DEPLOY_HOST"] %>
-    port:
-      - "8000:8000"
+    port: "8000:8000"
     env:
       secret:
         - ICECAST_SOURCE_PASSWORD

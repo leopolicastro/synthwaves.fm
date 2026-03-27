@@ -29,12 +29,12 @@ class LiquidsoapConfigService
 
   def settings_block
     <<~LIQ
-      rails_host = environment.get("RAILS_HOST", "localhost:3000")
-      rails_protocol = environment.get("RAILS_PROTOCOL", "http")
-      auth_token = environment.get("LIQUIDSOAP_API_TOKEN", "")
-      icecast_host = environment.get("ICECAST_HOST", "localhost")
-      icecast_port = int_of_string(environment.get("ICECAST_PORT", "8000"))
-      icecast_password = environment.get("ICECAST_SOURCE_PASSWORD", "hackme")
+      rails_host = getenv("RAILS_HOST") ?? "localhost:3000"
+      rails_protocol = getenv("RAILS_PROTOCOL") ?? "http"
+      auth_token = getenv("LIQUIDSOAP_API_TOKEN") ?? ""
+      icecast_host = getenv("ICECAST_HOST") ?? "localhost"
+      icecast_port = int_of_string(getenv("ICECAST_PORT") ?? "8000")
+      icecast_password = getenv("ICECAST_SOURCE_PASSWORD") ?? "hackme"
     LIQ
   end
 

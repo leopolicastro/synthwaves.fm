@@ -197,11 +197,6 @@ CREATE VIRTUAL TABLE tracks_search USING fts5(
   tokenize='unicode61 remove_diacritics 2'
 )
 /* tracks_search(track_title,artist_name,album_title,track_id) */;
-CREATE TABLE IF NOT EXISTS 'tracks_search_data'(id INTEGER PRIMARY KEY, block BLOB);
-CREATE TABLE IF NOT EXISTS 'tracks_search_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
-CREATE TABLE IF NOT EXISTS 'tracks_search_content'(id INTEGER PRIMARY KEY, c0, c1, c2, c3);
-CREATE TABLE IF NOT EXISTS 'tracks_search_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
-CREATE TABLE IF NOT EXISTS 'tracks_search_config'(k PRIMARY KEY, v) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS "artists" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "image_url" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "category" varchar DEFAULT 'music' NOT NULL, "user_id" integer NOT NULL);
 CREATE INDEX "index_artists_on_category" ON "artists" ("category") /*application='SynthWaves'*/;
 CREATE TABLE IF NOT EXISTS "albums" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar NOT NULL, "artist_id" integer NOT NULL, "year" integer, "genre" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "youtube_playlist_url" varchar, "user_id" integer NOT NULL, CONSTRAINT "fk_rails_124a79559a"

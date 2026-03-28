@@ -64,7 +64,7 @@ class LiquidsoapConfigService
       station_#{safe_id} = request.dynamic(id="#{slug}", next_track_#{safe_id})
       #{crossfade_line(station, safe_id)}
 
-      station_#{safe_id}.on_metadata(fun(m) ->
+      source.on_metadata(station_#{safe_id}, fun(m) ->
         tid = m["track_id"]
         if tid != "" then
           ignore(http.post(

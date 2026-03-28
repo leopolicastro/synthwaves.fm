@@ -1,5 +1,7 @@
 class StationControlJob < ApplicationJob
   def perform(station_id, action)
+    return unless Flipper.enabled?(:radio_stations)
+
     station = RadioStation.find_by(id: station_id)
     return unless station
 

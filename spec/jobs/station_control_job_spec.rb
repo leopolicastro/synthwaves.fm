@@ -5,53 +5,69 @@ RSpec.describe StationControlJob, type: :job do
   let(:playlist) { create(:playlist, user: user) }
 
   describe "#perform" do
-    it "starts a station" do
-      station = create(:radio_station, playlist: playlist, user: user, status: "starting")
+    context "when radio_stations feature is disabled" do
+      before { Flipper.disable(:radio_stations) }
 
-      allow(LiquidsoapConfigService).to receive(:call)
+      it "returns early without performing any station operations" do
+        station = create(:radio_station, playlist: playlist, user: user, status: "starting")
 
-      StationControlJob.perform_now(station.id, "start")
+        StationControlJob.perform_now(station.id, "start")
 
-      expect(station.reload.status).to eq("active")
-      expect(LiquidsoapConfigService).to have_received(:call)
+        expect(station.reload.status).to eq("starting")
+      end
     end
 
-    it "stops a station" do
-      station = create(:radio_station, playlist: playlist, user: user, status: "active")
+    context "when radio_stations feature is enabled" do
+      before { Flipper.enable(:radio_stations) }
 
-      allow(LiquidsoapConfigService).to receive(:call)
+      it "starts a station" do
+        station = create(:radio_station, playlist: playlist, user: user, status: "starting")
 
-      StationControlJob.perform_now(station.id, "stop")
+        allow(LiquidsoapConfigService).to receive(:call)
 
-      expect(station.reload.status).to eq("stopped")
-      expect(LiquidsoapConfigService).to have_received(:call)
-    end
+        StationControlJob.perform_now(station.id, "start")
 
-    it "skips to the next track" do
-      station = create(:radio_station, playlist: playlist, user: user, status: "active")
+        expect(station.reload.status).to eq("active")
+        expect(LiquidsoapConfigService).to have_received(:call)
+      end
 
-      allow(NextTrackService).to receive(:call).and_return(nil)
+      it "stops a station" do
+        station = create(:radio_station, playlist: playlist, user: user, status: "active")
 
-      StationControlJob.perform_now(station.id, "skip")
+        allow(LiquidsoapConfigService).to receive(:call)
 
-      expect(NextTrackService).to have_received(:call).with(station)
-    end
+        StationControlJob.perform_now(station.id, "stop")
 
-    it "handles missing station gracefully" do
-      expect {
-        StationControlJob.perform_now(999_999, "start")
-      }.not_to raise_error
-    end
+        expect(station.reload.status).to eq("stopped")
+        expect(LiquidsoapConfigService).to have_received(:call)
+      end
 
-    it "sets error status on failure during start" do
-      station = create(:radio_station, playlist: playlist, user: user, status: "starting")
+      it "skips to the next track" do
+        station = create(:radio_station, playlist: playlist, user: user, status: "active")
 
-      allow(LiquidsoapConfigService).to receive(:call).and_raise(RuntimeError, "Config write failed")
+        allow(NextTrackService).to receive(:call).and_return(nil)
 
-      StationControlJob.perform_now(station.id, "start")
+        StationControlJob.perform_now(station.id, "skip")
 
-      expect(station.reload.status).to eq("error")
-      expect(station.error_message).to eq("Config write failed")
+        expect(NextTrackService).to have_received(:call).with(station)
+      end
+
+      it "handles missing station gracefully" do
+        expect {
+          StationControlJob.perform_now(999_999, "start")
+        }.not_to raise_error
+      end
+
+      it "sets error status on failure during start" do
+        station = create(:radio_station, playlist: playlist, user: user, status: "starting")
+
+        allow(LiquidsoapConfigService).to receive(:call).and_raise(RuntimeError, "Config write failed")
+
+        StationControlJob.perform_now(station.id, "start")
+
+        expect(station.reload.status).to eq("error")
+        expect(station.error_message).to eq("Config write failed")
+      end
     end
   end
 end

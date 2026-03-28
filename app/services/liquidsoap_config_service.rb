@@ -64,7 +64,7 @@ class LiquidsoapConfigService
       station_#{safe_id} = request.dynamic(id="#{slug}", next_track_#{safe_id})
       #{crossfade_line(station, safe_id)}
 
-      source.on_metadata(station_#{safe_id}, fun(_) ->
+      station_#{safe_id}.on_metadata(fun(_) -> begin
         ignore(http.post(
           headers=[("Authorization", "Bearer " ^ auth_token), ("Content-Type", "application/x-www-form-urlencoded")],
           data="event=track_started",

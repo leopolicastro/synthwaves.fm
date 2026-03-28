@@ -56,9 +56,7 @@ class LiquidsoapConfigService
           if data.url == "" then
             null()
           else
-            r = request.create(data.url)
-            request.set_metadata(r, [("track_id", data.track_id)])
-            r
+            request.create(metadata=[("track_id", data.track_id)], data.url)
           end
         end
       end

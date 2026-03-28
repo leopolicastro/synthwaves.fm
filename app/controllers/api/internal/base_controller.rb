@@ -11,7 +11,8 @@ module API
       end
 
       def internal_api_token
-        ENV.fetch("LIQUIDSOAP_API_TOKEN") { Rails.application.credentials.dig(:liquidsoap, :api_token) || "" }
+        ENV.fetch("LIQUIDSOAP_API_TOKEN") { Rails.application.credentials.dig(:liquidsoap, :api_token) }
+          .then { |t| t.presence or raise "LIQUIDSOAP_API_TOKEN is not configured" }
       end
     end
   end

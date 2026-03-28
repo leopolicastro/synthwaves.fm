@@ -14,6 +14,8 @@ servers:
     cmd: bin/jobs
     options:
       group-add: "988"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
 
 # Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
 # If used with Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
@@ -88,7 +90,6 @@ aliases:
 # Recommended to change this to a mounted volume path that is backed up off server.
 volumes:
   - "groovy_tunes_storage:/rails/storage"
-  - "/var/run/docker.sock:/var/run/docker.sock"
 
 # Bridge fingerprinted assets, like JS and CSS, between versions to avoid
 # hitting 404 on in-flight requests. Combines all files from new and old

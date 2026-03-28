@@ -3,13 +3,15 @@ class API::Subsonic::RadioController < API::Subsonic::BaseController
     stations = []
 
     # Playlist-based radio stations (Icecast streams)
-    current_user.radio_stations.where.not(status: "stopped").each do |station|
-      stations << {
-        id: "radio-#{station.id}",
-        name: station.playlist.name,
-        streamUrl: station.listen_url,
-        homePageUrl: ""
-      }
+    if Flipper.enabled?(:radio_stations, current_user)
+      current_user.radio_stations.where.not(status: "stopped").each do |station|
+        stations << {
+          id: "radio-#{station.id}",
+          name: station.playlist.name,
+          streamUrl: station.listen_url,
+          homePageUrl: ""
+        }
+      end
     end
 
     # Stream-type external streams

@@ -64,14 +64,6 @@ class LiquidsoapConfigService
       station_#{safe_id} = request.dynamic(id="#{slug}", next_track_#{safe_id})
       #{crossfade_line(station, safe_id)}
 
-      station_#{safe_id}.on_metadata(fun(_) -> begin
-        ignore(http.post(
-          headers=[("Authorization", "Bearer " ^ auth_token), ("Content-Type", "application/x-www-form-urlencoded")],
-          data="event=track_started",
-          rails_protocol ^ "://" ^ rails_host ^ "/api/internal/radio_stations/#{id}/notify"
-        ))
-      end)
-
       station_#{safe_id} = mksafe(station_#{safe_id})
 
       output.icecast(

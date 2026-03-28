@@ -36,6 +36,9 @@
     <% if authenticated? %>
       <%= turbo_stream_from "downloads_#{Current.user.id}" %>
       <%= turbo_stream_from "recordings_#{Current.user.id}" %>
+      <% if Flipper.enabled?(:radio_stations, Current.user) %>
+        <%= turbo_stream_from "radio_stations_#{Current.user.id}" %>
+      <% end %>
       <div id="download-notifications" class="fixed top-20 right-4 z-50 space-y-2"></div>
     <% end %>
     <%= render 'navbar' unless turbo_native_app? %>

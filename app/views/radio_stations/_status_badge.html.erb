@@ -1,0 +1,30 @@
+<% case station.status %>
+<% when "active" %>
+  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-green-900 text-green-300">
+    <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+    Live
+    <% if station.listener_count > 0 %>
+      &middot; <%= station.listener_count %> listener<%= "s" unless station.listener_count == 1 %>
+    <% end %>
+  </span>
+<% when "starting" %>
+  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-900 text-yellow-300">
+    <span class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></span>
+    Starting
+  </span>
+<% when "idle" %>
+  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-cyan-900 text-cyan-300">
+    <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+    Idle
+  </span>
+<% when "error" %>
+  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-red-900 text-red-300">
+    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+    Error
+  </span>
+<% else %>
+  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-700 text-gray-400">
+    <span class="w-1.5 h-1.5 rounded-full bg-gray-500"></span>
+    Stopped
+  </span>
+<% end %>

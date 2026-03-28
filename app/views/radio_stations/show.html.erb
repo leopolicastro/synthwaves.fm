@@ -1,0 +1,104 @@
+<div class="w-full max-w-3xl">
+  <div class="mb-6">
+    <%= link_to "&larr; Radio Stations".html_safe, radio_stations_path, class: "text-neon-cyan hover:underline" %>
+  </div>
+
+  <div class="flex items-start justify-between mb-6">
+    <div>
+      <h1 class="text-3xl font-bold font-display"><%= @station.playlist.name %></h1>
+      <p class="text-gray-400 mt-1"><%= @station.playlist.tracks.count %> tracks &middot; <%= @station.playback_mode.capitalize %></p>
+    </div>
+    <%= render "radio_stations/status_badge", station: @station %>
+  </div>
+
+  <%# Controls %>
+  <div class="flex items-center gap-3 mb-6">
+    <% if @station.stopped? %>
+      <%= button_to start_radio_station_path(@station), class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink font-medium" do %>
+        Start Station
+      <% end %>
+    <% else %>
+      <button type="button"
+              id="radio-listen-btn"
+              class="px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink font-medium inline-flex items-center gap-2"
+              data-controller="song-row"
+              data-song-row-track-id-value="radio-<%= @station.id %>"
+              data-song-row-title-value="<%= @station.playlist.name %>"
+              data-song-row-artist-value="Radio Station"
+              data-song-row-stream-url-value="<%= @station.listen_url %>"
+              data-song-row-is-live-value="true"
+              <% if @station.current_track&.album&.cover_image&.attached? %>
+                data-song-row-cover-url-value="<%= url_for(@station.current_track.album.cover_image) %>"
+              <% end %>
+              data-action="click->song-row#play">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+        Listen
+      </button>
+      <%= button_to stop_radio_station_path(@station), class: "px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 font-medium" do %>
+        Stop
+      <% end %>
+      <%= button_to skip_radio_station_path(@station), class: "px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 font-medium" do %>
+        Skip Track
+      <% end %>
+    <% end %>
+    <%= link_to "Settings", edit_radio_station_path(@station), class: "px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 font-medium" %>
+  </div>
+
+  <%# Stream URL %>
+  <% unless @station.stopped? %>
+    <div class="bg-gray-800 rounded-lg border border-gray-700 p-5 mb-6">
+      <h2 class="text-sm font-medium text-gray-400 mb-2">Stream URL</h2>
+      <div class="flex items-center gap-2" data-controller="clipboard" data-clipboard-content-value="<%= @station.listen_url %>">
+        <code class="flex-1 bg-gray-900 px-3 py-2 rounded text-sm text-neon-cyan font-mono truncate"><%= @station.listen_url %></code>
+        <button type="button"
+                class="px-3 py-2 bg-gray-700 text-gray-300 rounded hover:bg-gray-600 text-sm"
+                data-clipboard-target="button"
+                data-action="clipboard#copy">
+          Copy
+        </button>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Now Playing (Turbo Stream target) %>
+  <div id="now_playing_<%= @station.id %>">
+    <%= render "radio_stations/now_playing", station: @station %>
+  </div>
+
+  <%# Error %>
+  <% if @station.error? && @station.error_message.present? %>
+    <div class="bg-red-900/20 border border-red-800 rounded-lg p-4 mb-6">
+      <p class="text-sm text-red-400"><%= @station.error_message %></p>
+    </div>
+  <% end %>
+
+  <%# Station Info %>
+  <div class="bg-gray-800 rounded-lg border border-gray-700 p-5">
+    <h2 class="text-sm font-medium text-gray-400 mb-3">Station Details</h2>
+    <dl class="grid grid-cols-2 gap-y-2 text-sm">
+      <dt class="text-gray-400">Mount Point</dt>
+      <dd class="text-white font-mono"><%= @station.mount_point %></dd>
+      <dt class="text-gray-400">Bitrate</dt>
+      <dd class="text-white"><%= @station.bitrate %> kbps</dd>
+      <dt class="text-gray-400">Crossfade</dt>
+      <dd class="text-white"><%= @station.crossfade? ? "#{@station.crossfade_duration}s" : "Off" %></dd>
+      <dt class="text-gray-400">Listeners</dt>
+      <dd class="text-white"><%= @station.listener_count %></dd>
+      <% if @station.started_at %>
+        <dt class="text-gray-400">Started</dt>
+        <dd class="text-white"><%= time_ago_in_words(@station.started_at) %> ago</dd>
+      <% end %>
+    </dl>
+  </div>
+</div>
+
+<%# Auto-play when visiting an active station %>
+<% unless @station.stopped? %>
+  <script>
+    document.addEventListener("turbo:load", function autoPlay() {
+      document.removeEventListener("turbo:load", autoPlay);
+      const btn = document.getElementById("radio-listen-btn");
+      if (btn) btn.click();
+    }, { once: true });
+  </script>
+<% end %>

@@ -48,6 +48,9 @@
             <div class="border-t border-gray-700 my-1"></div>
           </div>
           <%= render Button::Component.new(label: "Profile", behavior: :navigation, link_url: profile_path, style: :menu_item) %>
+          <% if Flipper.enabled?(:radio_stations, Current.user) %>
+            <%= render Button::Component.new(label: "Radio Stations", behavior: :navigation, link_url: radio_stations_path, style: :menu_item) %>
+          <% end %>
           <% if Current.user.admin? %>
             <div class="border-t border-gray-700 my-1"></div>
             <%= render Button::Component.new(label: "Admin", behavior: :navigation, link_url: "/admin", style: :menu_item) %>

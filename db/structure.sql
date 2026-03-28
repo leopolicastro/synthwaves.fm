@@ -230,7 +230,23 @@ CREATE INDEX "index_video_playback_positions_on_user_id" ON "video_playback_posi
 CREATE INDEX "index_video_playback_positions_on_video_id" ON "video_playback_positions" ("video_id") /*application='SynthWaves'*/;
 CREATE UNIQUE INDEX "index_video_playback_positions_on_user_id_and_video_id" ON "video_playback_positions" ("user_id", "video_id") /*application='SynthWaves'*/;
 CREATE INDEX "index_external_streams_on_user_id" ON "external_streams" ("user_id") /*application='SynthWaves'*/;
+CREATE TABLE IF NOT EXISTS "radio_stations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "playlist_id" integer NOT NULL, "user_id" integer NOT NULL, "status" varchar DEFAULT 'stopped' NOT NULL, "mount_point" varchar NOT NULL, "playback_mode" varchar DEFAULT 'shuffle' NOT NULL, "bitrate" integer DEFAULT 192 NOT NULL, "crossfade" boolean DEFAULT TRUE NOT NULL, "crossfade_duration" float DEFAULT 3.0 NOT NULL, "current_track_id" integer, "listener_count" integer DEFAULT 0, "error_message" text, "started_at" datetime(6), "last_track_at" datetime(6), "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_a5b9b61969"
+FOREIGN KEY ("playlist_id")
+  REFERENCES "playlists" ("id")
+, CONSTRAINT "fk_rails_0b9af78719"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+, CONSTRAINT "fk_rails_030bf29ea1"
+FOREIGN KEY ("current_track_id")
+  REFERENCES "tracks" ("id")
+);
+CREATE UNIQUE INDEX "index_radio_stations_on_playlist_id" ON "radio_stations" ("playlist_id") /*application='SynthWaves'*/;
+CREATE INDEX "index_radio_stations_on_user_id" ON "radio_stations" ("user_id") /*application='SynthWaves'*/;
+CREATE INDEX "index_radio_stations_on_current_track_id" ON "radio_stations" ("current_track_id") /*application='SynthWaves'*/;
+CREATE UNIQUE INDEX "index_radio_stations_on_mount_point" ON "radio_stations" ("mount_point") /*application='SynthWaves'*/;
+CREATE INDEX "index_radio_stations_on_status" ON "radio_stations" ("status") /*application='SynthWaves'*/;
 INSERT INTO "schema_migrations" (version) VALUES
+('20260326235243'),
 ('20260326231506'),
 ('20260313152644'),
 ('20260312231556'),

@@ -14,7 +14,7 @@ module API
         if result
           render json: {
             url: result.url,
-            track_id: result.track.id.to_s,
+            track_id: result.track.id,
             title: result.track.title,
             artist: result.track.artist.name,
             duration: result.track.duration
@@ -30,7 +30,7 @@ module API
         case params[:event]
         when "track_started"
           station.update!(
-            current_track_id: params[:track_id],
+            current_track_id: params[:track_id] || station.queued_track_id,
             last_track_at: Time.current,
             status: "active"
           )

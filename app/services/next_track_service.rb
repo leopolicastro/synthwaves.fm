@@ -15,7 +15,7 @@ class NextTrackService
 
     ensure_url_options!
     url = track.audio_file.url(expires_in: 1.hour)
-    @station.update!(current_track: track, last_track_at: Time.current)
+    @station.update!(queued_track: track)
 
     Result.new(track: track, url: url)
   end
@@ -48,7 +48,7 @@ class NextTrackService
     return tracks.order("RANDOM()").first if total <= 1
 
     # Exclude current track, then pick randomly
-    candidates = tracks.where.not(id: @station.current_track_id)
+    candidates = tracks.where.not(id: @station.queued_track_id)
 
     # Pick using random offset for better distribution than ORDER BY RANDOM()
     count = candidates.count
@@ -61,8 +61,8 @@ class NextTrackService
       .merge(Track.streamable)
       .order(:position)
 
-    if @station.current_track_id
-      current_position = ordered.find_by(track_id: @station.current_track_id)&.position
+    if @station.queued_track_id
+      current_position = ordered.find_by(track_id: @station.queued_track_id)&.position
       if current_position
         next_pt = ordered.where("position > ?", current_position).first
         return next_pt.track if next_pt

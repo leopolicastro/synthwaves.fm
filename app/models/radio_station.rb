@@ -6,6 +6,7 @@ class RadioStation < ApplicationRecord
   belongs_to :playlist
   belongs_to :user
   belongs_to :current_track, class_name: "Track", optional: true
+  belongs_to :queued_track, class_name: "Track", optional: true
 
   validates :status, inclusion: {in: STATUSES}
   validates :playback_mode, inclusion: {in: PLAYBACK_MODES}

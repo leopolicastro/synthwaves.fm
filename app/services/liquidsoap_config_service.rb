@@ -52,17 +52,30 @@ class LiquidsoapConfigService
         if body == "" then
           null()
         else
-          let json.parse (data : {url: string}) = body
+          let json.parse (data : {url: string, track_id: string}) = body
           if data.url == "" then
             null()
           else
-            request.create(data.url)
+            r = request.create(data.url)
+            request.set_metadata(r, [("track_id", data.track_id)])
+            r
           end
         end
       end
 
       station_#{safe_id} = request.dynamic(id="#{slug}", next_track_#{safe_id})
       #{crossfade_line(station, safe_id)}
+
+      station_#{safe_id}.on_metadata(fun(m) ->
+        tid = m["track_id"]
+        if tid != "" then
+          ignore(http.post(
+            headers=[("Authorization", "Bearer " ^ auth_token), ("Content-Type", "application/x-www-form-urlencoded")],
+            data="event=track_started&track_id=" ^ tid,
+            rails_protocol ^ "://" ^ rails_host ^ "/api/internal/radio_stations/#{id}/notify"
+          ))
+        end
+      end)
 
       station_#{safe_id} = mksafe(station_#{safe_id})
 

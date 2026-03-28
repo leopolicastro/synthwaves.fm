@@ -12,10 +12,9 @@ module API
         result = NextTrackService.call(station)
 
         if result
-          station.broadcast_now_playing
           render json: {
             url: result.url,
-            track_id: result.track.id,
+            track_id: result.track.id.to_s,
             title: result.track.title,
             artist: result.track.artist.name,
             duration: result.track.duration
@@ -35,6 +34,7 @@ module API
             last_track_at: Time.current,
             status: "active"
           )
+          station.broadcast_now_playing
         when "error"
           station.update!(status: "error", error_message: params[:message])
         when "idle"

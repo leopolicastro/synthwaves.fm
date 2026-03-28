@@ -29,6 +29,9 @@ RSpec.describe LiquidsoapConfigService do
       expect(config).to include("bitrate=192")
       expect(config).to include("crossfade(duration=3.0")
       expect(config).to include("Chill Vibes")
+      expect(config).to include("on_metadata")
+      expect(config).to include("track_started")
+      expect(config).to include("request.set_metadata")
     end
 
     it "excludes stopped stations" do

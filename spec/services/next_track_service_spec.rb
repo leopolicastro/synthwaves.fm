@@ -46,21 +46,20 @@ RSpec.describe NextTrackService do
         expect(result.url).to be_present
       end
 
-      it "updates the station's current_track and last_track_at" do
+      it "updates the station's queued_track" do
         track = create_track_with_audio(position: 1)
 
         expect {
           NextTrackService.call(station)
-        }.to change { station.reload.current_track }.to(track)
-          .and change { station.last_track_at }.from(nil)
+        }.to change { station.reload.queued_track }.to(track)
       end
 
-      it "avoids repeating the current track when possible" do
+      it "avoids repeating the queued track when possible" do
         create_track_with_audio(position: 1)
         track2 = create_track_with_audio(position: 2)
-        station.update!(current_track: track2)
+        station.update!(queued_track: track2)
 
-        # With 2 tracks and current=track2, next should always be track1 (not track2)
+        # With 2 tracks and queued=track2, next should always be track1 (not track2)
         result = NextTrackService.call(station)
         expect(result.track).not_to eq(track2)
       end
@@ -87,7 +86,7 @@ RSpec.describe NextTrackService do
       it "advances to the next track" do
         track1 = create_track_with_audio(position: 1)
         track2 = create_track_with_audio(position: 2)
-        station.update!(current_track: track1)
+        station.update!(queued_track: track1)
 
         result = NextTrackService.call(station)
         expect(result.track).to eq(track2)
@@ -96,7 +95,7 @@ RSpec.describe NextTrackService do
       it "wraps around to the first track" do
         track1 = create_track_with_audio(position: 1)
         track2 = create_track_with_audio(position: 2)
-        station.update!(current_track: track2)
+        station.update!(queued_track: track2)
 
         result = NextTrackService.call(station)
         expect(result.track).to eq(track1)
@@ -110,7 +109,7 @@ RSpec.describe NextTrackService do
         create(:playlist_track, playlist: playlist, track: track_no_audio, position: 2)
         track3 = create_track_with_audio(position: 3)
 
-        station.update!(current_track: track1)
+        station.update!(queued_track: track1)
 
         result = NextTrackService.call(station)
         expect(result.track).to eq(track3)

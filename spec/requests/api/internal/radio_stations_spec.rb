@@ -53,7 +53,7 @@ RSpec.describe "API::Internal::RadioStations", type: :request do
 
       expect(response).to have_http_status(:ok)
       json = response.parsed_body
-      expect(json["track_id"]).to eq(track.id)
+      expect(json["track_id"]).to eq(track.id.to_s)
       expect(json["title"]).to eq("Neon Drive")
       expect(json["artist"]).to eq(artist.name)
       expect(json["url"]).to be_present

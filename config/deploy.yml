@@ -14,8 +14,7 @@ servers:
     cmd: bin/jobs
     options:
       group-add: "988"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      volume: "/var/run/docker.sock:/var/run/docker.sock"
 
 # Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
 # If used with Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.

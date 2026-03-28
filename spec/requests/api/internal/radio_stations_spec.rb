@@ -10,8 +10,8 @@ RSpec.describe "API::Internal::RadioStations", type: :request do
   let(:headers) { {"Authorization" => "Bearer #{token}"} }
 
   before do
-    allow(ENV).to receive(:fetch).and_call_original
-    allow(ENV).to receive(:fetch).with("LIQUIDSOAP_API_TOKEN").and_return(token)
+    allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:[]).with("LIQUIDSOAP_API_TOKEN").and_return(token)
   end
 
   describe "authentication" do

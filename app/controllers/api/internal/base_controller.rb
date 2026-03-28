@@ -6,13 +6,15 @@ module API
       private
 
       def authenticate_internal!
+        expected = internal_api_token
+        return head(:unauthorized) unless expected
+
         token = request.headers["Authorization"]&.delete_prefix("Bearer ")
-        head :unauthorized unless token.present? && ActiveSupport::SecurityUtils.secure_compare(token, internal_api_token)
+        head :unauthorized unless token.present? && ActiveSupport::SecurityUtils.secure_compare(token, expected)
       end
 
       def internal_api_token
-        ENV.fetch("LIQUIDSOAP_API_TOKEN") { Rails.application.credentials.dig(:liquidsoap, :api_token) }
-          .then { |t| t.presence or raise "LIQUIDSOAP_API_TOKEN is not configured" }
+        ENV["LIQUIDSOAP_API_TOKEN"].presence || Rails.application.credentials.dig(:liquidsoap, :api_token).presence
       end
     end
   end

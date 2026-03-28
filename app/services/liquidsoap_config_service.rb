@@ -28,6 +28,7 @@ class LiquidsoapConfigService
   def settings_block
     <<~LIQ.chomp
       log.level.set(3)
+      settings.http.normalize_url.set(false)
 
       rails_host = environment.get(default="localhost:3000", "RAILS_HOST")
       rails_protocol = environment.get(default="http", "RAILS_PROTOCOL")

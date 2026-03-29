@@ -2,7 +2,9 @@ class TracksController < ApplicationController
   include Orderable
   include AdminAuthorization
 
-  before_action :set_track, only: [:show, :edit, :update, :destroy, :stream, :download, :lyrics, :enrich]
+  allow_unauthenticated_access only: [:lyrics]
+  before_action :set_track, only: [:show, :edit, :update, :destroy, :stream, :download, :enrich]
+  before_action :set_track_public, only: [:lyrics]
   before_action :require_admin, only: [:edit, :update, :destroy]
 
   def index
@@ -139,6 +141,10 @@ class TracksController < ApplicationController
 
   def set_track
     @track = Current.user.tracks.find(params[:id])
+  end
+
+  def set_track_public
+    @track = Track.find(params[:id])
   end
 
   def track_params

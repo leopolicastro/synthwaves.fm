@@ -84,14 +84,14 @@ class RadioQueueService
     candidates = pool.where.not(id: exclude_ids)
 
     if candidates.count >= count
-      candidates.order("RANDOM()").limit(count).to_a
+      candidates.reorder("RANDOM()").limit(count).to_a
     else
       # Not enough fresh candidates — relax recently-played constraint but still avoid upcoming duplicates
-      first_batch = candidates.order("RANDOM()").to_a
+      first_batch = candidates.reorder("RANDOM()").to_a
       remaining = count - first_batch.size
       if remaining > 0
         used_ids = (upcoming_ids + first_batch.map(&:id)).uniq
-        second_batch = pool.where.not(id: used_ids).order("RANDOM()").limit(remaining).to_a
+        second_batch = pool.where.not(id: used_ids).reorder("RANDOM()").limit(remaining).to_a
         first_batch + second_batch
       else
         first_batch

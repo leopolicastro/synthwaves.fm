@@ -96,7 +96,11 @@ module API
       def serve_current_track(station)
         track = station.current_track
         ensure_active_storage_url_options!
-        url = track.audio_file.url(expires_in: 1.hour)
+        raw_url = track.audio_file.url(expires_in: 1.hour)
+
+        # Seek to where the track "would be" so it sounds like the
+        # listener caught it mid-song rather than starting from zero
+        url = annotate_cue_in(raw_url, station, track)
 
         # Queue the next track so subsequent requests advance normally
         NextTrackService.call(station)
@@ -108,6 +112,19 @@ module API
           artist: track.artist.name,
           duration: track.duration
         }
+      end
+
+      def annotate_cue_in(url, station, track)
+        return url unless station.last_track_at
+
+        elapsed = Time.current - station.last_track_at
+        duration = track.duration || DEFAULT_TRACK_DURATION
+
+        # Leave at least 30s of playback so the listener hears something
+        cue_in = [elapsed, duration - 30].min
+        return url if cue_in <= 0
+
+        "annotate:liq_cue_in=\"#{cue_in.round(1)}\":#{url}"
       end
 
       def ensure_active_storage_url_options!

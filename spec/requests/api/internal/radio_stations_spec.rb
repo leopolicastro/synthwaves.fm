@@ -184,10 +184,28 @@ RSpec.describe "API::Internal::RadioStations", type: :request do
       expect(json["title"]).to eq("Displayed Song")
     end
 
+    it "seeks to the virtual playback position" do
+      get next_track_api_internal_radio_station_path(station), headers: headers
+
+      json = response.parsed_body
+      expect(json["url"]).to start_with("annotate:liq_cue_in=")
+      expect(json["url"]).to include("60.0")
+    end
+
     it "queues the next track for subsequent requests" do
       get next_track_api_internal_radio_station_path(station), headers: headers
 
       expect(station.reload.queued_track).to eq(track2)
+    end
+
+    it "leaves at least 30s of playback when track is almost over" do
+      station.update!(last_track_at: 170.seconds.ago) # 180s track, only 10s left
+
+      get next_track_api_internal_radio_station_path(station), headers: headers
+
+      json = response.parsed_body
+      # Capped to duration - 30 = 150s
+      expect(json["url"]).to include("150.0")
     end
   end
 

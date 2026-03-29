@@ -23,8 +23,8 @@ RSpec.describe "YoutubeImports", type: :request do
     end
 
     it "renders the playlist selector with user's playlists" do
-      playlist = create(:playlist, user: user, name: "Chill Vibes")
-      other_user_playlist = create(:playlist, name: "Not Mine")
+      create(:playlist, user: user, name: "Chill Vibes")
+      create(:playlist, name: "Not Mine")
 
       get new_youtube_import_path
 

@@ -47,7 +47,7 @@ class YoutubeImportsController < ApplicationController
 
   def resolve_playlist_id
     id = params[:playlist_id]
-    id == "new" ? nil : id.presence&.to_i
+    (id == "new") ? nil : id.presence&.to_i
   end
 
   def add_track_to_playlist(track)

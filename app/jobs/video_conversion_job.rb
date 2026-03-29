@@ -1,5 +1,5 @@
 class VideoConversionJob < ApplicationJob
-  queue_as :default
+  queue_as :conversion
 
   def perform(video_id)
     video = Video.find(video_id)

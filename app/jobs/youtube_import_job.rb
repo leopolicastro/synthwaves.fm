@@ -1,5 +1,5 @@
 class YoutubeImportJob < ApplicationJob
-  queue_as :default
+  queue_as :imports
 
   def perform(url, category: "music", download: false, user_id: nil, playlist_id: nil, new_playlist_name: nil)
     user = User.find(user_id)

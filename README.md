@@ -173,7 +173,6 @@ Manage with `bin/rails credentials:edit --environment=production`:
 | `SOLID_QUEUE_IN_PUMA` | Run job queue in-process          | —       |
 | `WEB_CONCURRENCY`     | Puma worker processes             | auto    |
 | `RAILS_MAX_THREADS`   | Puma threads per worker           | 3       |
-| `JOB_CONCURRENCY`     | Solid Queue workers               | 2       |
 
 Most users will upload music and videos through the web UI. If you have an existing local library you'd like to bulk-import to a remote deployment, the rake tasks in the next section accept these optional variables:
 

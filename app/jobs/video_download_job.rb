@@ -1,7 +1,7 @@
 class VideoDownloadJob < ApplicationJob
   include DownloadBroadcastable
 
-  queue_as :default
+  queue_as :imports
 
   def perform(video_id, url, user_id:)
     video = Video.find(video_id)

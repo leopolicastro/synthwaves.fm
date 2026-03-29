@@ -1,5 +1,5 @@
 class StreamRecordingJob < ApplicationJob
-  queue_as :default
+  queue_as :conversion
 
   def perform(recording_id)
     recording = Recording.find(recording_id)

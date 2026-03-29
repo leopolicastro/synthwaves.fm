@@ -60,8 +60,7 @@ env:
     ICECAST_INTERNAL_PORT: "8000"
     ICECAST_PORT: "443"
 
-    # Set number of processes dedicated to Solid Queue (default: 1)
-    # JOB_CONCURRENCY: 3
+    # Queue workers are configured in config/queue.yml (3 workers: conversion, imports, default)
 
     # Set number of cores available to the application on each server (default: 1).
     # WEB_CONCURRENCY: 2

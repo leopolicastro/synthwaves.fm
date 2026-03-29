@@ -1,7 +1,7 @@
 class MediaDownloadJob < ApplicationJob
   include DownloadBroadcastable
 
-  queue_as :default
+  queue_as :imports
 
   retry_on MediaDownloadService::RateLimitError,
     wait: :polynomially_longer,

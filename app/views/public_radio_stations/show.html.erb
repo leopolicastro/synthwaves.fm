@@ -59,8 +59,10 @@
             <div data-music-video-fallback class="flex justify-center">
               <div class="w-full max-w-md aspect-square rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10"
                    style="box-shadow: 0 0 40px color-mix(in srgb, var(--color-neon-pink) 20%, transparent), 0 0 80px color-mix(in srgb, var(--color-neon-purple) 10%, transparent), 0 25px 50px rgba(0,0,0,0.5);">
-                <% if @station.display_image %>
-                  <%= image_tag @station.display_image, class: "w-full h-full object-cover", data: { radio_player_target: "coverArt" } %>
+                <% if @station.image.attached? %>
+                  <%= image_tag @station.image, class: "w-full h-full object-cover", data: { radio_player_target: "coverArt" } %>
+                <% elsif @station.current_track&.album&.cover_image&.attached? %>
+                  <%= image_tag @station.current_track.album.cover_image, class: "w-full h-full object-cover", data: { radio_player_target: "coverArt" } %>
                 <% else %>
                   <img src="" class="w-full h-full object-cover hidden" data-radio-player-target="coverArt">
                   <div class="w-full h-full bg-gray-800 flex items-center justify-center" data-placeholder>

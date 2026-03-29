@@ -39,6 +39,7 @@ Rails.application.routes.draw do
   resources :podcasts, only: [:show]
   get "radio", to: "public_radio_stations#index", as: :public_radio_stations
   get "radio/:slug", to: "public_radio_stations#show", as: :public_radio_station
+  get "tv-guide", to: "public_tv_guide#index", as: :public_tv_guide
   resources :radio_stations, only: [:index, :show, :create, :edit, :update, :destroy] do
     member do
       post :start

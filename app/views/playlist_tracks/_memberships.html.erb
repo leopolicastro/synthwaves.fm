@@ -1,0 +1,11 @@
+<% if playlists.any? %>
+  <div class="flex flex-wrap items-center gap-x-1 gap-y-1 text-xs text-gray-500">
+    <svg class="w-3.5 h-3.5 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+    </svg>
+    <% playlists.each_with_index do |playlist, i| %>
+      <%= link_to playlist.name, playlist_path(playlist), class: "text-neon-cyan hover:underline" %><%= "," unless i == playlists.size - 1 %>
+    <% end %>
+  </div>
+<% end %>

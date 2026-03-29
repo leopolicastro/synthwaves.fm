@@ -17,6 +17,7 @@ class TracksController < ApplicationController
   end
 
   def show
+    @track_playlists = @track.playlists.where(user: Current.user).order(:name)
   end
 
   def new

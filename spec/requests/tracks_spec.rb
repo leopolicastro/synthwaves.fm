@@ -110,6 +110,39 @@ RSpec.describe "Tracks", type: :request do
       expect(doc.at_css('button[title="Delete"]')).to be_present
     end
 
+    it "displays playlist names when the track belongs to playlists" do
+      playlist_a = create(:playlist, user: user, name: "Chill Vibes")
+      playlist_b = create(:playlist, user: user, name: "Workout Mix")
+      playlist_a.playlist_tracks.create!(track: track, position: 1)
+      playlist_b.playlist_tracks.create!(track: track, position: 1)
+
+      get track_path(track)
+
+      expect(response.body).to include("Chill Vibes")
+      expect(response.body).to include("Workout Mix")
+    end
+
+    it "does not display playlist memberships section when track is in no playlists" do
+      get track_path(track)
+
+      doc = Nokogiri::HTML(response.body)
+      memberships_icon = doc.at_css('svg path[d="M4 6h16M4 10h16M4 14h16M4 18h16"]')
+      expect(memberships_icon).to be_nil
+    end
+
+    it "only shows playlists belonging to the current user" do
+      other_user = create(:user)
+      my_playlist = create(:playlist, user: user, name: "My Playlist")
+      other_playlist = create(:playlist, user: other_user, name: "Other User Playlist")
+      my_playlist.playlist_tracks.create!(track: track, position: 1)
+      other_playlist.playlist_tracks.create!(track: track, position: 1)
+
+      get track_path(track)
+
+      expect(response.body).to include("My Playlist")
+      expect(response.body).not_to include("Other User Playlist")
+    end
+
     it "renders download icon button only when audio file is attached" do
       youtube_track = create(:track, :youtube, album: create(:album, artist: create(:artist, user: user)))
       get track_path(youtube_track)

@@ -10,11 +10,18 @@
   </div>
 
   <% if station.current_track %>
-    <div class="mb-3 p-2 bg-gray-700/50 rounded text-sm">
-      <span class="text-gray-400">Now playing:</span>
-      <span class="text-white"><%= station.current_track.title %></span>
-      <span class="text-gray-400">by</span>
-      <span class="text-gray-300"><%= station.current_track.artist.name %></span>
+    <div class="mb-3 p-2 bg-gray-700/50 rounded text-sm flex items-center gap-3">
+      <% if station.current_track.album&.cover_image&.attached? %>
+        <%= image_tag station.current_track.album.cover_image, class: "w-10 h-10 rounded object-cover flex-shrink-0", loading: "lazy" %>
+      <% else %>
+        <div class="w-10 h-10 rounded bg-gray-600 flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+        </div>
+      <% end %>
+      <div class="min-w-0">
+        <div class="text-white truncate"><%= station.current_track.title %></div>
+        <div class="text-gray-400 text-xs truncate"><%= station.current_track.artist.name %></div>
+      </div>
     </div>
   <% end %>
 

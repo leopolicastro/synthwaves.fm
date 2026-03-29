@@ -42,6 +42,7 @@ export default class extends Controller {
       this._observer.disconnect()
       this._observer = null
     }
+    this._stopLiveTimer()
   }
 
   _bindToAudio() {
@@ -55,6 +56,7 @@ export default class extends Controller {
     if (!trackId) return
     // If pinned to a specific track, don't follow now-playing
     if (this.hasTrackIdValue && this.trackIdValue) return
+    this._stopLiveTimer()
     if (trackStartedAt != null) this.trackStartedAtValue = trackStartedAt
     this._fetchLyrics(trackId)
   }
@@ -78,6 +80,10 @@ export default class extends Controller {
       if (parsed) {
         this._syncedLines = parsed
         this._renderSyncedLines()
+        // Jump to current position immediately (important for mid-song joins)
+        this._highlightLine()
+        // For live radio, start a timer so lyrics scroll even without audio playing
+        if (this.trackStartedAtValue > 0) this._startLiveTimer()
       } else {
         this.contentTarget.textContent = data.lyrics
         this.contentTarget.classList.add("whitespace-pre-line", "text-gray-400")
@@ -115,15 +121,31 @@ export default class extends Controller {
     }
   }
 
+  _startLiveTimer() {
+    this._stopLiveTimer()
+    this._liveTimer = setInterval(() => this._highlightLine(), 500)
+  }
+
+  _stopLiveTimer() {
+    if (this._liveTimer) {
+      clearInterval(this._liveTimer)
+      this._liveTimer = null
+    }
+  }
+
   _highlightLine() {
-    if (!this._syncedLines || !this._audio || !this.hasContentTarget) return
+    if (!this._syncedLines || !this.hasContentTarget) return
 
     // For live radio streams, use wall clock time to determine track position
     // since audio.currentTime starts at 0 when the listener tunes in.
     // For normal playback (trackStartedAt is 0), use audio.currentTime directly.
-    const currentTime = this.trackStartedAtValue > 0
-      ? (Date.now() / 1000) - this.trackStartedAtValue
-      : this._audio.currentTime
+    let currentTime
+    if (this.trackStartedAtValue > 0) {
+      currentTime = (Date.now() / 1000) - this.trackStartedAtValue
+    } else {
+      if (!this._audio) return
+      currentTime = this._audio.currentTime
+    }
     let activeIndex = -1
 
     for (let i = this._syncedLines.length - 1; i >= 0; i--) {

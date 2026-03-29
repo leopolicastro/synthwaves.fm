@@ -206,6 +206,60 @@ RSpec.describe "Playlists", type: :request do
 
       expect(content).to include("https://youtube.com/watch?v=abc123")
     end
+
+    it "renders search input inside a turbo frame" do
+      doc = Nokogiri::HTML(response.body)
+      frame = doc.at_css("turbo-frame#playlist-tracks")
+      expect(frame).to be_present
+      expect(frame.at_css('input[name="q"]')).to be_present
+    end
+
+    it "filters tracks by search query" do
+      matching_track = create(:track, title: "Neon Sunset")
+      other_track = create(:track, title: "Ocean Waves")
+      create(:playlist_track, playlist: playlist, track: matching_track, position: 2)
+      create(:playlist_track, playlist: playlist, track: other_track, position: 3)
+
+      get playlist_path(playlist), params: {q: "Neon"}
+
+      doc = Nokogiri::HTML(response.body)
+      frame = doc.at_css("turbo-frame#playlist-tracks")
+      expect(frame.text).to include("Neon Sunset")
+      expect(frame.text).not_to include("Ocean Waves")
+    end
+
+    it "shows total track count in header regardless of search filter" do
+      matching_track = create(:track, title: "Neon Sunset")
+      other_track = create(:track, title: "Ocean Waves")
+      create(:playlist_track, playlist: playlist, track: matching_track, position: 2)
+      create(:playlist_track, playlist: playlist, track: other_track, position: 3)
+
+      get playlist_path(playlist), params: {q: "Neon"}
+
+      doc = Nokogiri::HTML(response.body)
+      header = doc.at_css("h1").parent
+      expect(header.text).to include("3 tracks")
+    end
+
+    it "paginates tracks when over 50" do
+      52.times do |i|
+        t = create(:track)
+        create(:playlist_track, playlist: playlist, track: t, position: i + 2)
+      end
+
+      get playlist_path(playlist)
+
+      doc = Nokogiri::HTML(response.body)
+      track_rows = doc.css('[data-controller~="song-row"]')
+      expect(track_rows.size).to eq(50)
+      expect(doc.at_css(".pagy")).to be_present
+    end
+
+    it "shows empty state when search matches nothing" do
+      get playlist_path(playlist), params: {q: "zzzznonexistent"}
+
+      expect(response.body).to include("No tracks found")
+    end
   end
 
   describe "DELETE /playlists/:id" do

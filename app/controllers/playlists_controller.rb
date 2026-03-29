@@ -13,8 +13,17 @@ class PlaylistsController < ApplicationController
   end
 
   def show
-    @playlist_tracks = @playlist.playlist_tracks.includes(track: [:artist, :album])
-    @total_duration = @playlist_tracks.sum { |pt| pt.track.duration || 0 }
+    @query = params[:q]
+    @total_track_count = @playlist.playlist_tracks_count
+    @total_duration = @playlist.tracks.sum(:duration)
+
+    scope = @playlist.playlist_tracks.includes(track: [:artist, :album]).order(:position)
+    if @query.present?
+      track_ids = Track.search(@query).select(:id)
+      scope = scope.where(track_id: track_ids)
+    end
+
+    @pagy, @playlist_tracks = pagy(:offset, scope, limit: 50)
     @favorited_track_ids = Current.user.favorited_ids_for("Track")
   end
 

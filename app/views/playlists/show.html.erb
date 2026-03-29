@@ -1,7 +1,7 @@
 <% content_for :meta_title, "#{@playlist.name} — synthwaves.fm" %>
-<% content_for :meta_description, "#{pluralize(@playlist_tracks.size, 'track')} · #{format_duration(@total_duration)} on synthwaves.fm" %>
-<% if (cover_track = @playlist_tracks.find { |pt| pt.track.album.cover_image.attached? }) %>
-  <% content_for :meta_image, og_image_url_for(cover_track.track.album.cover_image) %>
+<% content_for :meta_description, "#{pluralize(@total_track_count, 'track')} · #{format_duration(@total_duration)} on synthwaves.fm" %>
+<% if (cover_pt = @playlist.playlist_tracks.joins(track: { album: { cover_image_attachment: :blob } }).first) %>
+  <% content_for :meta_image, og_image_url_for(cover_pt.track.album.cover_image) %>
 <% end %>
 <% content_for :meta_type, "music.playlist" %>
 
@@ -13,9 +13,9 @@
   <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-6">
     <div>
       <h1 class="text-3xl font-bold font-display"><%= @playlist.name %></h1>
-      <p class="text-sm text-gray-400 mt-1"><%= pluralize(@playlist_tracks.size, "track") %> · <%= format_duration(@total_duration) %></p>
+      <p class="text-sm text-gray-400 mt-1"><%= pluralize(@total_track_count, "track") %> · <%= format_duration(@total_duration) %></p>
     </div>
-    <div class="flex flex-wrap gap-2" data-controller="clipboard" data-clipboard-content-value="<%= playlist_tracks_as_text(@playlist_tracks) %>">
+    <div class="flex flex-wrap gap-2" data-controller="clipboard" data-clipboard-content-value="<%= playlist_tracks_as_text(@playlist.playlist_tracks.includes(track: [:artist]).order(:position)) %>">
       <%= render Button::Component.new(data: { action: "play-all#playAll" }, extra_classes: "gap-1") do %>
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.84A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.27l9.344-5.891a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
         Play All
@@ -53,24 +53,41 @@
     <% end %>
   <% end %>
 
-  <div class="bg-gray-800 rounded-lg border border-gray-700">
-    <% @playlist_tracks.each do |pt| %>
-      <%= render TrackRow::Component.new(track: pt.track, number: pt.position, link_title: true, link_subtitle: true) do |c| %>
-        <% c.with_trailing do %>
-          <% if pt.track.audio_file.attached? %>
-            <%= link_to download_track_path(pt.track), class: "text-gray-400 hover:text-neon-cyan", title: "Download" do %>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+  <turbo-frame id="playlist-tracks" data-turbo-action="advance">
+    <form action="<%= playlist_path(@playlist) %>" method="get" data-controller="search" data-search-target="form" class="mb-4">
+      <input type="text" name="q" value="<%= @query %>" placeholder="Search tracks..."
+             class="w-full rounded-lg bg-gray-800 border-gray-700 text-white text-lg px-4 py-3 focus:outline-neon-cyan"
+             data-search-target="input" data-action="input->search#submit">
+    </form>
+
+    <% if @playlist_tracks.any? %>
+      <div class="bg-gray-800 rounded-lg border border-gray-700">
+        <% @playlist_tracks.each do |pt| %>
+          <%= render TrackRow::Component.new(track: pt.track, number: pt.position, link_title: true, link_subtitle: true) do |c| %>
+            <% c.with_trailing do %>
+              <% if pt.track.audio_file.attached? %>
+                <%= link_to download_track_path(pt.track), class: "text-gray-400 hover:text-neon-cyan", title: "Download" do %>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <% end %>
+              <% end %>
+              <%= render "favorites/button", favorable: pt.track, favorited: @favorited_track_ids.include?(pt.track.id) %>
+              <%= button_to playlist_track_path(@playlist, pt),
+                    method: :delete,
+                    class: "text-gray-400 hover:text-red-600",
+                    title: "Remove from playlist" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              <% end %>
             <% end %>
           <% end %>
-          <%= render "favorites/button", favorable: pt.track, favorited: @favorited_track_ids.include?(pt.track.id) %>
-          <%= button_to playlist_track_path(@playlist, pt),
-                method: :delete,
-                class: "text-gray-400 hover:text-red-600",
-                title: "Remove from playlist" do %>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-          <% end %>
         <% end %>
+      </div>
+      <% if @pagy.pages > 1 %>
+        <div class="mt-6 flex justify-center">
+          <%== @pagy.series_nav %>
+        </div>
       <% end %>
+    <% else %>
+      <p class="text-gray-400 py-8 text-center">No tracks found<%= " for \"#{@query}\"" if @query.present? %>.</p>
     <% end %>
-  </div>
+  </turbo-frame>
 </div>

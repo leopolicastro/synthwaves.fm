@@ -64,6 +64,6 @@ class RadioStationsController < ApplicationController
   end
 
   def station_params
-    params.require(:radio_station).permit(:playback_mode, :bitrate, :crossfade, :crossfade_duration)
+    params.require(:radio_station).permit(:playback_mode, :bitrate, :crossfade, :crossfade_duration, :image)
   end
 end

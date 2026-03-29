@@ -5,10 +5,17 @@
 <%= turbo_stream_from "radio_station_public_#{@station.id}" %>
 
 <div class="min-h-screen flex flex-col items-center px-4 py-12 relative">
-  <%# Decorative radial glow %>
+  <%# Decorative background — station image blur or radial glow %>
   <div class="absolute inset-0 pointer-events-none overflow-hidden">
-    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full"
-         style="background: radial-gradient(circle, color-mix(in srgb, var(--color-neon-pink) 15%, transparent) 0%, transparent 70%);"></div>
+    <% if @station.image.attached? %>
+      <div class="absolute inset-0">
+        <%= image_tag @station.image, class: "w-full h-full object-cover blur-3xl scale-110 opacity-15 saturate-150" %>
+        <div class="absolute inset-0 bg-gradient-to-b from-gray-950/60 via-transparent to-gray-950/90"></div>
+      </div>
+    <% else %>
+      <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full"
+           style="background: radial-gradient(circle, color-mix(in srgb, var(--color-neon-pink) 15%, transparent) 0%, transparent 70%);"></div>
+    <% end %>
   </div>
 
   <div class="relative z-10 w-full max-w-3xl">
@@ -22,6 +29,12 @@
 
     <%# Station Header %>
     <div class="text-center mb-8">
+      <% if @station.image.attached? %>
+        <div class="inline-block mb-4 rounded-full p-[2px]"
+             style="background: linear-gradient(135deg, var(--color-neon-pink), var(--color-neon-purple), var(--color-neon-cyan));">
+          <%= image_tag @station.image, class: "w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover ring-2 ring-gray-950" %>
+        </div>
+      <% end %>
       <h1 class="text-2xl sm:text-3xl font-bold font-display text-white mb-2"><%= @station.playlist.name %></h1>
       <div id="public_status_<%= @station.id %>" class="inline-block">
         <%= render "radio_stations/status_badge", station: @station %>
@@ -46,8 +59,8 @@
             <div data-music-video-fallback class="flex justify-center">
               <div class="w-full max-w-md aspect-square rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10"
                    style="box-shadow: 0 0 40px color-mix(in srgb, var(--color-neon-pink) 20%, transparent), 0 0 80px color-mix(in srgb, var(--color-neon-purple) 10%, transparent), 0 25px 50px rgba(0,0,0,0.5);">
-                <% if @station.current_track&.album&.cover_image&.attached? %>
-                  <%= image_tag @station.current_track.album.cover_image, class: "w-full h-full object-cover", data: { radio_player_target: "coverArt" } %>
+                <% if @station.display_image %>
+                  <%= image_tag @station.display_image, class: "w-full h-full object-cover", data: { radio_player_target: "coverArt" } %>
                 <% else %>
                   <img src="" class="w-full h-full object-cover hidden" data-radio-player-target="coverArt">
                   <div class="w-full h-full bg-gray-800 flex items-center justify-center" data-placeholder>
@@ -98,13 +111,17 @@
         </div>
       </div>
     <% else %>
-      <%# Offline: show album art centered %>
+      <%# Offline: show station image or placeholder %>
       <div class="flex justify-center mb-8">
-        <div class="w-64 h-64 sm:w-72 sm:h-72 rounded-2xl bg-gray-800 border border-gray-700 flex items-center justify-center"
+        <div class="w-64 h-64 sm:w-72 sm:h-72 rounded-2xl overflow-hidden bg-gray-800 border border-gray-700 flex items-center justify-center"
              style="box-shadow: 0 0 40px color-mix(in srgb, var(--color-neon-pink) 15%, transparent), 0 25px 50px rgba(0,0,0,0.5);">
-          <svg class="w-20 h-20 text-gray-600" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
-          </svg>
+          <% if @station.image.attached? %>
+            <%= image_tag @station.image, class: "w-full h-full object-cover" %>
+          <% else %>
+            <svg class="w-20 h-20 text-gray-600" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+            </svg>
+          <% end %>
         </div>
       </div>
       <div class="max-w-md mx-auto w-full mb-8">

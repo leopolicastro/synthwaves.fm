@@ -4,9 +4,14 @@
   </div>
 
   <div class="flex items-start justify-between mb-6">
-    <div>
-      <h1 class="text-3xl font-bold font-display"><%= @station.playlist.name %></h1>
-      <p class="text-gray-400 mt-1"><%= @station.playlist.tracks.count %> tracks &middot; <%= @station.playback_mode.capitalize %></p>
+    <div class="flex items-center gap-4">
+      <% if @station.image.attached? %>
+        <%= image_tag @station.image, class: "w-14 h-14 rounded-lg object-cover ring-1 ring-white/10" %>
+      <% end %>
+      <div>
+        <h1 class="text-3xl font-bold font-display"><%= @station.playlist.name %></h1>
+        <p class="text-gray-400 mt-1"><%= @station.playlist.tracks.count %> tracks &middot; <%= @station.playback_mode.capitalize %></p>
+      </div>
     </div>
     <%= render "radio_stations/status_badge", station: @station %>
   </div>
@@ -27,8 +32,8 @@
               data-song-row-artist-value="Radio Station"
               data-song-row-stream-url-value="<%= @station.listen_url %>"
               data-song-row-is-live-value="true"
-              <% if @station.current_track&.album&.cover_image&.attached? %>
-                data-song-row-cover-url-value="<%= url_for(@station.current_track.album.cover_image) %>"
+              <% if @station.display_image %>
+                data-song-row-cover-url-value="<%= url_for(@station.display_image) %>"
               <% end %>
               data-action="click->song-row#play">
         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>

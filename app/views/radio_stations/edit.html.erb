@@ -18,6 +18,19 @@
       <% end %>
 
       <div>
+        <%= f.label :image, "Station Image", class: "block text-sm font-medium text-gray-400 mb-1" %>
+        <p class="text-xs text-gray-500 mb-2">Displayed when the current track has no album art.</p>
+        <% if @station.image.attached? %>
+          <div class="mb-2 flex items-center gap-3">
+            <%= image_tag @station.image, class: "w-16 h-16 rounded-lg object-cover" %>
+            <span class="text-sm text-gray-400">Current image</span>
+          </div>
+        <% end %>
+        <%= f.file_field :image, accept: "image/*",
+            class: "w-full text-sm text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-gray-700 file:text-gray-300 file:cursor-pointer hover:file:bg-gray-600" %>
+      </div>
+
+      <div>
         <%= f.label :playback_mode, class: "block text-sm font-medium text-gray-400 mb-1" %>
         <%= f.select :playback_mode, RadioStation::PLAYBACK_MODES.map { |m| [m.capitalize, m] },
             {}, class: "w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-white focus:outline-neon-cyan" %>

@@ -8,6 +8,8 @@ class RadioStation < ApplicationRecord
   belongs_to :current_track, class_name: "Track", optional: true
   belongs_to :queued_track, class_name: "Track", optional: true
 
+  has_one_attached :image
+
   validates :status, inclusion: {in: STATUSES}
   validates :playback_mode, inclusion: {in: PLAYBACK_MODES}
   validates :bitrate, inclusion: {in: BITRATES}
@@ -18,6 +20,14 @@ class RadioStation < ApplicationRecord
   before_validation :generate_mount_point, on: :create
 
   STATUSES.each { |s| define_method(:"#{s}?") { status == s } }
+
+  def display_image
+    if current_track&.album&.cover_image&.attached?
+      current_track.album.cover_image
+    elsif image.attached?
+      image
+    end
+  end
 
   def slug
     mount_point.delete_prefix("/").delete_suffix(".mp3")

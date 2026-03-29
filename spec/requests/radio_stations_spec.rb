@@ -82,6 +82,17 @@ RSpec.describe "RadioStations", type: :request do
       expect(station.crossfade).to be false
       expect(response).to redirect_to(radio_station_path(station))
     end
+
+    it "attaches a station image" do
+      station = create(:radio_station, playlist: playlist, user: user)
+      image = fixture_file_upload("test.png", "image/png")
+
+      patch radio_station_path(station), params: {radio_station: {image: image}}
+
+      station.reload
+      expect(station.image).to be_attached
+      expect(response).to redirect_to(radio_station_path(station))
+    end
   end
 
   describe "POST /radio_stations/:id/start" do

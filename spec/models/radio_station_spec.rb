@@ -73,6 +73,45 @@ RSpec.describe RadioStation, type: :model do
     end
   end
 
+  describe "#display_image" do
+    it "returns the current track's album cover when attached" do
+      album = create(:album, :with_cover_image)
+      track = create(:track, album: album)
+      station = create(:radio_station, current_track: track)
+
+      expect(station.display_image).to eq(album.cover_image)
+    end
+
+    it "returns the station image when current track has no album cover" do
+      track = create(:track)
+      station = create(:radio_station, current_track: track)
+      station.image.attach(io: StringIO.new("img"), filename: "station.png", content_type: "image/png")
+
+      expect(station.display_image).to eq(station.image)
+    end
+
+    it "returns the station image when there is no current track" do
+      station = create(:radio_station)
+      station.image.attach(io: StringIO.new("img"), filename: "station.png", content_type: "image/png")
+
+      expect(station.display_image).to eq(station.image)
+    end
+
+    it "returns nil when neither image is available" do
+      station = create(:radio_station)
+      expect(station.display_image).to be_nil
+    end
+
+    it "prefers track album cover over station image" do
+      album = create(:album, :with_cover_image)
+      track = create(:track, album: album)
+      station = create(:radio_station, current_track: track)
+      station.image.attach(io: StringIO.new("img"), filename: "station.png", content_type: "image/png")
+
+      expect(station.display_image).to eq(album.cover_image)
+    end
+  end
+
   describe "#listen_url" do
     it "constructs the full Icecast URL" do
       station = build(:radio_station, mount_point: "/chill-vibes.mp3")

@@ -1,5 +1,5 @@
 class IPTVChannelSyncService
-  PLAYLIST_URL = "https://iptv-org.github.io/iptv/index.m3u"
+  PLAYLIST_URL = "https://tvpass.org/playlist/m3u"
   BATCH_SIZE = 500
 
   def self.call

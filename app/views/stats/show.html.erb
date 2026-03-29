@@ -1,6 +1,58 @@
 <div class="w-full">
+  <h1 class="text-2xl sm:text-3xl font-bold font-display text-white mb-6">Stats</h1>
+
+  <%# ── Library Stats (static, not time-range filtered) ── %>
+  <% if @library_stats %>
+    <div class="mb-10">
+      <h2 class="text-lg font-semibold text-white mb-3">Your Library</h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
+          <div class="text-2xl font-bold text-neon-cyan tabular-nums"><%= number_with_delimiter(@library_stats[:track_count]) %></div>
+          <div class="text-sm text-gray-400">Tracks</div>
+        </div>
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
+          <div class="text-2xl font-bold text-neon-pink tabular-nums"><%= number_with_delimiter(@library_stats[:album_count]) %></div>
+          <div class="text-sm text-gray-400">Albums</div>
+        </div>
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
+          <div class="text-2xl font-bold text-laser-green tabular-nums"><%= number_with_delimiter(@library_stats[:artist_count]) %></div>
+          <div class="text-sm text-gray-400">Artists</div>
+        </div>
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
+          <div class="text-2xl font-bold text-neon-purple tabular-nums"><%= format_library_duration(@library_stats[:total_duration]) %></div>
+          <div class="text-sm text-gray-400">Total Duration</div>
+        </div>
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
+          <div class="text-2xl font-bold text-neon-cyan tabular-nums"><%= format_listening_time(@library_stats[:avg_track_duration]) %></div>
+          <div class="text-sm text-gray-400">Avg Track Length</div>
+        </div>
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
+          <div class="text-2xl font-bold text-neon-pink tabular-nums"><%= number_to_human_size(@library_stats[:total_file_size]) %></div>
+          <div class="text-sm text-gray-400">Library Size</div>
+        </div>
+      </div>
+
+      <% if @library_stats[:top_genres].any? %>
+        <h3 class="text-base font-semibold text-white mb-2">Genres in Library</h3>
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4">
+          <% max_genre_count = @library_stats[:top_genres].values.max.to_f %>
+          <% @library_stats[:top_genres].each do |genre, count| %>
+            <div class="flex items-center gap-3 mb-2 last:mb-0">
+              <span class="text-xs text-gray-400 w-20 truncate text-right"><%= genre %></span>
+              <div class="flex-1 bg-gray-700 rounded-full h-4 overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-neon-purple to-laser-green rounded-full transition-all" style="width: <%= (count / max_genre_count * 100).round %>%"></div>
+              </div>
+              <span class="text-xs text-gray-400 tabular-nums w-10"><%= count %></span>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%# ── Listening Stats (time-range filtered) ── %>
   <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl sm:text-3xl font-bold font-display text-white">Listening Stats</h1>
+    <h2 class="text-lg font-semibold text-white">Listening Stats</h2>
     <!-- Time range selector -->
     <div class="flex gap-2">
       <% %i[week month year all_time].each do |range| %>

@@ -19,13 +19,13 @@ RSpec.describe "PublicRadioStations", type: :request do
     it "shows active stations" do
       station.update!(status: "active")
       get public_radio_stations_path
-      expect(response.body).to include(playlist.name)
+      expect(response.body).to include(public_radio_station_path(slug: station.slug))
     end
 
     it "excludes stopped stations" do
       station # default status is stopped
       get public_radio_stations_path
-      expect(response.body).not_to include(playlist.name)
+      expect(response.body).not_to include(public_radio_station_path(slug: station.slug))
     end
 
     it "shows empty state when no stations are live" do

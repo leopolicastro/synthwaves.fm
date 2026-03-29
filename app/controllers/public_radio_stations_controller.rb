@@ -3,7 +3,7 @@ class PublicRadioStationsController < ApplicationController
   layout "landing"
 
   def index
-    @stations = RadioStation.includes(:playlist, :current_track, image_attachment: :blob, current_track: {album: {cover_image_attachment: :blob}})
+    @stations = RadioStation.includes(:playlist, image_attachment: :blob, current_track: [:artist, {album: {cover_image_attachment: :blob}}])
       .where.not(status: "stopped")
       .order(listener_count: :desc, started_at: :desc)
   end

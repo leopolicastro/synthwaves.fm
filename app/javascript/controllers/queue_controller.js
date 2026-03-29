@@ -223,7 +223,7 @@ export default class extends Controller {
   playCurrent() {
     const track = this.queue[this.currentIndex]
     if (track) {
-      if (track.youtubeVideoId) {
+      if (track.youtubeVideoId && !track.streamUrl) {
         document.dispatchEvent(new CustomEvent("player:playYouTube", { detail: track }))
       } else {
         document.dispatchEvent(new CustomEvent("player:play", { detail: track }))

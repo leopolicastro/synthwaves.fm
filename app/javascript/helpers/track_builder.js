@@ -29,7 +29,8 @@ export function buildTrackFromElement(el) {
 
   if (d.songRowStreamUrlValue) {
     track.streamUrl = d.songRowStreamUrlValue
-  } else if (d.songRowYoutubeVideoIdValue) {
+  }
+  if (d.songRowYoutubeVideoIdValue) {
     track.youtubeVideoId = d.songRowYoutubeVideoIdValue
   }
 

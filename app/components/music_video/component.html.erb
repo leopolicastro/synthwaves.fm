@@ -1,0 +1,11 @@
+<div data-controller="music-video"
+     class="hidden"
+     <% if @track_id %>data-music-video-track-id-value="<%= @track_id %>"<% end %>
+     <% if @youtube_video_id %>data-music-video-youtube-video-id-value="<%= @youtube_video_id %>"<% end %>>
+  <% if @show_header %>
+    <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3" data-music-video-target="header">Music Video</h3>
+  <% end %>
+  <div data-music-video-target="container"
+       class="<%= @max_height %> overflow-hidden rounded-lg aspect-video">
+  </div>
+</div>

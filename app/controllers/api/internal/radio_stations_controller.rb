@@ -9,6 +9,12 @@ module API
           return
         end
 
+        unless has_listeners?(station)
+          advance_track_virtually(station)
+          head :no_content
+          return
+        end
+
         # When Liquidsoap requests the next track, the previously queued
         # track is now actually playing — promote it to current_track
         if station.queued_track_id && station.queued_track_id != station.current_track_id
@@ -65,6 +71,31 @@ module API
             status: s.status
           }
         }
+      end
+
+      private
+
+      DEFAULT_TRACK_DURATION = 240
+
+      def has_listeners?(station)
+        IcecastStatsService.listener_count(station.mount_point) > 0
+      end
+
+      def advance_track_virtually(station)
+        return unless station.current_track && station.last_track_at
+
+        duration = station.current_track.duration || DEFAULT_TRACK_DURATION
+        return unless Time.current - station.last_track_at >= duration
+
+        result = NextTrackService.call(station)
+        return unless result
+
+        station.update!(
+          current_track: result.track,
+          queued_track: result.track,
+          last_track_at: Time.current
+        )
+        station.broadcast_now_playing
       end
     end
   end

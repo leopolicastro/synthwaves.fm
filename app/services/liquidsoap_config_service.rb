@@ -61,7 +61,7 @@ class LiquidsoapConfigService
         end
       end
 
-      station_#{safe_id} = request.dynamic(id="#{slug}", next_track_#{safe_id})
+      station_#{safe_id} = request.dynamic(id="#{slug}", retry_delay=5., next_track_#{safe_id})
       #{crossfade_line(station, safe_id)}
 
       station_#{safe_id} = mksafe(station_#{safe_id})

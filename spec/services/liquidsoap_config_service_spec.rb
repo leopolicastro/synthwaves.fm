@@ -40,6 +40,14 @@ RSpec.describe LiquidsoapConfigService do
       expect(config).not_to include("/stopped.mp3")
     end
 
+    it "includes retry_delay on request.dynamic" do
+      playlist = create(:playlist, name: "Retry Test", user: user)
+      create(:radio_station, playlist: playlist, user: user, status: "active", mount_point: "/retry.mp3")
+
+      config = LiquidsoapConfigService.call
+      expect(config).to include("retry_delay=5.")
+    end
+
     it "omits crossfade when disabled" do
       playlist = create(:playlist, name: "No Fade", user: user)
       create(:radio_station,

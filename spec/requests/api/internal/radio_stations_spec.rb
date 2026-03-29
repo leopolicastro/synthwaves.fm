@@ -26,6 +26,7 @@ RSpec.describe "API::Internal::RadioStations", type: :request do
     end
 
     it "accepts requests with a valid token" do
+      stub_icecast_listeners(station.mount_point => 1)
       get next_track_api_internal_radio_station_path(station), headers: headers
       # Will be 204 (no tracks) but not 401
       expect(response).not_to have_http_status(:unauthorized)
@@ -33,6 +34,8 @@ RSpec.describe "API::Internal::RadioStations", type: :request do
   end
 
   describe "GET /api/internal/radio_stations/:id/next_track" do
+    before { stub_icecast_listeners(station.mount_point => 1) }
+
     it "returns 204 when playlist is empty" do
       get next_track_api_internal_radio_station_path(station), headers: headers
       expect(response).to have_http_status(:no_content)
@@ -94,6 +97,70 @@ RSpec.describe "API::Internal::RadioStations", type: :request do
     end
   end
 
+  describe "GET /api/internal/radio_stations/:id/next_track (idle - no listeners)" do
+    let(:track1) { create(:track, artist: artist, album: album, user: user, title: "Track 1", duration: 180) }
+    let(:track2) { create(:track, artist: artist, album: album, user: user, title: "Track 2", duration: 200) }
+
+    before do
+      track1.audio_file.attach(io: StringIO.new("audio"), filename: "t1.mp3", content_type: "audio/mpeg")
+      track2.audio_file.attach(io: StringIO.new("audio"), filename: "t2.mp3", content_type: "audio/mpeg")
+      create(:playlist_track, playlist: playlist, track: track1, position: 1)
+      create(:playlist_track, playlist: playlist, track: track2, position: 2)
+      stub_icecast_listeners(station.mount_point => 0)
+    end
+
+    it "returns 204 when no listeners" do
+      get next_track_api_internal_radio_station_path(station), headers: headers
+      expect(response).to have_http_status(:no_content)
+    end
+
+    it "does not generate a signed S3 URL when no listeners" do
+      allow(NextTrackService).to receive(:call).and_call_original
+
+      get next_track_api_internal_radio_station_path(station), headers: headers
+
+      expect(NextTrackService).not_to have_received(:call)
+    end
+
+    it "advances the current track when duration has elapsed" do
+      station.update!(current_track: track1, queued_track: track1, last_track_at: 200.seconds.ago)
+
+      get next_track_api_internal_radio_station_path(station), headers: headers
+
+      station.reload
+      expect(station.current_track).not_to eq(track1)
+      expect(station.last_track_at).to be_within(2.seconds).of(Time.current)
+    end
+
+    it "does not advance the current track before duration elapses" do
+      station.update!(current_track: track1, queued_track: track1, last_track_at: 10.seconds.ago)
+
+      get next_track_api_internal_radio_station_path(station), headers: headers
+
+      expect(station.reload.current_track).to eq(track1)
+    end
+
+    it "broadcasts now_playing when advancing tracks" do
+      station.update!(current_track: track1, queued_track: track1, last_track_at: 200.seconds.ago)
+      allow(station).to receive(:broadcast_now_playing)
+      allow(RadioStation).to receive(:find).and_return(station)
+
+      get next_track_api_internal_radio_station_path(station), headers: headers
+
+      expect(station).to have_received(:broadcast_now_playing)
+    end
+
+    it "uses default duration when track duration is nil" do
+      track1.update_column(:duration, nil)
+      station.update!(current_track: track1, queued_track: track1, last_track_at: 250.seconds.ago)
+
+      # 250s < 240s default — should advance
+      get next_track_api_internal_radio_station_path(station), headers: headers
+
+      expect(station.reload.current_track).not_to eq(track1)
+    end
+  end
+
   describe "GET /api/internal/radio_stations/active" do
     it "returns non-stopped stations" do
       active = create(:radio_station, status: "active", user: user)
@@ -106,5 +173,14 @@ RSpec.describe "API::Internal::RadioStations", type: :request do
       ids = response.parsed_body.pluck("id")
       expect(ids).to contain_exactly(active.id, idle.id)
     end
+  end
+
+  def stub_icecast_listeners(mount_listeners)
+    sources = mount_listeners.map do |mount, count|
+      {"listenurl" => "http://localhost:8000#{mount}", "listeners" => count}
+    end
+    body = {"icestats" => {"source" => sources.length == 1 ? sources.first : sources}}
+    stub_request(:get, %r{status-json\.xsl})
+      .to_return(status: 200, body: body.to_json, headers: {"Content-Type" => "application/json"})
   end
 end

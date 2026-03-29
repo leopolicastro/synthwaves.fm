@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["audio", "toggleButton", "playIcon", "pauseIcon", "label", "nowPlaying", "coverArt"]
+  static targets = ["audio", "toggleButton", "playIcon", "pauseIcon", "label", "nowPlaying", "coverArt", "lyricsPanel"]
   static values = { url: String }
 
   connect() {
@@ -56,6 +56,14 @@ export default class extends Controller {
     this.pauseIconTarget.classList.add("hidden")
     this.playIconTarget.classList.remove("hidden")
     this.labelTarget.textContent = "Listen Live"
+  }
+
+  showLyrics() {
+    if (this.hasLyricsPanelTarget) this.lyricsPanelTarget.classList.remove("hidden")
+  }
+
+  hideLyrics() {
+    if (this.hasLyricsPanelTarget) this.lyricsPanelTarget.classList.add("hidden")
   }
 
   _onNowPlayingChanged() {

@@ -60,8 +60,10 @@
             </div>
           </div>
 
-          <%# Right: Lyrics %>
-          <div class="lg:w-72 xl:w-80 shrink-0">
+          <%# Right: Lyrics (hidden when no lyrics available) %>
+          <div class="lg:w-72 xl:w-80 shrink-0 hidden"
+               data-radio-player-target="lyricsPanel"
+               data-action="lyrics:found->radio-player#showLyrics lyrics:empty->radio-player#hideLyrics">
             <div class="bg-gray-800/60 backdrop-blur rounded-xl border border-gray-700/50 p-5 lg:sticky lg:top-8">
               <%= render Lyrics::Component.new(show_header: true, max_height: "max-h-[50vh]", live: true) %>
             </div>
@@ -113,14 +115,10 @@
     <% end %>
 
     <%# Station Details %>
-    <div class="max-w-md mx-auto w-full grid grid-cols-3 gap-4 text-center mb-10">
+    <div class="max-w-md mx-auto w-full grid grid-cols-2 gap-4 text-center mb-10">
       <div class="bg-gray-800/60 backdrop-blur rounded-lg border border-gray-700/50 py-3 px-2">
         <p class="text-xl font-bold font-display text-white"><%= @station.listener_count %></p>
         <p class="text-xs text-gray-500 uppercase tracking-wider mt-0.5">Listeners</p>
-      </div>
-      <div class="bg-gray-800/60 backdrop-blur rounded-lg border border-gray-700/50 py-3 px-2">
-        <p class="text-xl font-bold font-display text-white"><%= @station.playlist.tracks.count %></p>
-        <p class="text-xs text-gray-500 uppercase tracking-wider mt-0.5">Tracks</p>
       </div>
       <div class="bg-gray-800/60 backdrop-blur rounded-lg border border-gray-700/50 py-3 px-2">
         <p class="text-xl font-bold font-display text-white"><%= @station.bitrate %></p>

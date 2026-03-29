@@ -69,7 +69,7 @@ export default class extends Controller {
       if (!response.ok) return
       const data = await response.json()
       if (!data.lyrics) {
-        this.contentTarget.innerHTML = '<span class="text-gray-400">No lyrics available</span>'
+        this._setEmpty()
         return
       }
 
@@ -86,9 +86,17 @@ export default class extends Controller {
         this.contentTarget.textContent = plainText
         this.contentTarget.classList.add("whitespace-pre-line", "text-gray-400")
       }
+      this.element.classList.remove("hidden")
+      this.dispatch("found")
     } catch (e) {
-      this.contentTarget.innerHTML = '<span class="text-gray-400">No lyrics available</span>'
+      this._setEmpty()
     }
+  }
+
+  _setEmpty() {
+    if (this.hasContentTarget) this.contentTarget.innerHTML = ""
+    this.element.classList.add("hidden")
+    this.dispatch("empty")
   }
 
   _parseLRC(text) {

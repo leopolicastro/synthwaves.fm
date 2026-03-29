@@ -6,7 +6,7 @@ class RadioStationsController < ApplicationController
   before_action :set_station, only: [:show, :edit, :update, :destroy, :start, :stop, :skip]
 
   def index
-    @stations = Current.user.radio_stations.includes(:playlist, :current_track).order(created_at: :desc)
+    @stations = Current.user.radio_stations.includes(:playlist, current_track: [:artist, {album: {cover_image_attachment: :blob}}]).order(created_at: :desc)
   end
 
   def show

@@ -16,7 +16,7 @@ RSpec.describe "Static::Landing", type: :request do
         expect(response.body).to include("Live TV")
         expect(response.body).to include("TV Guide & DVR")
         expect(response.body).to include("Podcasts")
-        expect(response.body).to include("Internet Radio")
+        expect(response.body).to include("Live Radio")
         expect(response.body).to include("Themes")
         expect(response.body).not_to include("AI Assistant")
       end

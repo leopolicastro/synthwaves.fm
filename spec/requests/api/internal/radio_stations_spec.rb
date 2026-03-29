@@ -123,13 +123,15 @@ RSpec.describe "API::Internal::RadioStations", type: :request do
     end
 
     it "advances the current track when duration has elapsed" do
-      station.update!(current_track: track1, queued_track: track1, last_track_at: 200.seconds.ago)
+      started_at = 200.seconds.ago
+      station.update!(current_track: track1, queued_track: track1, last_track_at: started_at)
 
       get next_track_api_internal_radio_station_path(station), headers: headers
 
       station.reload
       expect(station.current_track).not_to eq(track1)
-      expect(station.last_track_at).to be_within(2.seconds).of(Time.current)
+      # last_track_at advances by exactly the track duration (180s), not Time.current
+      expect(station.last_track_at).to be_within(2.seconds).of(started_at + 180.seconds)
     end
 
     it "does not advance the current track before duration elapses" do

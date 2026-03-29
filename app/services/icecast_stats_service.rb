@@ -10,12 +10,13 @@ class IcecastStatsService
   end
 
   def listener_count(mount_point)
-    all_mount_listeners[mount_point] || 0
+    all_mount_listeners&.fetch(mount_point, 0) || 0
   end
 
+  # Returns nil when Icecast is unreachable, {} when up but no mounts active
   def all_mount_listeners
     stats = fetch_stats
-    return {} unless stats
+    return nil unless stats
 
     parse_mount_listeners(stats)
   end
@@ -25,9 +26,11 @@ class IcecastStatsService
   def fetch_stats
     host = ENV.fetch("ICECAST_INTERNAL_HOST", "localhost")
     port = ENV.fetch("ICECAST_INTERNAL_PORT", "8000")
-    url = format(STATS_URL, host: host, port: port)
+    uri = URI(format(STATS_URL, host: host, port: port))
 
-    response = Net::HTTP.get_response(URI(url))
+    response = Net::HTTP.start(uri.host, uri.port, open_timeout: 2, read_timeout: 2) do |http|
+      http.get(uri.request_uri)
+    end
     return nil unless response.is_a?(Net::HTTPSuccess)
 
     JSON.parse(response.body)

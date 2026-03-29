@@ -6,7 +6,7 @@ class StationListenerSyncJob < ApplicationJob
     return if stations.none?
 
     mount_listeners = IcecastStatsService.new.all_mount_listeners
-    return if mount_listeners.empty?
+    return if mount_listeners.nil?
 
     stations.find_each do |station|
       count = mount_listeners[station.mount_point] || 0

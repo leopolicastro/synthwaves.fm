@@ -148,7 +148,7 @@ module API
         station.update!(
           current_track: result.track,
           queued_track: result.track,
-          last_track_at: Time.current
+          last_track_at: station.last_track_at + duration.seconds
         )
         station.broadcast_now_playing
       end

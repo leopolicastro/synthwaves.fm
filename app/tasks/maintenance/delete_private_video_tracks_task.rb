@@ -1,7 +1,7 @@
 module Maintenance
   class DeletePrivateVideoTracksTask < MaintenanceTasks::Task
     def collection
-      Track.where(title: "Private video")
+      Track.where(title: ["Private video", "Deleted video"])
     end
 
     def count

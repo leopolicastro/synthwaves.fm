@@ -12,11 +12,12 @@
   </div>
 
   <div class="relative z-10 w-full max-w-md flex flex-col items-center">
-    <%# Logo %>
-    <div class="mb-10">
+    <%# Logo & Back Link %>
+    <div class="mb-10 flex flex-col items-center gap-3">
       <%= link_to root_path do %>
         <%= render(Logo::Component.new(size: :md, icon: true)) %>
       <% end %>
+      <%= link_to "&larr; All Stations".html_safe, public_radio_stations_path, class: "text-sm text-gray-500 hover:text-neon-cyan transition-colors" %>
     </div>
 
     <%# Album Art %>

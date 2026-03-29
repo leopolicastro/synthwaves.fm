@@ -6,8 +6,8 @@ class RadioStation < ApplicationRecord
   belongs_to :playlist
   belongs_to :user
   belongs_to :current_track, class_name: "Track", optional: true
-  belongs_to :queued_track, class_name: "Track", optional: true
 
+  has_many :radio_queue_tracks, dependent: :delete_all
   has_one_attached :image
 
   validates :status, inclusion: {in: STATUSES}
@@ -76,6 +76,23 @@ class RadioStation < ApplicationRecord
       partial: "radio_stations/now_playing",
       locals: {station: self}
     )
+  end
+
+  def broadcast_queue
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "radio_station_public_#{id}",
+      target: "station_queue_#{id}",
+      partial: "public_radio_stations/queue",
+      locals: {station: self, upcoming_tracks: upcoming_tracks, recently_played: recently_played_tracks}
+    )
+  end
+
+  def upcoming_tracks(limit = 3)
+    radio_queue_tracks.upcoming.limit(limit).includes(track: [:artist, {album: {cover_image_attachment: :blob}}])
+  end
+
+  def recently_played_tracks(limit = 10)
+    radio_queue_tracks.recently_played(limit).includes(track: [:artist, {album: {cover_image_attachment: :blob}}])
   end
 
   private

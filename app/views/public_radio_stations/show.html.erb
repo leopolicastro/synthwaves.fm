@@ -101,6 +101,14 @@
           </button>
           <audio data-radio-player-target="audio" preload="none"></audio>
         </div>
+
+        <%# Queue: Up Next + Recently Played %>
+        <div class="max-w-md mx-auto w-full mb-8">
+          <%= render "public_radio_stations/queue",
+            station: @station,
+            upcoming_tracks: @upcoming_tracks || [],
+            recently_played: @recently_played || [] %>
+        </div>
       </div>
     <% elsif @station.starting? %>
       <div class="max-w-md mx-auto w-full mb-8">

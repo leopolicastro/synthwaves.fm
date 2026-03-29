@@ -28,6 +28,9 @@ class RadioStationsController < ApplicationController
 
   def update
     if @station.update(station_params)
+      if @station.saved_change_to_playback_mode? && !@station.stopped?
+        RadioQueueService.new(@station).populate!
+      end
       redirect_to @station, notice: "Station updated."
     else
       render :edit, status: :unprocessable_content
@@ -36,12 +39,14 @@ class RadioStationsController < ApplicationController
 
   def start
     @station.update!(status: "starting", started_at: Time.current, error_message: nil)
+    RadioQueueService.new(@station).populate!
     StationControlJob.perform_later(@station.id, "start")
     redirect_to @station, notice: "Station starting..."
   end
 
   def stop
-    @station.update!(status: "stopped")
+    @station.update!(status: "stopped", current_track: nil)
+    RadioQueueService.new(@station).clear!
     StationControlJob.perform_later(@station.id, "stop")
     redirect_to @station, notice: "Station stopped."
   end

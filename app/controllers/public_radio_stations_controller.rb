@@ -10,5 +10,9 @@ class PublicRadioStationsController < ApplicationController
 
   def show
     @station = RadioStation.find_by_slug!(params[:slug])
+    if @station.active? || @station.idle?
+      @upcoming_tracks = @station.upcoming_tracks(3)
+      @recently_played = @station.recently_played_tracks(10)
+    end
   end
 end

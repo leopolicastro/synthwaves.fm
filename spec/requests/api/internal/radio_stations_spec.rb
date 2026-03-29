@@ -161,6 +161,36 @@ RSpec.describe "API::Internal::RadioStations", type: :request do
     end
   end
 
+  describe "GET /api/internal/radio_stations/:id/next_track (resuming from idle)" do
+    let(:track1) { create(:track, artist: artist, album: album, user: user, title: "Displayed Song", duration: 180) }
+    let(:track2) { create(:track, artist: artist, album: album, user: user, title: "Next Song", duration: 200) }
+
+    before do
+      track1.audio_file.attach(io: StringIO.new("audio"), filename: "t1.mp3", content_type: "audio/mpeg")
+      track2.audio_file.attach(io: StringIO.new("audio"), filename: "t2.mp3", content_type: "audio/mpeg")
+      create(:playlist_track, playlist: playlist, track: track1, position: 1)
+      create(:playlist_track, playlist: playlist, track: track2, position: 2)
+      # Station was idle (current == queued), now a listener connects
+      station.update!(current_track: track1, queued_track: track1, last_track_at: 60.seconds.ago, playback_mode: "sequential")
+      stub_icecast_listeners(station.mount_point => 1)
+    end
+
+    it "serves the currently displayed track, not the next one" do
+      get next_track_api_internal_radio_station_path(station), headers: headers
+
+      expect(response).to have_http_status(:ok)
+      json = response.parsed_body
+      expect(json["track_id"]).to eq(track1.id)
+      expect(json["title"]).to eq("Displayed Song")
+    end
+
+    it "queues the next track for subsequent requests" do
+      get next_track_api_internal_radio_station_path(station), headers: headers
+
+      expect(station.reload.queued_track).to eq(track2)
+    end
+  end
+
   describe "GET /api/internal/radio_stations/active" do
     it "returns non-stopped stations" do
       active = create(:radio_station, status: "active", user: user)

@@ -86,7 +86,6 @@ export default class extends Controller {
         this.contentTarget.textContent = plainText
         this.contentTarget.classList.add("whitespace-pre-line", "text-gray-400")
       }
-      this.element.classList.remove("hidden")
       this.dispatch("found")
     } catch (e) {
       this._setEmpty()
@@ -95,7 +94,6 @@ export default class extends Controller {
 
   _setEmpty() {
     if (this.hasContentTarget) this.contentTarget.innerHTML = ""
-    this.element.classList.add("hidden")
     this.dispatch("empty")
   }
 

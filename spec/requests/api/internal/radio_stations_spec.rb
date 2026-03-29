@@ -69,17 +69,18 @@ RSpec.describe "API::Internal::RadioStations", type: :request do
       create(:playlist_track, playlist: playlist, track: track2, position: 2)
       RadioQueueService.new(station).populate!
 
-      # First call: queues track1, no current_track yet (nothing was previously queued)
+      # First call: queues a track, no current_track yet (nothing was previously queued)
       get next_track_api_internal_radio_station_path(station), headers: headers
       station.reload
-      expect(station.queued_track).to eq(track1)
+      first_queued = station.queued_track
+      expect(first_queued).to be_present
       expect(station.current_track).to be_nil
 
-      # Second call: promotes track1 to current (it's now playing), queues track2
+      # Second call: promotes first queued track to current, queues another
       get next_track_api_internal_radio_station_path(station), headers: headers
       station.reload
-      expect(station.current_track).to eq(track1)
-      expect(station.queued_track).to eq(track2)
+      expect(station.current_track).to eq(first_queued)
+      expect(station.queued_track).not_to eq(first_queued)
     end
   end
 

@@ -20,9 +20,13 @@ export default class extends Controller {
     document.addEventListener("music-video:showing", this._onVideoShowing)
     document.addEventListener("music-video:hidden", this._onVideoHidden)
 
-    // Observe the now-playing container for Turbo Stream replacements
+    // Observe the now-playing container for Turbo Stream replacements.
+    // Use requestAnimationFrame to defer reads until the DOM has settled
+    // after Turbo's replacement.
     if (this.hasNowPlayingTarget) {
-      this._observer = new MutationObserver(() => this._onNowPlayingChanged())
+      this._observer = new MutationObserver(() => {
+        requestAnimationFrame(() => this._onNowPlayingChanged())
+      })
       this._observer.observe(this.nowPlayingTarget, { childList: true, subtree: true })
       // Dispatch initial state
       this._onNowPlayingChanged()

@@ -54,9 +54,18 @@ class MusicController < ApplicationController
     @query = params[:q]
     @sort = sort_column(Track, default: "created_at")
     @direction = sort_direction
-    scope = Current.user.tracks.music.includes(:artist, :album).search(@query).order(@sort => @direction)
+    scope = Current.user.tracks.music.includes(:artist, :album).search(@query)
+    scope = scope.by_genre(params[:genre]) if params[:genre].present?
+    scope = scope.by_language(params[:language]) if params[:language].present?
+    scope = scope.by_decade(params[:decade]) if params[:decade].present?
+    scope = scope.order(@sort => @direction)
     @pagy, @tracks = pagy(:offset, scope, limit: 24)
     @favorited_track_ids = Current.user.favorited_ids_for("Track")
+
+    user_tracks = Current.user.tracks.music
+    @genres = user_tracks.genre_names
+    @languages = user_tracks.available_languages
+    @decades = user_tracks.available_decades
   end
 
   def load_playlists

@@ -19,6 +19,34 @@
     content_frame: "tracks-list",
     empty_label: "tracks"
   ) do |c| %>
+    <% if @genres.any? || @languages.any? || @decades.any? %>
+      <% c.with_filters do %>
+        <% if @genres.any? %>
+          <select name="genre" data-action="change->search#submit" class="text-sm rounded-lg border border-gray-600 bg-gray-700 text-white px-3 py-2 focus:outline-neon-cyan">
+            <option value="">All Genres</option>
+            <% @genres.each do |genre| %>
+              <option value="<%= genre %>" <%= "selected" if params[:genre] == genre %>><%= genre.titleize %></option>
+            <% end %>
+          </select>
+        <% end %>
+        <% if @languages.any? %>
+          <select name="language" data-action="change->search#submit" class="text-sm rounded-lg border border-gray-600 bg-gray-700 text-white px-3 py-2 focus:outline-neon-cyan">
+            <option value="">All Languages</option>
+            <% @languages.each do |lang| %>
+              <option value="<%= lang %>" <%= "selected" if params[:language] == lang %>><%= language_name(lang) %></option>
+            <% end %>
+          </select>
+        <% end %>
+        <% if @decades.any? %>
+          <select name="decade" data-action="change->search#submit" class="text-sm rounded-lg border border-gray-600 bg-gray-700 text-white px-3 py-2 focus:outline-neon-cyan">
+            <option value="">All Decades</option>
+            <% @decades.each do |decade| %>
+              <option value="<%= decade %>" <%= "selected" if params[:decade] == decade.to_s %>><%= decade_label(decade) %></option>
+            <% end %>
+          </select>
+        <% end %>
+      <% end %>
+    <% end %>
     <% c.with_before_grid do %>
       <% if @query.present? && @tracks.any? %>
         <div class="flex justify-end mb-3">

@@ -88,6 +88,8 @@ gem "quarterdeck"
 
 gem "wahwah"
 
+gem "whatlanguage"
+
 gem "aws-sdk-s3", require: false
 
 gem "http"

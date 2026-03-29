@@ -539,6 +539,7 @@ GEM
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    whatlanguage (1.0.6)
     yaml (0.4.0)
     zeitwerk (2.7.5)
 
@@ -597,6 +598,7 @@ DEPENDENCIES
   wahwah
   web-console
   webmock
+  whatlanguage
 
 CHECKSUMS
   action_text-trix (2.1.17) sha256=b44691639d77e67169dc054ceacd1edc04d44dc3e4c6a427aa155a2beb4cc951
@@ -800,6 +802,7 @@ CHECKSUMS
   webmock (3.26.1) sha256=4f696fb57c90a827c20aadb2d4f9058bbff10f7f043bd0d4c3f58791143b1cd7
   websocket-driver (0.8.0) sha256=ed0dba4b943c22f17f9a734817e808bc84cdce6a7e22045f5315aa57676d4962
   websocket-extensions (0.1.5) sha256=1c6ba63092cda343eb53fc657110c71c754c56484aad42578495227d717a8241
+  whatlanguage (1.0.6) sha256=2f3410f4c2cc50eb582640e01b2d18c478fc7a95a3d1bcfc5d8ea05a1f68fd69
   yaml (0.4.0) sha256=240e69d1e6ce3584d6085978719a0faa6218ae426e034d8f9b02fb54d3471942
   zeitwerk (2.7.5) sha256=d8da92128c09ea6ec62c949011b00ed4a20242b255293dd66bf41545398f73dd
 

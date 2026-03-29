@@ -19,6 +19,14 @@ class RadioStation < ApplicationRecord
 
   STATUSES.each { |s| define_method(:"#{s}?") { status == s } }
 
+  def slug
+    mount_point.delete_prefix("/").delete_suffix(".mp3")
+  end
+
+  def self.find_by_slug!(slug)
+    find_by!(mount_point: "/#{slug}.mp3")
+  end
+
   def listen_url
     host = ENV.fetch("ICECAST_HOST", "localhost")
     protocol = ENV.fetch("ICECAST_PROTOCOL", "http")
@@ -37,11 +45,23 @@ class RadioStation < ApplicationRecord
       partial: "radio_stations/station",
       locals: {station: self}
     )
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "radio_station_public_#{id}",
+      target: "public_status_#{id}",
+      partial: "radio_stations/status_badge",
+      locals: {station: self}
+    )
   end
 
   def broadcast_now_playing
     Turbo::StreamsChannel.broadcast_replace_to(
       "radio_stations_#{user_id}",
+      target: "now_playing_#{id}",
+      partial: "radio_stations/now_playing",
+      locals: {station: self}
+    )
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "radio_station_public_#{id}",
       target: "now_playing_#{id}",
       partial: "radio_stations/now_playing",
       locals: {station: self}

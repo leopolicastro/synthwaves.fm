@@ -3,7 +3,10 @@ module ApplicationCable
     identified_by :current_user
 
     def connect
-      set_current_user || reject_unauthorized_connection
+      set_current_user
+      # Anonymous connections allowed for public Turbo Streams (radio pages).
+      # Turbo uses signed stream names, so visitors can only subscribe to
+      # channels rendered in their HTML.
     end
 
     private

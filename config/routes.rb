@@ -36,6 +36,8 @@ Rails.application.routes.draw do
     resources :tracks, controller: "playlist_tracks", only: [:create, :destroy], as: :tracks
   end
   resources :podcasts, only: [:show]
+  get "radio", to: "public_radio_stations#index", as: :public_radio_stations
+  get "radio/:slug", to: "public_radio_stations#show", as: :public_radio_station
   resources :radio_stations, only: [:index, :show, :create, :edit, :update, :destroy] do
     member do
       post :start

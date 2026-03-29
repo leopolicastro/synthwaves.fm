@@ -47,7 +47,10 @@
   <%# Stream URL %>
   <% unless @station.stopped? %>
     <div class="bg-gray-800 rounded-lg border border-gray-700 p-5 mb-6">
-      <h2 class="text-sm font-medium text-gray-400 mb-2">Stream URL</h2>
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-sm font-medium text-gray-400">Stream URL</h2>
+        <%= link_to "Public Page \u2197", public_radio_station_path(slug: @station.slug), class: "text-neon-cyan hover:underline text-sm", target: "_blank" %>
+      </div>
       <div class="flex items-center gap-2" data-controller="clipboard" data-clipboard-content-value="<%= @station.listen_url %>">
         <code class="flex-1 bg-gray-900 px-3 py-2 rounded text-sm text-neon-cyan font-mono truncate"><%= @station.listen_url %></code>
         <button type="button"

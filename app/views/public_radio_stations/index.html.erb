@@ -1,0 +1,132 @@
+<% content_for :title, "Radio — synthwaves.fm" %>
+<% content_for :meta_title, "Radio — synthwaves.fm" %>
+<% content_for :meta_description, "Live radio stations streaming on synthwaves.fm. Tune in to curated playlists broadcasting 24/7." %>
+
+<div class="min-h-screen flex flex-col">
+  <%# Nav %>
+  <nav class="w-full py-4 px-4 sm:py-5 sm:px-6">
+    <div class="max-w-5xl mx-auto flex justify-between items-center">
+      <%= link_to root_path do %>
+        <%= render(Logo::Component.new(size: :md, icon: true, text: false)) %>
+      <% end %>
+      <div class="flex items-center gap-4">
+        <% if authenticated? %>
+          <%= link_to "Dashboard", home_path, class: "text-sm text-gray-400 hover:text-neon-cyan transition-colors" %>
+        <% else %>
+          <%= render Button::Component.new(label: "Log In", behavior: :navigation, link_url: new_session_path, style: :link) %>
+        <% end %>
+      </div>
+    </div>
+  </nav>
+
+  <%# Header %>
+  <div class="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-8 sm:pt-16 pb-10 sm:pb-14">
+    <div class="flex items-end gap-4 mb-2">
+      <h1 class="text-4xl sm:text-5xl font-bold font-display text-white tracking-tight">Radio</h1>
+      <% live_count = @stations.count { |s| s.active? } %>
+      <% if live_count > 0 %>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-900/60 text-green-300 border border-green-800/40 mb-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+          <%= live_count %> live
+        </span>
+      <% end %>
+    </div>
+    <p class="text-gray-500 text-lg max-w-xl">Curated playlists, streaming around the clock. Pick a station and tune in.</p>
+  </div>
+
+  <%# Station Grid %>
+  <div class="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 pb-16">
+    <% if @stations.any? %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <% @stations.each do |station| %>
+          <%= link_to public_radio_station_path(slug: station.slug), class: "group block" do %>
+            <div class="relative bg-gray-800/70 backdrop-blur rounded-xl border border-gray-700/60 overflow-hidden transition-all duration-300 hover:border-gray-600 hover:bg-gray-800"
+                 style="box-shadow: 0 4px 24px rgba(0,0,0,0.2); transition: box-shadow 0.3s ease;"
+                 onmouseenter="this.style.boxShadow='0 4px 32px rgba(0,0,0,0.3), 0 0 20px color-mix(in srgb, var(--color-neon-pink) 8%, transparent)'"
+                 onmouseleave="this.style.boxShadow='0 4px 24px rgba(0,0,0,0.2)'">
+
+              <%# Cover Art %>
+              <div class="aspect-square w-full relative overflow-hidden">
+                <% if station.current_track&.album&.cover_image&.attached? %>
+                  <%= image_tag station.current_track.album.cover_image, class: "w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" %>
+                <% else %>
+                  <div class="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+                    <svg class="w-16 h-16 text-gray-700" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+                    </svg>
+                  </div>
+                <% end %>
+
+                <%# Status overlay %>
+                <div class="absolute top-3 left-3">
+                  <% if station.active? %>
+                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-600/90 text-white backdrop-blur-sm shadow-lg">
+                      <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                      LIVE
+                    </span>
+                  <% elsif station.starting? %>
+                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-600/90 text-white backdrop-blur-sm shadow-lg">
+                      <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                      STARTING
+                    </span>
+                  <% elsif station.idle? %>
+                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold bg-cyan-600/90 text-white backdrop-blur-sm shadow-lg">
+                      IDLE
+                    </span>
+                  <% end %>
+                </div>
+
+                <%# Listener count overlay %>
+                <% if station.listener_count > 0 %>
+                  <div class="absolute top-3 right-3">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-black/60 text-white backdrop-blur-sm">
+                      <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/></svg>
+                      <%= station.listener_count %>
+                    </span>
+                  </div>
+                <% end %>
+
+                <%# Hover play icon %>
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
+                  <div class="w-14 h-14 rounded-full bg-neon-pink/90 flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-300">
+                    <svg class="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+                  </div>
+                </div>
+              </div>
+
+              <%# Station Info %>
+              <div class="p-4">
+                <h2 class="font-display font-bold text-white text-lg truncate mb-1"><%= station.playlist.name %></h2>
+                <% if station.current_track %>
+                  <p class="text-sm text-gray-400 truncate"><%= station.current_track.title %> &mdash; <%= station.current_track.artist.name %></p>
+                <% else %>
+                  <p class="text-sm text-gray-500"><%= station.playlist.tracks.count %> tracks &middot; <%= station.bitrate %> kbps</p>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <%# Empty State %>
+      <div class="flex flex-col items-center justify-center py-24 text-center">
+        <div class="w-20 h-20 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center mb-6">
+          <svg class="w-10 h-10 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5l16.5-4.125M12 6.75c-2.708 0-5.363.224-7.948.655C2.999 7.58 2.25 8.507 2.25 9.574v9.176A2.25 2.25 0 004.5 21h15a2.25 2.25 0 002.25-2.25V9.574c0-1.067-.75-1.994-1.802-2.169A48.329 48.329 0 0012 6.75zm-1.683 6.443l-.311.07a1.5 1.5 0 10.656 2.926l.311-.07a1.5 1.5 0 10-.656-2.926zm8.166 0l-.312.07a1.5 1.5 0 10.657 2.926l.311-.07a1.5 1.5 0 00-.656-2.926z"/>
+          </svg>
+        </div>
+        <h2 class="text-xl font-display font-bold text-gray-300 mb-2">No stations on air</h2>
+        <p class="text-gray-500 max-w-sm">There are no radio stations broadcasting right now. Check back later.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Footer %>
+  <footer class="w-full max-w-5xl mx-auto px-4 sm:px-6 pb-8">
+    <div class="border-t border-gray-800 pt-6 flex items-center justify-between">
+      <p class="text-gray-600 text-sm">
+        Powered by <%= link_to "synthwaves.fm", root_path, class: "text-gray-500 hover:text-neon-cyan transition-colors" %>
+      </p>
+    </div>
+  </footer>
+</div>

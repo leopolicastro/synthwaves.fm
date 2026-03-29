@@ -148,11 +148,13 @@ song_row_controller  -->  queue_controller  -->  player_controller
 
 ### Background Jobs (app/jobs/)
 
-- `AudioConversionJob` - Converts non-MP3 formats to MP3 via ffmpeg at 192k bitrate, then re-extracts metadata
-- `MetadataExtractionJob` - Extracts and saves audio metadata on upload
-- `ChatResponseJob` - Streams AI responses via ActionCable
-- `StationControlJob` - Manages radio station lifecycle (start/stop/skip), restarts Liquidsoap via Docker socket
-- `StationListenerSyncJob` - Polls Icecast stats every 30s, updates listener counts (recurring)
+Three Solid Queue queues isolate work by resource profile (configured in `config/queue.yml`):
+
+- **conversion** (2 threads) — CPU-heavy ffmpeg work: `AudioConversionJob`, `VideoConversionJob`, `StreamRecordingJob`
+- **imports** (2 threads) — long-running network downloads: `MediaDownloadJob`, `VideoDownloadJob`, `YoutubeImportJob`
+- **default** (3 threads) — everything else: `ChatResponseJob`, `MetadataExtractionJob`, `StationControlJob`, `StationListenerSyncJob`, `DownloadZipJob`, and other lightweight/quick jobs
+
+When adding a new job, assign it to the appropriate queue via `queue_as` in the job class. Default is `:default` if omitted.
 
 ## Radio Stations (Icecast + Liquidsoap)
 

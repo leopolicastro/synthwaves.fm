@@ -1,5 +1,5 @@
 class AudioConversionJob < ApplicationJob
-  queue_as :default
+  queue_as :conversion
 
   CONVERTIBLE_FORMATS = %w[webm ogg wav flac aac wma].freeze
 

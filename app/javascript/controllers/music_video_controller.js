@@ -23,6 +23,14 @@ export default class extends Controller {
     // Pinned mode: embed immediately
     if (this.hasYoutubeVideoIdValue && this.youtubeVideoIdValue) {
       this._embed(this.youtubeVideoIdValue)
+    } else {
+      // Check DOM for existing now-playing state — handles the case where
+      // radio-player dispatched player:nowPlaying before this controller connected
+      // (common on Turbo navigation).
+      const existing = document.querySelector("[data-youtube-video-id]")
+      if (existing?.dataset.youtubeVideoId) {
+        this._embed(existing.dataset.youtubeVideoId)
+      }
     }
   }
 

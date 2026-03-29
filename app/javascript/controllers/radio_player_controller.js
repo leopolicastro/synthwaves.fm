@@ -67,7 +67,6 @@ export default class extends Controller {
     const trackId = parseInt(trackEl.dataset.trackId)
     const youtubeVideoId = trackEl.dataset.youtubeVideoId || null
     const coverUrl = trackEl.dataset.coverUrl || null
-    const trackStartedAt = parseFloat(trackEl.dataset.trackStartedAt) || 0
 
     // Update album art if we have a coverArt target
     if (this.hasCoverArtTarget && coverUrl) {
@@ -80,7 +79,7 @@ export default class extends Controller {
 
     if (trackId) {
       document.dispatchEvent(new CustomEvent("player:nowPlaying", {
-        detail: { trackId, youtubeVideoId, trackStartedAt }
+        detail: { trackId, youtubeVideoId }
       }))
     }
   }

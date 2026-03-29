@@ -1,5 +1,6 @@
 <div data-controller="lyrics"
-     <% if @track_id %>data-lyrics-track-id-value="<%= @track_id %>"<% end %>>
+     <% if @track_id %>data-lyrics-track-id-value="<%= @track_id %>"<% end %>
+     <% if @live %>data-lyrics-live-value="true"<% end %>>
   <% if @show_header %>
     <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">Lyrics</h3>
   <% end %>

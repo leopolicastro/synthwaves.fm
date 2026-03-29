@@ -4,7 +4,7 @@ const LRC_REGEX = /\[(\d{2,}):(\d{2})\.(\d{2,3})\](.*)/
 
 export default class extends Controller {
   static targets = ["content"]
-  static values = { trackId: Number, trackStartedAt: { type: Number, default: 0 } }
+  static values = { trackId: Number, live: { type: Boolean, default: false } }
 
   connect() {
     this._syncedLines = null
@@ -42,7 +42,6 @@ export default class extends Controller {
       this._observer.disconnect()
       this._observer = null
     }
-    this._stopLiveTimer()
   }
 
   _bindToAudio() {
@@ -52,12 +51,10 @@ export default class extends Controller {
     }
   }
 
-  _onNowPlaying({ trackId, trackStartedAt }) {
+  _onNowPlaying({ trackId }) {
     if (!trackId) return
     // If pinned to a specific track, don't follow now-playing
     if (this.hasTrackIdValue && this.trackIdValue) return
-    this._stopLiveTimer()
-    if (trackStartedAt != null) this.trackStartedAtValue = trackStartedAt
     this._fetchLyrics(trackId)
   }
 
@@ -77,15 +74,16 @@ export default class extends Controller {
       }
 
       const parsed = this._parseLRC(data.lyrics)
-      if (parsed) {
+      if (parsed && !this.liveValue) {
+        // Synced mode: highlight lines in time with audio playback
         this._syncedLines = parsed
         this._renderSyncedLines()
-        // Jump to current position immediately (important for mid-song joins)
-        this._highlightLine()
-        // For live radio, start a timer so lyrics scroll even without audio playing
-        if (this.trackStartedAtValue > 0) this._startLiveTimer()
       } else {
-        this.contentTarget.textContent = data.lyrics
+        // Plain text mode: strip LRC timestamps if present, show as readable text
+        const plainText = parsed
+          ? parsed.map(l => l.text).filter(t => t).join("\n")
+          : data.lyrics
+        this.contentTarget.textContent = plainText
         this.contentTarget.classList.add("whitespace-pre-line", "text-gray-400")
       }
     } catch (e) {
@@ -121,31 +119,10 @@ export default class extends Controller {
     }
   }
 
-  _startLiveTimer() {
-    this._stopLiveTimer()
-    this._liveTimer = setInterval(() => this._highlightLine(), 500)
-  }
-
-  _stopLiveTimer() {
-    if (this._liveTimer) {
-      clearInterval(this._liveTimer)
-      this._liveTimer = null
-    }
-  }
-
   _highlightLine() {
-    if (!this._syncedLines || !this.hasContentTarget) return
+    if (!this._syncedLines || !this._audio || !this.hasContentTarget) return
 
-    // For live radio streams, use wall clock time to determine track position
-    // since audio.currentTime starts at 0 when the listener tunes in.
-    // For normal playback (trackStartedAt is 0), use audio.currentTime directly.
-    let currentTime
-    if (this.trackStartedAtValue > 0) {
-      currentTime = (Date.now() / 1000) - this.trackStartedAtValue
-    } else {
-      if (!this._audio) return
-      currentTime = this._audio.currentTime
-    }
+    const currentTime = this._audio.currentTime
     let activeIndex = -1
 
     for (let i = this._syncedLines.length - 1; i >= 0; i--) {

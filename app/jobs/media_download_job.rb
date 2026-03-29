@@ -43,14 +43,15 @@ class MediaDownloadJob < ApplicationJob
     enrich_from_embedded_metadata(track, metadata) if track.youtube_video_id.present?
 
     broadcast_download_status(track, user_id, type: "track")
-  rescue MediaDownloadService::RateLimitError => e
-    track&.update!(download_status: "failed", download_error: e.message.truncate(500))
+  rescue MediaDownloadService::RateLimitError
+    track&.update!(download_status: "downloading", download_error: "Rate limited, retrying...")
     broadcast_download_status(track, user_id, type: "track") if track
     raise
   rescue MediaDownloadService::Error => e
+    Rails.logger.error("[MediaDownloadJob] #{e.class}: #{e.message}")
     track&.update!(download_status: "failed", download_error: e.message.truncate(500))
     broadcast_download_status(track, user_id, type: "track") if track
-  rescue StandardError => e
+  rescue => e
     track&.update!(download_status: "failed", download_error: e.message.truncate(500))
     broadcast_download_status(track, user_id, type: "track") if track
     raise

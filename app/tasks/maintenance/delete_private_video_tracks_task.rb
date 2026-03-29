@@ -9,7 +9,7 @@ module Maintenance
     end
 
     def process(track)
-      track.destroy
+      track.destroy!
     end
   end
 end

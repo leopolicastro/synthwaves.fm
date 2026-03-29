@@ -66,7 +66,7 @@ export default class extends Controller {
 
     try {
       const response = await fetch(`/tracks/${trackId}/lyrics.json`)
-      if (!response.ok) return
+      if (!response.ok) { this._setEmpty(); return }
       const data = await response.json()
       if (!data.lyrics) {
         this._setEmpty()
@@ -88,6 +88,7 @@ export default class extends Controller {
       }
       this.dispatch("found")
     } catch (e) {
+      console.error("[lyrics]", e)
       this._setEmpty()
     }
   }

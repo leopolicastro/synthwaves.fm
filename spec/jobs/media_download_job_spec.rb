@@ -57,13 +57,17 @@ RSpec.describe MediaDownloadJob, type: :job do
       expect(track.download_error).to include("something went wrong")
     end
 
-    it "retries on rate limit error" do
+    it "retries on rate limit error and keeps downloading status" do
       allow(MediaDownloadService).to receive(:download_audio)
         .and_raise(MediaDownloadService::RateLimitError, "yt-dlp rate limited: HTTP Error 429")
 
       expect {
         described_class.perform_now(track.id, url, user_id: user.id)
       }.to have_enqueued_job(described_class).with(track.id, url, user_id: user.id)
+
+      track.reload
+      expect(track.download_status).to eq("downloading")
+      expect(track.download_error).to eq("Rate limited, retrying...")
     end
 
     it "cleans up temp directory" do

@@ -25,7 +25,7 @@ export default class extends Controller {
     // after Turbo's replacement.
     if (this.hasNowPlayingTarget) {
       this._observer = new MutationObserver(() => {
-        requestAnimationFrame(() => this._onNowPlayingChanged())
+        this._rafId = requestAnimationFrame(() => this._onNowPlayingChanged())
       })
       this._observer.observe(this.nowPlayingTarget, { childList: true, subtree: true })
       // Dispatch initial state
@@ -36,6 +36,7 @@ export default class extends Controller {
   disconnect() {
     document.removeEventListener("music-video:showing", this._onVideoShowing)
     document.removeEventListener("music-video:hidden", this._onVideoHidden)
+    if (this._rafId) cancelAnimationFrame(this._rafId)
     if (this._observer) {
       this._observer.disconnect()
       this._observer = null

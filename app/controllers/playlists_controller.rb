@@ -58,6 +58,8 @@ class PlaylistsController < ApplicationController
     redirect_to @playlist, notice: "Merged \"#{source.name}\" into this playlist."
   rescue PlaylistMergeService::Error => e
     redirect_to @playlist, alert: e.message
+  rescue ActiveRecord::RecordNotFound
+    redirect_to @playlist, alert: "Source playlist not found."
   end
 
   def destroy

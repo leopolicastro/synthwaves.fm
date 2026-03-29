@@ -54,5 +54,13 @@ RSpec.describe PlaylistMergeService do
         described_class.call(target: target, source: target)
       }.to raise_error(PlaylistMergeService::Error, "Cannot merge a playlist into itself.")
     end
+
+    it "raises an error when source has an active radio station" do
+      create(:radio_station, playlist: source, user: user, status: "active")
+
+      expect {
+        described_class.call(target: target, source: source)
+      }.to raise_error(PlaylistMergeService::Error, /active radio station/)
+    end
   end
 end

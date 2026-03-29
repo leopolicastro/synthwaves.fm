@@ -9,6 +9,7 @@ class IPTVChannel < ApplicationRecord
   validates :tvg_id, uniqueness: true, allow_nil: true
 
   scope :active, -> { where(active: true) }
+  scope :with_epg, -> { where(tvg_id: EPGProgramme.where("ends_at > ?", Time.current).select(:channel_id).distinct) }
   scope :by_country, ->(country) { where(country: country) if country.present? }
   scope :by_language, ->(language) { where(language: language) if language.present? }
   scope :search, ->(query) { where("name LIKE ?", "%#{query}%") if query.present? }

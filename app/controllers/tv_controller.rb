@@ -23,7 +23,7 @@ class TvController < ApplicationController
 
   def load_guide
     @categories = IPTVCategory.with_channels.order(:name)
-    scope = IPTVChannel.active.includes(:iptv_category)
+    scope = IPTVChannel.active.with_epg.includes(:iptv_category)
 
     if params[:category].present?
       @current_category = IPTVCategory.find_by(slug: params[:category])

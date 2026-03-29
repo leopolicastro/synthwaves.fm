@@ -51,7 +51,7 @@ class EPGSyncService
 
   def sync_from_url(url, tvg_ids, remap: nil)
     response = HTTP.follow(max_hops: 5).timeout(30).get(url)
-    body = response.body.to_s.encode("UTF-8", invalid: :replace, undef: :replace, replace: "")
+    body = response.body.to_s.force_encoding("UTF-8").encode("UTF-8", invalid: :replace, undef: :replace, replace: "")
     entries = XMLTVParser.parse(body)
 
     # For per-channel EPG URLs, the feed's channel IDs likely differ from our tvg_ids.

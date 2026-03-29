@@ -1,5 +1,5 @@
 class IPTVChannelSyncService
-  PLAYLIST_URL = "https://iptv-org.github.io/iptv/index.m3u"
+  PLAYLIST_URL = "https://tvpass.org/playlist/m3u"
   BATCH_SIZE = 500
 
   def self.call
@@ -16,9 +16,13 @@ class IPTVChannelSyncService
   end
 
   def call
-    response = HTTP.follow(max_hops: 5).get(@url)
-    body = response.body.to_s.encode("UTF-8", invalid: :replace, undef: :replace, replace: "")
+    Rails.logger.info "[IPTVSync] Starting sync from #{@url}"
+
+    response = HTTP.follow(max_hops: 5).timeout(connect: 10, read: 30).get(@url)
+    body = response.body.to_s.force_encoding("UTF-8").encode("UTF-8", invalid: :replace, undef: :replace, replace: "")
     entries = IPTVPlaylistParser.parse(body)
+
+    Rails.logger.info "[IPTVSync] Parsed #{entries.size} entries"
 
     imported = 0
     seen_tvg_ids = Set.new
@@ -50,6 +54,8 @@ class IPTVChannelSyncService
     end
 
     reset_counter_caches
+
+    Rails.logger.info "[IPTVSync] Done — synced #{imported} channels (#{IPTVChannel.active.count} active)"
 
     {synced: imported}
   end

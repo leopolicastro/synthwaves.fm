@@ -18,7 +18,7 @@
     <% end %>
   </div>
 
-  <div class="relative z-10 w-full max-w-3xl">
+  <div class="relative z-10 w-full max-w-3xl xl:max-w-7xl">
     <%# Logo & Back Link %>
     <div class="mb-10 flex flex-col items-center gap-3">
       <%= link_to root_path do %>
@@ -44,70 +44,89 @@
     <%# Main content: video/art + lyrics side by side %>
     <% if @station.active? || @station.idle? %>
       <div data-controller="radio-player" data-radio-player-url-value="<%= @station.listen_url %>">
-        <%# Two-column layout: video/art left, lyrics right %>
-        <div class="flex flex-col lg:flex-row gap-6 mb-8">
-          <%# Left: Music Video or Album Art %>
-          <div class="flex-1 min-w-0">
-            <%# Now Playing (Turbo Stream target — ID is inside the partial) %>
-            <div data-radio-player-target="nowPlaying">
-              <%= render "radio_stations/now_playing", station: @station %>
-            </div>
+        <%# Now Playing — full-width bar above the grid on desktop, same position on mobile %>
+        <div data-radio-player-target="nowPlaying" class="max-w-md xl:max-w-none mx-auto xl:mx-0 mb-6">
+          <%= render "radio_stations/now_playing", station: @station %>
+        </div>
 
-            <%= render MusicVideo::Component.new(max_height: "max-h-[55vh]") %>
+        <%# Desktop: two-column grid (art left, sidebar right). Mobile: single column stacking. %>
+        <div class="xl:grid xl:grid-cols-[1fr_320px] xl:gap-8 xl:items-start">
+          <%# LEFT COLUMN: Art/Video hero + Lyrics %>
+          <div class="mb-8 xl:mb-0">
+            <div class="flex flex-col lg:flex-row gap-6">
+              <div class="flex-1 min-w-0">
+                <%= render MusicVideo::Component.new(max_height: "max-h-[55vh] xl:max-h-[70vh]") %>
 
-            <%# Album Art (shown when no music video, updates dynamically via JS) %>
-            <div data-music-video-fallback class="flex justify-center">
-              <div class="w-full max-w-md aspect-square rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10"
-                   style="box-shadow: 0 0 40px color-mix(in srgb, var(--color-neon-pink) 20%, transparent), 0 0 80px color-mix(in srgb, var(--color-neon-purple) 10%, transparent), 0 25px 50px rgba(0,0,0,0.5);">
-                <% if @station.image.attached? %>
-                  <%= image_tag @station.image, class: "w-full h-full object-cover", data: { radio_player_target: "coverArt" } %>
-                <% elsif @station.current_track&.album&.cover_image&.attached? %>
-                  <%= image_tag @station.current_track.album.cover_image, class: "w-full h-full object-cover", data: { radio_player_target: "coverArt" } %>
-                <% else %>
-                  <img src="" class="w-full h-full object-cover hidden" data-radio-player-target="coverArt">
-                  <div class="w-full h-full bg-gray-800 flex items-center justify-center" data-placeholder>
-                    <svg class="w-20 h-20 text-gray-600" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
-                    </svg>
+                <%# Album Art (shown when no music video, updates dynamically via JS) %>
+                <div data-music-video-fallback class="flex justify-center">
+                  <div class="w-full max-w-md xl:max-w-xl aspect-square rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10"
+                       style="box-shadow: 0 0 40px color-mix(in srgb, var(--color-neon-pink) 20%, transparent), 0 0 80px color-mix(in srgb, var(--color-neon-purple) 10%, transparent), 0 25px 50px rgba(0,0,0,0.5);">
+                    <% if @station.image.attached? %>
+                      <%= image_tag @station.image, class: "w-full h-full object-cover", data: { radio_player_target: "coverArt" } %>
+                    <% elsif @station.current_track&.album&.cover_image&.attached? %>
+                      <%= image_tag @station.current_track.album.cover_image, class: "w-full h-full object-cover", data: { radio_player_target: "coverArt" } %>
+                    <% else %>
+                      <img src="" class="w-full h-full object-cover hidden" data-radio-player-target="coverArt">
+                      <div class="w-full h-full bg-gray-800 flex items-center justify-center" data-placeholder>
+                        <svg class="w-20 h-20 text-gray-600" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+                        </svg>
+                      </div>
+                    <% end %>
                   </div>
-                <% end %>
+                </div>
+              </div>
+
+              <%# Lyrics (hidden when no lyrics available) %>
+              <div class="lg:w-72 xl:w-80 shrink-0 hidden"
+                   data-radio-player-target="lyricsPanel"
+                   data-action="lyrics:found->radio-player#showLyrics lyrics:empty->radio-player#hideLyrics">
+                <div class="bg-gray-800/60 backdrop-blur rounded-xl border border-gray-700/50 p-5 lg:sticky lg:top-8">
+                  <%= render Lyrics::Component.new(show_header: true, max_height: "max-h-[50vh]", live: true) %>
+                </div>
               </div>
             </div>
           </div>
 
-          <%# Right: Lyrics (hidden when no lyrics available) %>
-          <div class="lg:w-72 xl:w-80 shrink-0 hidden"
-               data-radio-player-target="lyricsPanel"
-               data-action="lyrics:found->radio-player#showLyrics lyrics:empty->radio-player#hideLyrics">
-            <div class="bg-gray-800/60 backdrop-blur rounded-xl border border-gray-700/50 p-5 lg:sticky lg:top-8">
-              <%= render Lyrics::Component.new(show_header: true, max_height: "max-h-[50vh]", live: true) %>
+          <%# RIGHT COLUMN: Controls + Queue + Details (sticky sidebar on desktop) %>
+          <div class="xl:sticky xl:top-8 xl:max-h-[calc(100vh-4rem)] xl:overflow-y-auto space-y-6">
+            <%# Listen Button %>
+            <div class="max-w-md xl:max-w-none mx-auto xl:mx-0 w-full">
+              <button type="button"
+                      data-action="click->radio-player#toggle"
+                      data-radio-player-target="toggleButton"
+                      class="w-full py-4 rounded-xl font-display font-bold text-lg tracking-wide text-white bg-neon-pink hover:shadow-neon-pink transition-all duration-300 flex items-center justify-center gap-3">
+                <span data-radio-player-target="playIcon">
+                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+                </span>
+                <span data-radio-player-target="pauseIcon" class="hidden">
+                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.5 3a1.5 1.5 0 00-1.5 1.5v11A1.5 1.5 0 005.5 17h1A1.5 1.5 0 008 15.5v-11A1.5 1.5 0 006.5 3h-1zm8 0a1.5 1.5 0 00-1.5 1.5v11a1.5 1.5 0 001.5 1.5h1a1.5 1.5 0 001.5-1.5v-11A1.5 1.5 0 0014.5 3h-1z" clip-rule="evenodd"/></svg>
+                </span>
+                <span data-radio-player-target="label">Listen Live</span>
+              </button>
+              <audio data-radio-player-target="audio" preload="none"></audio>
+            </div>
+
+            <%# Queue: Up Next + Recently Played %>
+            <div class="max-w-md xl:max-w-none mx-auto xl:mx-0 w-full">
+              <%= render "public_radio_stations/queue",
+                station: @station,
+                upcoming_tracks: @upcoming_tracks || [],
+                recently_played: @recently_played || [] %>
+            </div>
+
+            <%# Station Details %>
+            <div class="max-w-md xl:max-w-none mx-auto xl:mx-0 w-full grid grid-cols-2 gap-4 text-center">
+              <div class="bg-gray-800/60 backdrop-blur rounded-lg border border-gray-700/50 py-3 px-2">
+                <p class="text-xl font-bold font-display text-white"><%= @station.listener_count %></p>
+                <p class="text-xs text-gray-500 uppercase tracking-wider mt-0.5">Listeners</p>
+              </div>
+              <div class="bg-gray-800/60 backdrop-blur rounded-lg border border-gray-700/50 py-3 px-2">
+                <p class="text-xl font-bold font-display text-white"><%= @station.bitrate %></p>
+                <p class="text-xs text-gray-500 uppercase tracking-wider mt-0.5">kbps</p>
+              </div>
             </div>
           </div>
-        </div>
-
-        <%# Listen Button %>
-        <div class="max-w-md mx-auto w-full mb-8">
-          <button type="button"
-                  data-action="click->radio-player#toggle"
-                  data-radio-player-target="toggleButton"
-                  class="w-full py-4 rounded-xl font-display font-bold text-lg tracking-wide text-white bg-neon-pink hover:shadow-neon-pink transition-all duration-300 flex items-center justify-center gap-3">
-            <span data-radio-player-target="playIcon">
-              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
-            </span>
-            <span data-radio-player-target="pauseIcon" class="hidden">
-              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.5 3a1.5 1.5 0 00-1.5 1.5v11A1.5 1.5 0 005.5 17h1A1.5 1.5 0 008 15.5v-11A1.5 1.5 0 006.5 3h-1zm8 0a1.5 1.5 0 00-1.5 1.5v11a1.5 1.5 0 001.5 1.5h1a1.5 1.5 0 001.5-1.5v-11A1.5 1.5 0 0014.5 3h-1z" clip-rule="evenodd"/></svg>
-            </span>
-            <span data-radio-player-target="label">Listen Live</span>
-          </button>
-          <audio data-radio-player-target="audio" preload="none"></audio>
-        </div>
-
-        <%# Queue: Up Next + Recently Played %>
-        <div class="max-w-md mx-auto w-full mb-8">
-          <%= render "public_radio_stations/queue",
-            station: @station,
-            upcoming_tracks: @upcoming_tracks || [],
-            recently_played: @recently_played || [] %>
         </div>
       </div>
     <% elsif @station.starting? %>
@@ -141,17 +160,19 @@
       </div>
     <% end %>
 
-    <%# Station Details %>
-    <div class="max-w-md mx-auto w-full grid grid-cols-2 gap-4 text-center mb-10">
-      <div class="bg-gray-800/60 backdrop-blur rounded-lg border border-gray-700/50 py-3 px-2">
-        <p class="text-xl font-bold font-display text-white"><%= @station.listener_count %></p>
-        <p class="text-xs text-gray-500 uppercase tracking-wider mt-0.5">Listeners</p>
+    <%# Station Details — shown outside the grid for non-active states %>
+    <% unless @station.active? || @station.idle? %>
+      <div class="max-w-md mx-auto w-full grid grid-cols-2 gap-4 text-center mb-10">
+        <div class="bg-gray-800/60 backdrop-blur rounded-lg border border-gray-700/50 py-3 px-2">
+          <p class="text-xl font-bold font-display text-white"><%= @station.listener_count %></p>
+          <p class="text-xs text-gray-500 uppercase tracking-wider mt-0.5">Listeners</p>
+        </div>
+        <div class="bg-gray-800/60 backdrop-blur rounded-lg border border-gray-700/50 py-3 px-2">
+          <p class="text-xl font-bold font-display text-white"><%= @station.bitrate %></p>
+          <p class="text-xs text-gray-500 uppercase tracking-wider mt-0.5">kbps</p>
+        </div>
       </div>
-      <div class="bg-gray-800/60 backdrop-blur rounded-lg border border-gray-700/50 py-3 px-2">
-        <p class="text-xl font-bold font-display text-white"><%= @station.bitrate %></p>
-        <p class="text-xs text-gray-500 uppercase tracking-wider mt-0.5">kbps</p>
-      </div>
-    </div>
+    <% end %>
 
     <%# Footer %>
     <p class="text-gray-600 text-sm text-center">

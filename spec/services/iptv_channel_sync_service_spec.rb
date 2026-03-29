@@ -124,6 +124,24 @@ RSpec.describe IPTVChannelSyncService do
       music = IPTVCategory.find_by(name: "Music")
       expect(music.channels_count).to eq(1)
     end
+
+    it "preserves non-ASCII channel names" do
+      cyrillic_content = <<~M3U
+        #EXTM3U
+        #EXTINF:-1 tvg-id="ZaTV.ru@SD" tvg-logo="https://example.com/logo.png" group-title="General",За!ТВ
+        https://stream.example.com/zatv.m3u8
+        #EXTINF:-1 tvg-id="MatchBoets.ru@SD" group-title="Sports",МАТЧ! Боец (576p)
+        https://stream.example.com/match.m3u8
+      M3U
+
+      stub_request(:get, IPTVChannelSyncService::PLAYLIST_URL)
+        .to_return(status: 200, body: cyrillic_content.b)
+
+      described_class.call
+
+      expect(IPTVChannel.find_by(tvg_id: "ZaTV.ru@SD").name).to eq("За!ТВ")
+      expect(IPTVChannel.find_by(tvg_id: "MatchBoets.ru@SD").name).to eq("МАТЧ! Боец (576p)")
+    end
   end
 
   describe ".import" do

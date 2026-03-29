@@ -33,6 +33,7 @@ Rails.application.routes.draw do
     member { get :file }
   end
   resources :playlists do
+    post :merge, on: :member
     resources :tracks, controller: "playlist_tracks", only: [:create, :destroy], as: :tracks
   end
   resources :podcasts, only: [:show]

@@ -27,6 +27,7 @@
       <%= button_to "Download", downloads_path(downloadable_type: "Playlist", downloadable_id: @playlist.id), class: "px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600" %>
       <%= render Button::Component.new(label: "Copy track list", style: :secondary, data: { clipboard_target: "button", action: "clipboard#copy" }) %>
       <%= render Button::Component.new(label: "Edit", behavior: :navigation, link_url: edit_playlist_path(@playlist), style: :secondary) %>
+      <%= render "playlists/merge_menu", playlist: @playlist %>
       <%= button_to "Delete", playlist_path(@playlist), method: :delete, data: { turbo_confirm: "Delete this playlist?" }, class: "px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700" %>
     </div>
   </div>

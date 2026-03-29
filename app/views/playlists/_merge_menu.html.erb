@@ -1,0 +1,29 @@
+<div class="relative" data-controller="playlist-menu" data-action="click@window->playlist-menu#close">
+  <button data-action="click->playlist-menu#toggle" class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-neon-cyan bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+    Merge into this
+  </button>
+  <div data-playlist-menu-target="menu" class="hidden absolute z-10 mt-1 w-72 bg-gray-800 border border-gray-700 rounded-lg shadow-lg right-0">
+    <div class="p-2 border-b border-gray-700">
+      <input type="text"
+             data-playlist-menu-target="input"
+             data-action="input->playlist-menu#filter keydown->playlist-menu#filterKeydown"
+             placeholder="Search playlists to merge..."
+             class="w-full px-2 py-1 text-sm text-gray-200 bg-gray-900 border border-gray-600 rounded focus:outline-none focus:border-neon-cyan">
+    </div>
+    <div class="max-h-64 overflow-y-auto">
+      <% Current.user.playlists.where.not(id: playlist.id).order(:name).each do |source| %>
+        <div data-playlist-menu-target="item" data-playlist-name="<%= source.name %>">
+          <%= button_to merge_playlist_path(playlist),
+                params: { source_playlist_id: source.id },
+                method: :post,
+                class: "block w-full text-left px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 hover:text-neon-cyan",
+                data: { turbo_confirm: "Merge \"#{source.name}\" into \"#{playlist.name}\"? Duplicate tracks will be skipped and the source playlist will be deleted." } do %>
+            <span class="block truncate"><%= source.name %></span>
+            <span class="block text-xs text-gray-400 truncate"><%= pluralize(source.playlist_tracks_count, "track") %></span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    <div data-playlist-menu-target="emptyMessage" style="display: none" class="px-4 py-2 text-sm text-gray-400">No matching playlists</div>
+  </div>
+</div>

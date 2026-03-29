@@ -1,7 +1,7 @@
 class PlaylistsController < ApplicationController
   include Orderable
 
-  before_action :set_playlist, only: [:show, :edit, :update, :destroy]
+  before_action :set_playlist, only: [:show, :edit, :update, :destroy, :merge]
 
   def index
     @query = params[:q]
@@ -50,6 +50,14 @@ class PlaylistsController < ApplicationController
     else
       render :edit, status: :unprocessable_content
     end
+  end
+
+  def merge
+    source = Current.user.playlists.find(params[:source_playlist_id])
+    PlaylistMergeService.call(target: @playlist, source: source)
+    redirect_to @playlist, notice: "Merged \"#{source.name}\" into this playlist."
+  rescue PlaylistMergeService::Error => e
+    redirect_to @playlist, alert: e.message
   end
 
   def destroy

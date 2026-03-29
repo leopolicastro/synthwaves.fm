@@ -1,5 +1,6 @@
 class MediaDownloadService
   class Error < StandardError; end
+  class RateLimitError < Error; end
 
   def self.download_audio(url, output_dir:)
     new.download_audio(url, output_dir: output_dir)
@@ -103,6 +104,9 @@ class MediaDownloadService
     stdout_stderr, status = Open3.capture2e("yt-dlp", *args)
 
     unless status.success?
+      if stdout_stderr.match?(/HTTP Error 429|Too Many Requests|Sign in to confirm/i)
+        raise RateLimitError, "yt-dlp rate limited: #{stdout_stderr.truncate(500)}"
+      end
       raise Error, "yt-dlp failed: #{stdout_stderr.truncate(500)}"
     end
 

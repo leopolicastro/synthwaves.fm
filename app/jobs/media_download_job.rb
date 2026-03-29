@@ -3,6 +3,10 @@ class MediaDownloadJob < ApplicationJob
 
   queue_as :default
 
+  retry_on MediaDownloadService::RateLimitError,
+    wait: :polynomially_longer,
+    attempts: 5
+
   def perform(track_id, url, user_id:)
     track = Track.find(track_id)
     return if track.audio_file.attached?
@@ -39,10 +43,17 @@ class MediaDownloadJob < ApplicationJob
     enrich_from_embedded_metadata(track, metadata) if track.youtube_video_id.present?
 
     broadcast_download_status(track, user_id, type: "track")
-  rescue MediaDownloadService::Error, StandardError => e
+  rescue MediaDownloadService::RateLimitError => e
     track&.update!(download_status: "failed", download_error: e.message.truncate(500))
     broadcast_download_status(track, user_id, type: "track") if track
-    raise unless e.is_a?(MediaDownloadService::Error)
+    raise
+  rescue MediaDownloadService::Error => e
+    track&.update!(download_status: "failed", download_error: e.message.truncate(500))
+    broadcast_download_status(track, user_id, type: "track") if track
+  rescue StandardError => e
+    track&.update!(download_status: "failed", download_error: e.message.truncate(500))
+    broadcast_download_status(track, user_id, type: "track") if track
+    raise
   ensure
     FileUtils.rm_rf(temp_dir) if temp_dir
   end

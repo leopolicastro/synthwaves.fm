@@ -47,5 +47,16 @@ RSpec.describe Maintenance::DownloadYoutubeAudioTask do
         user_id: admin.id
       )
     end
+
+    it "staggers jobs with incremental 15-second delays" do
+      tracks = create_list(:track, 3, :youtube)
+
+      freeze_time do
+        tracks.each { |t| task.process(t) }
+
+        expect { task.process(create(:track, :youtube)) }
+          .to have_enqueued_job(MediaDownloadJob).at(45.seconds.from_now)
+      end
+    end
   end
 end

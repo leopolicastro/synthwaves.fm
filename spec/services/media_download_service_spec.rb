@@ -45,6 +45,40 @@ RSpec.describe MediaDownloadService do
       }.to raise_error(MediaDownloadService::Error, /Video unavailable/)
     end
 
+    it "raises RateLimitError on HTTP 429" do
+      allow(Open3).to receive(:capture3).with(
+        "yt-dlp", "--dump-json", "--no-download", anything
+      ).and_return(not_live_metadata)
+
+      expect(Open3).to receive(:capture2e).with(
+        "yt-dlp", "-x", any_args
+      ).and_return(
+        ["WARNING: [youtube] Unable to download webpage: HTTP Error 429: Too Many Requests\n",
+          instance_double(Process::Status, success?: false)]
+      )
+
+      expect {
+        described_class.download_audio("https://youtube.com/watch?v=abc123", output_dir: temp_dir)
+      }.to raise_error(MediaDownloadService::RateLimitError, /rate limited/)
+    end
+
+    it "raises RateLimitError on Sign in to confirm" do
+      allow(Open3).to receive(:capture3).with(
+        "yt-dlp", "--dump-json", "--no-download", anything
+      ).and_return(not_live_metadata)
+
+      expect(Open3).to receive(:capture2e).with(
+        "yt-dlp", "-x", any_args
+      ).and_return(
+        ["ERROR: Sign in to confirm you are not a bot\n",
+          instance_double(Process::Status, success?: false)]
+      )
+
+      expect {
+        described_class.download_audio("https://youtube.com/watch?v=abc123", output_dir: temp_dir)
+      }.to raise_error(MediaDownloadService::RateLimitError, /rate limited/)
+    end
+
     it "raises Error when no mp3 file is found after download" do
       allow(Open3).to receive(:capture3).with(
         "yt-dlp", "--dump-json", "--no-download", anything

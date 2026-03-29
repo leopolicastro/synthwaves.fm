@@ -60,15 +60,26 @@ RSpec.describe "API::Internal::RadioStations", type: :request do
       expect(json["url"]).to be_present
     end
 
-    it "sets the current_track on the station" do
-      track = create(:track, artist: artist, album: album, user: user)
-      track.audio_file.attach(io: StringIO.new("audio"), filename: "track.mp3", content_type: "audio/mpeg")
-      create(:playlist_track, playlist: playlist, track: track, position: 1)
+    it "queues the track and promotes the previous queued track to current" do
+      track1 = create(:track, artist: artist, album: album, user: user)
+      track1.audio_file.attach(io: StringIO.new("audio"), filename: "t1.mp3", content_type: "audio/mpeg")
+      create(:playlist_track, playlist: playlist, track: track1, position: 1)
+      track2 = create(:track, artist: artist, album: album, user: user)
+      track2.audio_file.attach(io: StringIO.new("audio"), filename: "t2.mp3", content_type: "audio/mpeg")
+      create(:playlist_track, playlist: playlist, track: track2, position: 2)
       RadioQueueService.new(station).populate!
 
+      # First call: queues track1, no current_track yet (nothing was previously queued)
       get next_track_api_internal_radio_station_path(station), headers: headers
+      station.reload
+      expect(station.queued_track).to eq(track1)
+      expect(station.current_track).to be_nil
 
-      expect(station.reload.current_track).to eq(track)
+      # Second call: promotes track1 to current (it's now playing), queues track2
+      get next_track_api_internal_radio_station_path(station), headers: headers
+      station.reload
+      expect(station.current_track).to eq(track1)
+      expect(station.queued_track).to eq(track2)
     end
   end
 

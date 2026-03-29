@@ -10,6 +10,7 @@
         <%= render(Logo::Component.new(size: :md, icon: true, text: false)) %>
       <% end %>
       <div class="flex items-center gap-4">
+        <%= link_to "TV Guide", public_tv_guide_path, class: "text-sm text-gray-400 hover:text-neon-cyan transition-colors" %>
         <% if authenticated? %>
           <%= link_to "Dashboard", home_path, class: "text-sm text-gray-400 hover:text-neon-cyan transition-colors" %>
         <% else %>

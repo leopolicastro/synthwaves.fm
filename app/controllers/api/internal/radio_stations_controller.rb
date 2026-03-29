@@ -12,8 +12,14 @@ module API
         result = NextTrackService.call(station)
 
         if result
-          station.update!(current_track: result.track, last_track_at: Time.current)
-          station.broadcast_now_playing
+          # Promote: the previously queued track is now actually playing.
+          # The new track is queued for Liquidsoap to play next.
+          station.update!(
+            current_track_id: station.queued_track_id,
+            queued_track: result.track,
+            last_track_at: Time.current
+          )
+          station.broadcast_now_playing if station.current_track_id
 
           render json: {
             url: result.url,

@@ -197,6 +197,11 @@ CREATE VIRTUAL TABLE tracks_search USING fts5(
   tokenize='unicode61 remove_diacritics 2'
 )
 /* tracks_search(track_title,artist_name,album_title,track_id) */;
+CREATE TABLE IF NOT EXISTS 'tracks_search_data'(id INTEGER PRIMARY KEY, block BLOB);
+CREATE TABLE IF NOT EXISTS 'tracks_search_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS 'tracks_search_content'(id INTEGER PRIMARY KEY, c0, c1, c2, c3);
+CREATE TABLE IF NOT EXISTS 'tracks_search_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
+CREATE TABLE IF NOT EXISTS 'tracks_search_config'(k PRIMARY KEY, v) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS "artists" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "image_url" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "category" varchar DEFAULT 'music' NOT NULL, "user_id" integer NOT NULL, "apple_music_storefront" varchar /*application='SynthWaves'*/);
 CREATE INDEX "index_artists_on_category" ON "artists" ("category") /*application='SynthWaves'*/;
 CREATE TABLE IF NOT EXISTS "albums" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar NOT NULL, "artist_id" integer NOT NULL, "year" integer, "genre" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "youtube_playlist_url" varchar, "user_id" integer NOT NULL, CONSTRAINT "fk_rails_124a79559a"
@@ -246,22 +251,27 @@ CREATE INDEX "index_radio_queue_tracks_on_radio_station_id" ON "radio_queue_trac
 CREATE INDEX "index_radio_queue_tracks_on_track_id" ON "radio_queue_tracks" ("track_id") /*application='SynthWaves'*/;
 CREATE UNIQUE INDEX "index_radio_queue_tracks_on_radio_station_id_and_position" ON "radio_queue_tracks" ("radio_station_id", "position") /*application='SynthWaves'*/;
 CREATE INDEX "index_radio_queue_tracks_on_radio_station_id_and_played_at" ON "radio_queue_tracks" ("radio_station_id", "played_at") /*application='SynthWaves'*/;
-CREATE TABLE IF NOT EXISTS "radio_stations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "playlist_id" integer NOT NULL, "user_id" integer NOT NULL, "status" varchar DEFAULT 'stopped' NOT NULL, "mount_point" varchar NOT NULL, "playback_mode" varchar DEFAULT 'shuffle' NOT NULL, "bitrate" integer DEFAULT 192 NOT NULL, "crossfade" boolean DEFAULT TRUE NOT NULL, "crossfade_duration" float DEFAULT 3.0 NOT NULL, "current_track_id" integer, "listener_count" integer DEFAULT 0, "error_message" text, "started_at" datetime(6), "last_track_at" datetime(6), "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_030bf29ea1"
-FOREIGN KEY ("current_track_id")
-  REFERENCES "tracks" ("id")
+CREATE TABLE IF NOT EXISTS "radio_stations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "playlist_id" integer NOT NULL, "user_id" integer NOT NULL, "status" varchar DEFAULT 'stopped' NOT NULL, "mount_point" varchar NOT NULL, "playback_mode" varchar DEFAULT 'shuffle' NOT NULL, "bitrate" integer DEFAULT 192 NOT NULL, "crossfade" boolean DEFAULT TRUE NOT NULL, "crossfade_duration" float DEFAULT 3.0 NOT NULL, "current_track_id" integer, "listener_count" integer DEFAULT 0, "error_message" text, "started_at" datetime(6), "last_track_at" datetime(6), "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "queued_track_id" integer, CONSTRAINT "fk_rails_a5b9b61969"
+FOREIGN KEY ("playlist_id")
+  REFERENCES "playlists" ("id")
 , CONSTRAINT "fk_rails_0b9af78719"
 FOREIGN KEY ("user_id")
   REFERENCES "users" ("id")
-, CONSTRAINT "fk_rails_a5b9b61969"
-FOREIGN KEY ("playlist_id")
-  REFERENCES "playlists" ("id")
+, CONSTRAINT "fk_rails_030bf29ea1"
+FOREIGN KEY ("current_track_id")
+  REFERENCES "tracks" ("id")
+, CONSTRAINT "fk_rails_7aec4f103b"
+FOREIGN KEY ("queued_track_id")
+  REFERENCES "tracks" ("id")
 );
 CREATE UNIQUE INDEX "index_radio_stations_on_playlist_id" ON "radio_stations" ("playlist_id") /*application='SynthWaves'*/;
 CREATE INDEX "index_radio_stations_on_user_id" ON "radio_stations" ("user_id") /*application='SynthWaves'*/;
 CREATE INDEX "index_radio_stations_on_current_track_id" ON "radio_stations" ("current_track_id") /*application='SynthWaves'*/;
 CREATE UNIQUE INDEX "index_radio_stations_on_mount_point" ON "radio_stations" ("mount_point") /*application='SynthWaves'*/;
 CREATE INDEX "index_radio_stations_on_status" ON "radio_stations" ("status") /*application='SynthWaves'*/;
+CREATE INDEX "index_radio_stations_on_queued_track_id" ON "radio_stations" ("queued_track_id") /*application='SynthWaves'*/;
 INSERT INTO "schema_migrations" (version) VALUES
+('20260329203941'),
 ('20260329190333'),
 ('20260329130613'),
 ('20260329130608'),

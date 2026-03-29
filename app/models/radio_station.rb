@@ -6,6 +6,7 @@ class RadioStation < ApplicationRecord
   belongs_to :playlist
   belongs_to :user
   belongs_to :current_track, class_name: "Track", optional: true
+  belongs_to :queued_track, class_name: "Track", optional: true
 
   has_many :radio_queue_tracks, dependent: :delete_all
   has_one_attached :image

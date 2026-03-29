@@ -14,7 +14,8 @@ RSpec.describe "IPTVChannels", type: :request do
     end
 
     it "displays channels" do
-      create(:iptv_channel, name: "CNN International")
+      channel = create(:iptv_channel, name: "CNN International")
+      create(:epg_programme, :current, channel_id: channel.tvg_id)
       get tv_path
       expect(response.body).to include("CNN International")
     end
@@ -22,8 +23,10 @@ RSpec.describe "IPTVChannels", type: :request do
     it "filters by category" do
       news = create(:iptv_category, name: "News", slug: "news")
       music = create(:iptv_category, name: "Music", slug: "music")
-      create(:iptv_channel, name: "CNN", iptv_category: news)
-      _mtv = create(:iptv_channel, name: "MTV", iptv_category: music)
+      cnn = create(:iptv_channel, name: "CNN", iptv_category: news)
+      create(:epg_programme, :current, channel_id: cnn.tvg_id)
+      mtv = create(:iptv_channel, name: "MTV", iptv_category: music)
+      create(:epg_programme, :current, channel_id: mtv.tvg_id)
 
       get tv_path(tab: "guide", category: "news")
       expect(response.body).to include("CNN")
@@ -31,8 +34,10 @@ RSpec.describe "IPTVChannels", type: :request do
     end
 
     it "filters by search query" do
-      create(:iptv_channel, name: "CNN International")
-      create(:iptv_channel, name: "BBC World")
+      cnn = create(:iptv_channel, name: "CNN International")
+      create(:epg_programme, :current, channel_id: cnn.tvg_id)
+      bbc = create(:iptv_channel, name: "BBC World")
+      create(:epg_programme, :current, channel_id: bbc.tvg_id)
 
       get tv_path(tab: "guide", q: "CNN")
       expect(response.body).to include("CNN International")
@@ -40,8 +45,10 @@ RSpec.describe "IPTVChannels", type: :request do
     end
 
     it "filters by country" do
-      create(:iptv_channel, name: "CNN", country: "US")
-      create(:iptv_channel, name: "BBC", country: "UK")
+      cnn = create(:iptv_channel, name: "CNN", country: "US")
+      create(:epg_programme, :current, channel_id: cnn.tvg_id)
+      bbc = create(:iptv_channel, name: "BBC", country: "UK")
+      create(:epg_programme, :current, channel_id: bbc.tvg_id)
 
       get tv_path(tab: "guide", country: "US")
       expect(response.body).to include("CNN")
@@ -49,7 +56,8 @@ RSpec.describe "IPTVChannels", type: :request do
     end
 
     it "excludes inactive channels" do
-      create(:iptv_channel, name: "Active Channel", active: true)
+      active = create(:iptv_channel, name: "Active Channel", active: true)
+      create(:epg_programme, :current, channel_id: active.tvg_id)
       create(:iptv_channel, name: "Dead Channel", active: false)
 
       get tv_path
@@ -58,7 +66,8 @@ RSpec.describe "IPTVChannels", type: :request do
     end
 
     it "renders the TV Guide grid" do
-      create(:iptv_channel, name: "ESPN")
+      channel = create(:iptv_channel, name: "ESPN")
+      create(:epg_programme, :current, channel_id: channel.tvg_id)
       get tv_path
       expect(response.body).to include("tv-guide")
       expect(response.body).to include("ESPN")

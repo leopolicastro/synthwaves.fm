@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["audio", "toggleButton", "playIcon", "pauseIcon", "label", "nowPlaying"]
+  static targets = ["audio", "toggleButton", "playIcon", "pauseIcon", "label", "nowPlaying", "coverArt"]
   static values = { url: String }
 
   connect() {
@@ -66,10 +66,21 @@ export default class extends Controller {
 
     const trackId = parseInt(trackEl.dataset.trackId)
     const youtubeVideoId = trackEl.dataset.youtubeVideoId || null
+    const coverUrl = trackEl.dataset.coverUrl || null
+    const trackStartedAt = parseFloat(trackEl.dataset.trackStartedAt) || 0
+
+    // Update album art if we have a coverArt target
+    if (this.hasCoverArtTarget && coverUrl) {
+      this.coverArtTarget.src = coverUrl
+      this.coverArtTarget.classList.remove("hidden")
+      // Hide placeholder if present
+      const placeholder = this.coverArtTarget.closest("[data-music-video-fallback]")?.querySelector("[data-placeholder]")
+      if (placeholder) placeholder.classList.add("hidden")
+    }
 
     if (trackId) {
       document.dispatchEvent(new CustomEvent("player:nowPlaying", {
-        detail: { trackId, youtubeVideoId }
+        detail: { trackId, youtubeVideoId, trackStartedAt }
       }))
     }
   }

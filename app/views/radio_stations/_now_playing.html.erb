@@ -1,16 +1,22 @@
-<% if station.current_track %>
-  <div class="bg-gray-800 rounded-lg border border-gray-700 p-5 mb-6"
+<div id="now_playing_<%= station.id %>"
+     <% if station.current_track %>
        data-track-id="<%= station.current_track.id %>"
-       <% if station.current_track.youtube? %>data-youtube-video-id="<%= station.current_track.youtube_video_id %>"<% end %>>
-    <h2 class="text-sm font-medium text-gray-400 mb-2">Now Playing</h2>
-    <div class="flex items-center gap-3">
-      <% if station.current_track.album.cover_image.attached? %>
-        <%= image_tag station.current_track.album.cover_image, class: "w-12 h-12 rounded object-cover" %>
-      <% end %>
-      <div>
-        <p class="text-white font-medium"><%= station.current_track.title %></p>
-        <p class="text-sm text-gray-400"><%= station.current_track.artist.name %> &middot; <%= station.current_track.album.title %></p>
+       <% if station.current_track.youtube? %>data-youtube-video-id="<%= station.current_track.youtube_video_id %>"<% end %>
+       <% if station.last_track_at %>data-track-started-at="<%= station.last_track_at.to_f %>"<% end %>
+       <% if station.current_track.album.cover_image.attached? %>data-cover-url="<%= url_for(station.current_track.album.cover_image) %>"<% end %>
+     <% end %>>
+  <% if station.current_track %>
+    <div class="bg-gray-800 rounded-lg border border-gray-700 p-5 mb-6">
+      <h2 class="text-sm font-medium text-gray-400 mb-2">Now Playing</h2>
+      <div class="flex items-center gap-3">
+        <% if station.current_track.album.cover_image.attached? %>
+          <%= image_tag station.current_track.album.cover_image, class: "w-12 h-12 rounded object-cover" %>
+        <% end %>
+        <div>
+          <p class="text-white font-medium"><%= station.current_track.title %></p>
+          <p class="text-sm text-gray-400"><%= station.current_track.artist.name %> &middot; <%= station.current_track.album.title %></p>
+        </div>
       </div>
     </div>
-  </div>
-<% end %>
+  <% end %>
+</div>

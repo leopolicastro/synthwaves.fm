@@ -64,9 +64,7 @@
   <% end %>
 
   <%# Now Playing (Turbo Stream target) %>
-  <div id="now_playing_<%= @station.id %>">
-    <%= render "radio_stations/now_playing", station: @station %>
-  </div>
+  <%= render "radio_stations/now_playing", station: @station %>
 
   <%# Error %>
   <% if @station.error? && @station.error_message.present? %>

@@ -38,6 +38,21 @@
     </div>
 
     <div>
+      <%= f.label :language, class: "block text-sm font-medium text-gray-400 mb-1" %>
+      <%= f.select :language, TracksHelper::LANGUAGE_NAMES.map { |code, name| [name, code] }.sort_by(&:first), { include_blank: "Not set", selected: @track.language }, class: "w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-white focus:outline-neon-cyan" %>
+    </div>
+
+    <div>
+      <%= f.label :release_year, "Release Year", class: "block text-sm font-medium text-gray-400 mb-1" %>
+      <%= f.number_field :release_year, class: "w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-white focus:outline-neon-cyan", placeholder: "e.g. 2013" %>
+    </div>
+
+    <div>
+      <%= f.label :content_rating, "Content Rating", class: "block text-sm font-medium text-gray-400 mb-1" %>
+      <%= f.select :content_rating, [["Explicit", "explicit"], ["Clean", "clean"]], { include_blank: "Not rated", selected: @track.content_rating }, class: "w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-white focus:outline-neon-cyan" %>
+    </div>
+
+    <div>
       <%= f.label :lyrics, class: "block text-sm font-medium text-gray-400 mb-1" %>
       <%= f.text_area :lyrics, rows: 8, class: "w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-white focus:outline-neon-cyan font-mono text-sm", placeholder: "Paste lyrics here..." %>
     </div>

@@ -197,7 +197,7 @@ CREATE VIRTUAL TABLE tracks_search USING fts5(
   tokenize='unicode61 remove_diacritics 2'
 )
 /* tracks_search(track_title,artist_name,album_title,track_id) */;
-CREATE TABLE IF NOT EXISTS "artists" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "image_url" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "category" varchar DEFAULT 'music' NOT NULL, "user_id" integer NOT NULL);
+CREATE TABLE IF NOT EXISTS "artists" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "image_url" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "category" varchar DEFAULT 'music' NOT NULL, "user_id" integer NOT NULL, "apple_music_storefront" varchar /*application='SynthWaves'*/);
 CREATE INDEX "index_artists_on_category" ON "artists" ("category") /*application='SynthWaves'*/;
 CREATE TABLE IF NOT EXISTS "albums" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar NOT NULL, "artist_id" integer NOT NULL, "year" integer, "genre" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "youtube_playlist_url" varchar, "user_id" integer NOT NULL, CONSTRAINT "fk_rails_124a79559a"
 FOREIGN KEY ("artist_id")
@@ -205,7 +205,7 @@ FOREIGN KEY ("artist_id")
 );
 CREATE INDEX "index_albums_on_artist_id" ON "albums" ("artist_id") /*application='SynthWaves'*/;
 CREATE UNIQUE INDEX "index_albums_on_artist_id_and_title" ON "albums" ("artist_id", "title") /*application='SynthWaves'*/;
-CREATE TABLE IF NOT EXISTS "tracks" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar NOT NULL, "album_id" integer NOT NULL, "artist_id" integer NOT NULL, "track_number" integer, "disc_number" integer DEFAULT 1, "duration" float, "file_format" varchar, "file_size" integer, "bitrate" integer, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "youtube_video_id" varchar, "lyrics" text, "download_status" varchar, "download_error" varchar, "user_id" integer NOT NULL, CONSTRAINT "fk_rails_d99a0cbd74"
+CREATE TABLE IF NOT EXISTS "tracks" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar NOT NULL, "album_id" integer NOT NULL, "artist_id" integer NOT NULL, "track_number" integer, "disc_number" integer DEFAULT 1, "duration" float, "file_format" varchar, "file_size" integer, "bitrate" integer, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "youtube_video_id" varchar, "lyrics" text, "download_status" varchar, "download_error" varchar, "user_id" integer NOT NULL, "apple_music_id" varchar /*application='SynthWaves'*/, "isrc" varchar /*application='SynthWaves'*/, "content_rating" varchar /*application='SynthWaves'*/, "language" varchar /*application='SynthWaves'*/, "release_year" integer /*application='SynthWaves'*/, "enrichment_status" varchar /*application='SynthWaves'*/, "enriched_at" datetime(6) /*application='SynthWaves'*/, CONSTRAINT "fk_rails_d99a0cbd74"
 FOREIGN KEY ("artist_id")
   REFERENCES "artists" ("id")
 , CONSTRAINT "fk_rails_7c47d80164"
@@ -249,7 +249,14 @@ CREATE INDEX "index_radio_stations_on_current_track_id" ON "radio_stations" ("cu
 CREATE UNIQUE INDEX "index_radio_stations_on_mount_point" ON "radio_stations" ("mount_point") /*application='SynthWaves'*/;
 CREATE INDEX "index_radio_stations_on_status" ON "radio_stations" ("status") /*application='SynthWaves'*/;
 CREATE INDEX "index_radio_stations_on_queued_track_id" ON "radio_stations" ("queued_track_id") /*application='SynthWaves'*/;
+CREATE INDEX "index_tracks_on_apple_music_id" ON "tracks" ("apple_music_id") /*application='SynthWaves'*/;
+CREATE INDEX "index_tracks_on_isrc" ON "tracks" ("isrc") /*application='SynthWaves'*/;
+CREATE INDEX "index_tracks_on_language" ON "tracks" ("language") /*application='SynthWaves'*/;
+CREATE INDEX "index_tracks_on_release_year" ON "tracks" ("release_year") /*application='SynthWaves'*/;
+CREATE INDEX "index_tracks_on_enrichment_status" ON "tracks" ("enrichment_status") /*application='SynthWaves'*/;
 INSERT INTO "schema_migrations" (version) VALUES
+('20260329130613'),
+('20260329130608'),
 ('20260328213859'),
 ('20260326235243'),
 ('20260326231506'),

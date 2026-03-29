@@ -18,6 +18,18 @@ class Track < ApplicationRecord
   scope :podcast, -> { joins(:artist).merge(Artist.podcast) }
   scope :streamable, -> { joins(:audio_file_attachment) }
 
+  scope :by_genre, ->(name) {
+    joins(:taggings)
+      .joins("INNER JOIN tags ON tags.id = taggings.tag_id")
+      .where(tags: {tag_type: "genre", name: name.downcase})
+      .distinct
+  }
+  scope :by_language, ->(lang) { where(language: lang) }
+  scope :by_decade, ->(decade) {
+    year = decade.to_i
+    where(release_year: year..(year + 9))
+  }
+
   SORT_OPTIONS = {
     "title" => "Title",
     "created_at" => "Recently Added"
@@ -34,6 +46,22 @@ class Track < ApplicationRecord
     youtube_video_id.present?
   end
 
+  def self.genre_names
+    Tag.genres.joins(:taggings)
+      .where(taggings: {taggable_type: "Track"})
+      .distinct.order(:name).pluck(:name)
+  end
+
+  def self.available_languages
+    where.not(language: [nil, ""]).distinct.pluck(:language).sort
+  end
+
+  def self.available_decades
+    where.not(release_year: nil)
+      .pluck(Arel.sql("DISTINCT (release_year / 10) * 10"))
+      .sort.reverse
+  end
+
   scope :search, ->(query) {
     if query.present?
       sanitized = query.gsub(/["*()]/, "")
@@ -44,12 +72,19 @@ class Track < ApplicationRecord
 
   after_create_commit :convert_audio_if_needed
   after_create_commit :add_to_search_index
+  after_create_commit :queue_apple_music_enrichment
   after_update_commit :update_search_index, if: -> {
     saved_change_to_title? || saved_change_to_album_id? || saved_change_to_artist_id?
   }
   after_destroy_commit :remove_from_search_index
 
   private
+
+  def queue_apple_music_enrichment
+    return unless Flipper.enabled?(:apple_music_enrichment)
+
+    AppleMusicEnrichmentJob.perform_later(id)
+  end
 
   def convert_audio_if_needed
     return unless audio_file.attached?

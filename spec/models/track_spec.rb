@@ -158,6 +158,81 @@ RSpec.describe Track, type: :model do
     end
   end
 
+  describe ".by_genre" do
+    it "returns tracks with the given genre tag" do
+      tag = Tag.create!(name: "electronic", tag_type: "genre")
+      track = create(:track)
+      Tagging.create!(tag: tag, taggable: track, user: track.user)
+      other_track = create(:track)
+
+      results = Track.by_genre("electronic")
+      expect(results).to include(track)
+      expect(results).not_to include(other_track)
+    end
+
+    it "is case-insensitive" do
+      tag = Tag.create!(name: "electronic", tag_type: "genre")
+      track = create(:track)
+      Tagging.create!(tag: tag, taggable: track, user: track.user)
+
+      expect(Track.by_genre("Electronic")).to include(track)
+    end
+  end
+
+  describe ".by_language" do
+    it "returns tracks with the given language" do
+      en_track = create(:track, language: "en")
+      ja_track = create(:track, language: "ja")
+
+      results = Track.by_language("en")
+      expect(results).to include(en_track)
+      expect(results).not_to include(ja_track)
+    end
+  end
+
+  describe ".by_decade" do
+    it "returns tracks within the given decade" do
+      track_2010s = create(:track, release_year: 2013)
+      track_2020s = create(:track, release_year: 2023)
+
+      results = Track.by_decade("2010")
+      expect(results).to include(track_2010s)
+      expect(results).not_to include(track_2020s)
+    end
+  end
+
+  describe ".genre_names" do
+    it "returns distinct genre tag names for tracks" do
+      tag = Tag.create!(name: "electronic", tag_type: "genre")
+      track = create(:track)
+      Tagging.create!(tag: tag, taggable: track, user: track.user)
+
+      expect(Track.genre_names).to include("electronic")
+    end
+  end
+
+  describe ".available_languages" do
+    it "returns distinct language codes" do
+      create(:track, language: "en")
+      create(:track, language: "ja")
+      create(:track, language: nil)
+
+      result = Track.available_languages
+      expect(result).to contain_exactly("en", "ja")
+    end
+  end
+
+  describe ".available_decades" do
+    it "returns distinct decades sorted descending" do
+      create(:track, release_year: 2013)
+      create(:track, release_year: 2023)
+      create(:track, release_year: nil)
+
+      result = Track.available_decades
+      expect(result).to eq([2020, 2010])
+    end
+  end
+
   describe "callbacks" do
     it "enqueues AudioConversionJob for webm files" do
       track = build(:track, file_format: "webm")

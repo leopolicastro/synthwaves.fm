@@ -4,7 +4,7 @@ const LRC_REGEX = /\[(\d{2,}):(\d{2})\.(\d{2,3})\](.*)/
 
 export default class extends Controller {
   static targets = ["content"]
-  static values = { trackId: Number }
+  static values = { trackId: Number, trackStartedAt: { type: Number, default: 0 } }
 
   connect() {
     this._syncedLines = null
@@ -51,10 +51,11 @@ export default class extends Controller {
     }
   }
 
-  _onNowPlaying({ trackId }) {
+  _onNowPlaying({ trackId, trackStartedAt }) {
     if (!trackId) return
     // If pinned to a specific track, don't follow now-playing
     if (this.hasTrackIdValue && this.trackIdValue) return
+    if (trackStartedAt != null) this.trackStartedAtValue = trackStartedAt
     this._fetchLyrics(trackId)
   }
 
@@ -117,7 +118,12 @@ export default class extends Controller {
   _highlightLine() {
     if (!this._syncedLines || !this._audio || !this.hasContentTarget) return
 
-    const currentTime = this._audio.currentTime
+    // For live radio streams, use wall clock time to determine track position
+    // since audio.currentTime starts at 0 when the listener tunes in.
+    // For normal playback (trackStartedAt is 0), use audio.currentTime directly.
+    const currentTime = this.trackStartedAtValue > 0
+      ? (Date.now() / 1000) - this.trackStartedAtValue
+      : this._audio.currentTime
     let activeIndex = -1
 
     for (let i = this._syncedLines.length - 1; i >= 0; i--) {

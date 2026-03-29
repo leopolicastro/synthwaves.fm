@@ -32,48 +32,64 @@
 <!-- Fullscreen Now Playing overlay -->
 <div id="fullscreen-now-playing" data-turbo-permanent data-controller="fullscreen-now-playing">
   <div data-fullscreen-now-playing-target="overlay"
-     class="hidden opacity-0 fixed inset-0 z-[60] transition-opacity duration-300 fullscreen-np-bg flex flex-col items-center justify-center p-8">
+     class="hidden opacity-0 fixed inset-0 z-[60] transition-opacity duration-300 fullscreen-np-bg overflow-y-auto">
     <button data-action="fullscreen-now-playing#close" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 z-10">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
     </button>
-    <!-- Album art -->
-    <div data-fullscreen-now-playing-target="albumArt"
-       class="w-64 h-64 sm:w-80 sm:h-80 rounded-lg overflow-hidden crt-screen album-art-glow mb-8">
-      <div class="w-full h-full bg-gray-700 rounded-lg flex items-center justify-center">
-        <svg class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
+
+    <!-- Split layout: video left, controls+lyrics right (or centered fallback) -->
+    <div class="h-full flex flex-col lg:flex-row items-center lg:items-stretch p-6 lg:p-10 pb-24 lg:pb-10 gap-6 lg:gap-10">
+
+      <!-- Left: Visual (music video or album art) -->
+      <div class="flex-1 flex flex-col items-center justify-center min-w-0 w-full lg:w-auto">
+        <!-- Music Video (auto-hides when no video via controller) -->
+        <div data-fullscreen-now-playing-target="videoPanel" class="w-full max-w-3xl">
+          <%= render MusicVideo::Component.new(max_height: "max-h-[75vh]") %>
+        </div>
+        <!-- Album art (hidden when video is active) -->
+        <div data-fullscreen-now-playing-target="albumArt"
+           class="w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-lg overflow-hidden crt-screen album-art-glow">
+          <div class="w-full h-full bg-gray-700 rounded-lg flex items-center justify-center">
+            <svg class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
+          </div>
+        </div>
       </div>
-    </div>
-    <!-- Track info -->
-    <div class="text-center mb-6">
-      <h2 data-fullscreen-now-playing-target="title" class="text-2xl sm:text-3xl font-bold font-display text-white mb-1"></h2>
-      <p data-fullscreen-now-playing-target="artist" class="text-lg text-gray-400"></p>
-    </div>
-    <!-- Progress bar -->
-    <div class="w-full max-w-md mb-4">
-      <div class="h-1.5 bg-gray-700 rounded-full cursor-pointer" data-action="click->fullscreen-now-playing#seek">
-        <div data-fullscreen-now-playing-target="progress" class="h-full bg-gradient-to-r from-neon-pink to-neon-cyan rounded-full transition-all duration-200" style="width: 0%"></div>
+
+      <!-- Right: Info + Controls + Lyrics -->
+      <div class="w-full lg:w-[22rem] xl:w-[26rem] flex flex-col items-center lg:items-start justify-center gap-4 shrink-0">
+        <!-- Track info -->
+        <div class="text-center lg:text-left w-full">
+          <h2 data-fullscreen-now-playing-target="title" class="text-2xl sm:text-3xl font-bold font-display text-white mb-1 truncate"></h2>
+          <p data-fullscreen-now-playing-target="artist" class="text-lg text-gray-400 truncate"></p>
+        </div>
+        <!-- Progress bar -->
+        <div class="w-full">
+          <div class="h-1.5 bg-gray-700 rounded-full cursor-pointer" data-action="click->fullscreen-now-playing#seek">
+            <div data-fullscreen-now-playing-target="progress" class="h-full bg-gradient-to-r from-neon-pink to-neon-cyan rounded-full transition-all duration-200" style="width: 0%"></div>
+          </div>
+          <div class="flex justify-between mt-1">
+            <span data-fullscreen-now-playing-target="currentTime" class="text-xs text-gray-400 tabular-nums">0:00</span>
+            <span data-fullscreen-now-playing-target="duration" class="text-xs text-gray-400 tabular-nums">0:00</span>
+          </div>
+        </div>
+        <!-- Controls -->
+        <div class="flex items-center gap-6">
+          <button data-action="fullscreen-now-playing#previous" class="text-gray-400 hover:text-white transition-colors">
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z"/></svg>
+          </button>
+          <button data-action="fullscreen-now-playing#togglePlayback" class="w-14 h-14 rounded-full bg-neon-pink text-white flex items-center justify-center hover:shadow-neon-pink transition-shadow">
+            <svg data-fullscreen-now-playing-target="playIcon" class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+            <svg data-fullscreen-now-playing-target="pauseIcon" class="w-7 h-7 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M5.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75A.75.75 0 007.25 3h-1.5zM12.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75a.75.75 0 00-.75-.75h-1.5z"/></svg>
+          </button>
+          <button data-action="fullscreen-now-playing#next" class="text-gray-400 hover:text-white transition-colors">
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path d="M11.555 5.168A1 1 0 0010 6v2.798l-5.445-3.63A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4z"/></svg>
+          </button>
+        </div>
+        <!-- Lyrics (fills remaining space) -->
+        <div class="w-full flex-1 min-h-0 overflow-hidden mt-2">
+          <%= render Lyrics::Component.new(max_height: "max-h-[35vh] lg:max-h-full") %>
+        </div>
       </div>
-      <div class="flex justify-between mt-1">
-        <span data-fullscreen-now-playing-target="currentTime" class="text-xs text-gray-400 tabular-nums">0:00</span>
-        <span data-fullscreen-now-playing-target="duration" class="text-xs text-gray-400 tabular-nums">0:00</span>
-      </div>
-    </div>
-    <!-- Controls -->
-    <div class="flex items-center gap-6">
-      <button data-action="fullscreen-now-playing#previous" class="text-gray-400 hover:text-white">
-        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z"/></svg>
-      </button>
-      <button data-action="fullscreen-now-playing#togglePlayback" class="w-16 h-16 rounded-full bg-neon-pink text-white flex items-center justify-center hover:shadow-neon-pink transition-shadow">
-        <svg data-fullscreen-now-playing-target="playIcon" class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
-        <svg data-fullscreen-now-playing-target="pauseIcon" class="w-8 h-8 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M5.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75A.75.75 0 007.25 3h-1.5zM12.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75a.75.75 0 00-.75-.75h-1.5z"/></svg>
-      </button>
-      <button data-action="fullscreen-now-playing#next" class="text-gray-400 hover:text-white">
-        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M11.555 5.168A1 1 0 0010 6v2.798l-5.445-3.63A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4z"/></svg>
-      </button>
-    </div>
-    <!-- Lyrics -->
-    <div class="mt-6 w-full max-w-lg">
-      <%= render Lyrics::Component.new(max_height: "max-h-56") %>
     </div>
   </div>
 </div>

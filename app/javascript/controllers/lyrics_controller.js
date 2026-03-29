@@ -140,7 +140,13 @@ export default class extends Controller {
     }
 
     if (activeIndex >= 0 && children[activeIndex]) {
-      children[activeIndex].scrollIntoView({ behavior: "smooth", block: "center" })
+      const container = this.contentTarget
+      const line = children[activeIndex]
+      const lineTop = line.offsetTop - container.offsetTop
+      container.scrollTo({
+        top: lineTop - container.clientHeight / 2 + line.offsetHeight / 2,
+        behavior: "smooth"
+      })
     }
   }
 }

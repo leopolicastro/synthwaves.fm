@@ -11,16 +11,22 @@ export default class extends Controller {
     this.playHandler = (e) => this.play(e.detail)
     this.stopHandler = () => this.stop()
     this.toggleHandler = () => this.toggle()
+    this.musicVideoShowingHandler = () => this.hidePip()
+    this.musicVideoHiddenHandler = () => this._restorePipIfActive()
 
     document.addEventListener("youtube:play", this.playHandler)
     document.addEventListener("youtube:stop", this.stopHandler)
     document.addEventListener("youtube:toggle", this.toggleHandler)
+    document.addEventListener("music-video:showing", this.musicVideoShowingHandler)
+    document.addEventListener("music-video:hidden", this.musicVideoHiddenHandler)
   }
 
   disconnect() {
     document.removeEventListener("youtube:play", this.playHandler)
     document.removeEventListener("youtube:stop", this.stopHandler)
     document.removeEventListener("youtube:toggle", this.toggleHandler)
+    document.removeEventListener("music-video:showing", this.musicVideoShowingHandler)
+    document.removeEventListener("music-video:hidden", this.musicVideoHiddenHandler)
   }
 
   get pip() {
@@ -249,5 +255,11 @@ export default class extends Controller {
 
   hidePip() {
     this.pip.classList.add("hidden")
+  }
+
+  _restorePipIfActive() {
+    if (this.player) {
+      this.showPip()
+    }
   }
 }

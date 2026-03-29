@@ -198,7 +198,7 @@ export default class extends Controller {
         }
       }
 
-      this.dispatchNowPlaying({ trackId: track.trackId, title: track.title, artist: track.artist, coverUrl: track.coverUrl })
+      this.dispatchNowPlaying({ trackId: track.trackId, title: track.title, artist: track.artist, coverUrl: track.coverUrl, youtubeVideoId: track.youtubeVideoId })
 
       if ("mediaSession" in navigator && track.title) {
         const metadata = { title: track.title, artist: track.isLive ? "Live" : (track.artist || "") }
@@ -266,7 +266,7 @@ export default class extends Controller {
 
   // Playback
 
-  playTrack({ trackId, title, artist, streamUrl, isLive, coverUrl, isPodcast }) {
+  playTrack({ trackId, title, artist, streamUrl, isLive, coverUrl, isPodcast, youtubeVideoId }) {
     if (this.youtubeActive) {
       document.dispatchEvent(new CustomEvent("youtube:stop"))
       this.youtubeActive = false
@@ -288,8 +288,8 @@ export default class extends Controller {
       this.showNormalMode()
     }
 
-    this.saveCurrentTrack({ trackId, title, artist, streamUrl, isLive: isLive || false, coverUrl: coverUrl || null, isPodcast: isPodcast || false })
-    this.dispatchNowPlaying({ trackId, title, artist, coverUrl })
+    this.saveCurrentTrack({ trackId, title, artist, streamUrl, isLive: isLive || false, coverUrl: coverUrl || null, isPodcast: isPodcast || false, youtubeVideoId: youtubeVideoId || null })
+    this.dispatchNowPlaying({ trackId, title, artist, coverUrl, youtubeVideoId })
     this._applyPlaybackRate()
 
     // If crossfade already started playback, skip audio source reset
@@ -349,7 +349,7 @@ export default class extends Controller {
 
     this.saveCurrentTrack({ trackId, title, artist, youtubeVideoId, isLive: isLive || false, coverUrl: coverUrl || null })
     this.startPositionSave()
-    this.dispatchNowPlaying({ trackId, title, artist, coverUrl })
+    this.dispatchNowPlaying({ trackId, title, artist, coverUrl, youtubeVideoId })
 
     if ("mediaSession" in navigator) {
       const metadata = { title, artist: isLive ? "Live" : artist }
@@ -490,9 +490,9 @@ export default class extends Controller {
 
   // Now playing
 
-  dispatchNowPlaying({ trackId, title, artist, coverUrl }) {
+  dispatchNowPlaying({ trackId, title, artist, coverUrl, youtubeVideoId }) {
     document.dispatchEvent(new CustomEvent("player:nowPlaying", {
-      detail: { trackId, title, artist, coverUrl }
+      detail: { trackId, title, artist, coverUrl, youtubeVideoId }
     }))
   }
 

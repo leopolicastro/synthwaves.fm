@@ -14,7 +14,8 @@
      data-song-row-duration-value="<%= (track.duration || 0).to_i %>"
      <% if track.audio_file.attached? %>
      data-song-row-stream-url-value="<%= stream_track_path(track) %>"
-     <% elsif track.youtube? %>
+     <% end %>
+     <% if track.youtube? %>
      data-song-row-youtube-video-id-value="<%= track.youtube_video_id %>"
      <% end %>
      <% if helpers.native_url_builder %>

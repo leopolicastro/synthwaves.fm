@@ -56,7 +56,8 @@ export default class extends Controller {
 
     if (this.streamUrlValue) {
       track.streamUrl = this.streamUrlValue
-    } else if (this.youtubeVideoIdValue) {
+    }
+    if (this.youtubeVideoIdValue) {
       track.youtubeVideoId = this.youtubeVideoIdValue
     }
 

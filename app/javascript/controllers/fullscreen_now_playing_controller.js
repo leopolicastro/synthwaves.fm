@@ -1,17 +1,22 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["overlay", "albumArt", "title", "artist", "progress", "currentTime", "duration", "playIcon", "pauseIcon"]
+  static targets = ["overlay", "albumArt", "videoPanel", "title", "artist", "progress", "currentTime", "duration", "playIcon", "pauseIcon"]
 
   connect() {
     this._visible = false
+    this._videoActive = false
     this._nowPlayingHandler = (e) => this._onNowPlaying(e.detail)
     this._toggleHandler = () => this.toggle()
     this._closeHandler = () => this.close()
+    this._videoShowingHandler = () => this._onVideoShowing()
+    this._videoHiddenHandler = () => this._onVideoHidden()
 
     document.addEventListener("player:nowPlaying", this._nowPlayingHandler)
     document.addEventListener("fullscreen-now-playing:toggle", this._toggleHandler)
     document.addEventListener("fullscreen-now-playing:close", this._closeHandler)
+    document.addEventListener("music-video:showing", this._videoShowingHandler)
+    document.addEventListener("music-video:hidden", this._videoHiddenHandler)
 
     this._onTimeUpdate = () => this._updateProgress()
     this._onPlay = () => this._updatePlayPause(false)
@@ -44,6 +49,8 @@ export default class extends Controller {
     document.removeEventListener("player:nowPlaying", this._nowPlayingHandler)
     document.removeEventListener("fullscreen-now-playing:toggle", this._toggleHandler)
     document.removeEventListener("fullscreen-now-playing:close", this._closeHandler)
+    document.removeEventListener("music-video:showing", this._videoShowingHandler)
+    document.removeEventListener("music-video:hidden", this._videoHiddenHandler)
 
     if (this._audio) {
       this._audio.removeEventListener("timeupdate", this._onTimeUpdate)
@@ -127,6 +134,16 @@ export default class extends Controller {
   _updatePlayPause(paused) {
     if (this.hasPlayIconTarget) this.playIconTarget.classList.toggle("hidden", !paused)
     if (this.hasPauseIconTarget) this.pauseIconTarget.classList.toggle("hidden", paused)
+  }
+
+  _onVideoShowing() {
+    this._videoActive = true
+    if (this.hasAlbumArtTarget) this.albumArtTarget.classList.add("hidden")
+  }
+
+  _onVideoHidden() {
+    this._videoActive = false
+    if (this.hasAlbumArtTarget) this.albumArtTarget.classList.remove("hidden")
   }
 
   _formatTime(seconds) {

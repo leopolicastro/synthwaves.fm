@@ -158,7 +158,7 @@ class TracksController < ApplicationController
   end
 
   def track_params
-    params.require(:track).permit(:title, :track_number, :disc_number, :lyrics, :album_id, :artist_id)
+    params.require(:track).permit(:title, :track_number, :disc_number, :lyrics, :album_id, :artist_id, :language, :release_year, :content_rating)
   end
 
   def cloud_storage?

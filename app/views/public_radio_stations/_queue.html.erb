@@ -1,0 +1,57 @@
+<div id="station_queue_<%= station.id %>">
+  <% if upcoming_tracks.any? %>
+    <div class="bg-gray-800/60 backdrop-blur rounded-xl border border-gray-700/50 p-5 mb-4">
+      <h2 class="text-sm font-medium text-gray-400 mb-3 uppercase tracking-wider">Up Next</h2>
+      <div class="space-y-3">
+        <% upcoming_tracks.each do |entry| %>
+          <div class="flex items-center gap-3">
+            <% if entry.track.album&.cover_image&.attached? %>
+              <%= image_tag entry.track.album.cover_image, class: "w-10 h-10 rounded object-cover flex-shrink-0", loading: "lazy" %>
+            <% else %>
+              <div class="w-10 h-10 rounded bg-gray-700 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+                </svg>
+              </div>
+            <% end %>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm text-white truncate"><%= entry.track.title %></p>
+              <p class="text-xs text-gray-400 truncate"><%= entry.track.artist.name %></p>
+            </div>
+            <% if entry.track.duration %>
+              <span class="text-xs text-gray-500 flex-shrink-0"><%= format_duration(entry.track.duration) %></span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if recently_played.any? %>
+    <div class="bg-gray-800/60 backdrop-blur rounded-xl border border-gray-700/50 p-5">
+      <h2 class="text-sm font-medium text-gray-400 mb-3 uppercase tracking-wider">Recently Played</h2>
+      <div class="space-y-3">
+        <% recently_played.each do |entry| %>
+          <div class="flex items-center gap-3 opacity-60">
+            <% if entry.track.album&.cover_image&.attached? %>
+              <%= image_tag entry.track.album.cover_image, class: "w-8 h-8 rounded object-cover flex-shrink-0", loading: "lazy" %>
+            <% else %>
+              <div class="w-8 h-8 rounded bg-gray-700 flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+                </svg>
+              </div>
+            <% end %>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm text-gray-300 truncate"><%= entry.track.title %></p>
+              <p class="text-xs text-gray-500 truncate"><%= entry.track.artist.name %></p>
+            </div>
+            <% if entry.track.duration %>
+              <span class="text-xs text-gray-600 flex-shrink-0"><%= format_duration(entry.track.duration) %></span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -106,6 +106,17 @@ RSpec.describe "RadioStations", type: :request do
       expect(station.reload.status).to eq("starting")
       expect(response).to redirect_to(radio_station_path(station))
     end
+
+    it "populates the queue" do
+      track = create(:track, user: user)
+      track.audio_file.attach(io: StringIO.new("audio"), filename: "track.mp3", content_type: "audio/mpeg")
+      create(:playlist_track, playlist: playlist, track: track, position: 1)
+      station = create(:radio_station, playlist: playlist, user: user)
+
+      post start_radio_station_path(station)
+
+      expect(station.radio_queue_tracks.upcoming.count).to eq(1)
+    end
   end
 
   describe "POST /radio_stations/:id/stop" do
@@ -118,6 +129,15 @@ RSpec.describe "RadioStations", type: :request do
 
       expect(station.reload.status).to eq("stopped")
       expect(response).to redirect_to(radio_station_path(station))
+    end
+
+    it "clears the queue" do
+      station = create(:radio_station, playlist: playlist, user: user, status: "active")
+      create(:radio_queue_track, radio_station: station, track: create(:track), position: 1)
+
+      post stop_radio_station_path(station)
+
+      expect(station.radio_queue_tracks.count).to eq(0)
     end
   end
 

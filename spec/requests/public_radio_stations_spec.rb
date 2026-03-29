@@ -76,6 +76,24 @@ RSpec.describe "PublicRadioStations", type: :request do
         get public_radio_station_path(slug: station.slug)
         expect(response.body).to include(track.title)
       end
+
+      it "shows upcoming tracks in the queue" do
+        upcoming = create(:track, title: "Upcoming Jam")
+        create(:radio_queue_track, radio_station: station, track: upcoming, position: 1)
+
+        get public_radio_station_path(slug: station.slug)
+        expect(response.body).to include("Upcoming Jam")
+        expect(response.body).to include("Up Next")
+      end
+
+      it "shows recently played tracks" do
+        played = create(:track, title: "Old Favorite")
+        create(:radio_queue_track, radio_station: station, track: played, position: 1, played_at: 1.minute.ago)
+
+        get public_radio_station_path(slug: station.slug)
+        expect(response.body).to include("Old Favorite")
+        expect(response.body).to include("Recently Played")
+      end
     end
 
     context "when station is stopped" do

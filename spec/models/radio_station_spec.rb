@@ -5,6 +5,7 @@ RSpec.describe RadioStation, type: :model do
     it { is_expected.to belong_to(:playlist) }
     it { is_expected.to belong_to(:user) }
     it { is_expected.to belong_to(:current_track).class_name("Track").optional }
+    it { is_expected.to have_many(:radio_queue_tracks).dependent(:delete_all) }
   end
 
   describe "validations" do

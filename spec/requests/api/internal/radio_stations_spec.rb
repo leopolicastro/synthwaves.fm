@@ -48,6 +48,7 @@ RSpec.describe "API::Internal::RadioStations", type: :request do
       track = create(:track, artist: artist, album: album, user: user, title: "Neon Drive")
       track.audio_file.attach(io: StringIO.new("audio"), filename: "track.mp3", content_type: "audio/mpeg")
       create(:playlist_track, playlist: playlist, track: track, position: 1)
+      RadioQueueService.new(station).populate!
 
       get next_track_api_internal_radio_station_path(station), headers: headers
 
@@ -57,6 +58,17 @@ RSpec.describe "API::Internal::RadioStations", type: :request do
       expect(json["title"]).to eq("Neon Drive")
       expect(json["artist"]).to eq(artist.name)
       expect(json["url"]).to be_present
+    end
+
+    it "sets the current_track on the station" do
+      track = create(:track, artist: artist, album: album, user: user)
+      track.audio_file.attach(io: StringIO.new("audio"), filename: "track.mp3", content_type: "audio/mpeg")
+      create(:playlist_track, playlist: playlist, track: track, position: 1)
+      RadioQueueService.new(station).populate!
+
+      get next_track_api_internal_radio_station_path(station), headers: headers
+
+      expect(station.reload.current_track).to eq(track)
     end
   end
 

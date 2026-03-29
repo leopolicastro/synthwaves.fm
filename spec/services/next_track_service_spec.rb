@@ -21,6 +21,7 @@ RSpec.describe NextTrackService do
   describe ".call" do
     context "with an empty playlist" do
       it "returns nil" do
+        RadioQueueService.new(station).populate!
         expect(NextTrackService.call(station)).to be_nil
       end
     end
@@ -30,6 +31,7 @@ RSpec.describe NextTrackService do
         track = create(:track, :youtube, artist: artist, album: album, user: user)
         track.audio_file.purge if track.audio_file.attached?
         create(:playlist_track, playlist: playlist, track: track, position: 1)
+        RadioQueueService.new(station).populate!
 
         expect(NextTrackService.call(station)).to be_nil
       end
@@ -38,6 +40,7 @@ RSpec.describe NextTrackService do
     context "shuffle mode" do
       it "returns a track with a signed URL" do
         create_track_with_audio(position: 1)
+        RadioQueueService.new(station).populate!
 
         result = NextTrackService.call(station)
 
@@ -46,73 +49,39 @@ RSpec.describe NextTrackService do
         expect(result.url).to be_present
       end
 
-      it "updates the station's queued_track" do
-        track = create_track_with_audio(position: 1)
+      it "advances the queue" do
+        create_track_with_audio(position: 1)
+        create_track_with_audio(position: 2)
+        RadioQueueService.new(station).populate!
 
         expect {
           NextTrackService.call(station)
-        }.to change { station.reload.queued_track }.to(track)
-      end
-
-      it "avoids repeating the queued track when possible" do
-        create_track_with_audio(position: 1)
-        track2 = create_track_with_audio(position: 2)
-        station.update!(queued_track: track2)
-
-        # With 2 tracks and queued=track2, next should always be track1 (not track2)
-        result = NextTrackService.call(station)
-        expect(result.track).not_to eq(track2)
-      end
-
-      it "allows the only track to repeat" do
-        create_track_with_audio(position: 1)
-
-        result = NextTrackService.call(station)
-        expect(result).to be_present
+        }.to change { station.radio_queue_tracks.played.count }.by(1)
       end
     end
 
     context "sequential mode" do
       before { station.update!(playback_mode: "sequential") }
 
-      it "starts with the first track" do
+      it "returns tracks in playlist order" do
         track1 = create_track_with_audio(position: 1)
         create_track_with_audio(position: 2)
+        RadioQueueService.new(station).populate!
 
         result = NextTrackService.call(station)
         expect(result.track).to eq(track1)
       end
 
-      it "advances to the next track" do
+      it "advances through the queue" do
         track1 = create_track_with_audio(position: 1)
         track2 = create_track_with_audio(position: 2)
-        station.update!(queued_track: track1)
+        RadioQueueService.new(station).populate!
 
-        result = NextTrackService.call(station)
-        expect(result.track).to eq(track2)
-      end
+        result1 = NextTrackService.call(station)
+        result2 = NextTrackService.call(station)
 
-      it "wraps around to the first track" do
-        track1 = create_track_with_audio(position: 1)
-        track2 = create_track_with_audio(position: 2)
-        station.update!(queued_track: track2)
-
-        result = NextTrackService.call(station)
-        expect(result.track).to eq(track1)
-      end
-
-      it "skips tracks without audio files" do
-        track1 = create_track_with_audio(position: 1)
-        # Track at position 2 has no audio
-        track_no_audio = create(:track, :youtube, artist: artist, album: album, user: user)
-        track_no_audio.audio_file.purge if track_no_audio.audio_file.attached?
-        create(:playlist_track, playlist: playlist, track: track_no_audio, position: 2)
-        track3 = create_track_with_audio(position: 3)
-
-        station.update!(queued_track: track1)
-
-        result = NextTrackService.call(station)
-        expect(result.track).to eq(track3)
+        expect(result1.track).to eq(track1)
+        expect(result2.track).to eq(track2)
       end
     end
   end

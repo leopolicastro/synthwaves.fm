@@ -21,6 +21,18 @@ RSpec.describe "YoutubeImports", type: :request do
       expect(response.body).to include("Audio (Track)")
       expect(response.body).to include("Video")
     end
+
+    it "renders the playlist selector with user's playlists" do
+      playlist = create(:playlist, user: user, name: "Chill Vibes")
+      other_user_playlist = create(:playlist, name: "Not Mine")
+
+      get new_youtube_import_path
+
+      expect(response.body).to include("Add to Playlist")
+      expect(response.body).to include("Chill Vibes")
+      expect(response.body).to include("Create new playlist")
+      expect(response.body).not_to include("Not Mine")
+    end
   end
 
   describe "GET /youtube_imports/search" do
@@ -87,7 +99,9 @@ RSpec.describe "YoutubeImports", type: :request do
           "https://www.youtube.com/playlist?list=PLtest123",
           category: "music",
           download: true,
-          user_id: user.id
+          user_id: user.id,
+          playlist_id: nil,
+          new_playlist_name: nil
         )
         expect(response).to redirect_to(library_path)
       end
@@ -102,7 +116,44 @@ RSpec.describe "YoutubeImports", type: :request do
           "https://www.youtube.com/playlist?list=PLtest123",
           category: "podcast",
           download: true,
-          user_id: user.id
+          user_id: user.id,
+          playlist_id: nil,
+          new_playlist_name: nil
+        )
+      end
+
+      it "passes playlist_id to the job when an existing playlist is selected" do
+        playlist = create(:playlist, user: user)
+
+        post youtube_imports_path, params: {
+          youtube_url: "https://www.youtube.com/playlist?list=PLtest123",
+          playlist_id: playlist.id.to_s
+        }
+
+        expect(YoutubeImportJob).to have_been_enqueued.with(
+          "https://www.youtube.com/playlist?list=PLtest123",
+          category: "music",
+          download: true,
+          user_id: user.id,
+          playlist_id: playlist.id,
+          new_playlist_name: nil
+        )
+      end
+
+      it "passes new_playlist_name to the job when creating a new playlist" do
+        post youtube_imports_path, params: {
+          youtube_url: "https://www.youtube.com/playlist?list=PLtest123",
+          playlist_id: "new",
+          new_playlist_name: "My Import"
+        }
+
+        expect(YoutubeImportJob).to have_been_enqueued.with(
+          "https://www.youtube.com/playlist?list=PLtest123",
+          category: "music",
+          download: true,
+          user_id: user.id,
+          playlist_id: nil,
+          new_playlist_name: "My Import"
         )
       end
 
@@ -131,6 +182,31 @@ RSpec.describe "YoutubeImports", type: :request do
           expect(YoutubeVideoImportService).to have_received(:call).with(video_url, category: "podcast", api_key: "test_key", user: user)
         end
 
+        it "adds the track to an existing playlist when playlist_id is given" do
+          album = create(:album)
+          track = create(:track, album: album, youtube_video_id: "R-FxmoVM7X4", user: user)
+          playlist = create(:playlist, user: user)
+          allow(YoutubeVideoImportService).to receive(:call).and_return(track)
+
+          post youtube_imports_path, params: {youtube_url: video_url, playlist_id: playlist.id.to_s}
+
+          expect(playlist.tracks).to include(track)
+        end
+
+        it "creates a new playlist and adds the track when playlist_id is 'new'" do
+          album = create(:album)
+          track = create(:track, album: album, youtube_video_id: "R-FxmoVM7X4", user: user)
+          allow(YoutubeVideoImportService).to receive(:call).and_return(track)
+
+          expect {
+            post youtube_imports_path, params: {youtube_url: video_url, playlist_id: "new", new_playlist_name: "Fresh Imports"}
+          }.to change(Playlist, :count).by(1)
+
+          playlist = Playlist.last
+          expect(playlist.name).to eq("Fresh Imports")
+          expect(playlist.tracks).to include(track)
+        end
+
         it "renders the form with an error when the service fails" do
           allow(YoutubeVideoImportService).to receive(:call)
             .and_raise(YoutubeVideoImportService::Error, "Video not found")
@@ -155,7 +231,8 @@ RSpec.describe "YoutubeImports", type: :request do
           post youtube_imports_path, params: {youtube_url: url}
 
           expect(YoutubeImportJob).to have_been_enqueued.with(
-            url, category: "music", download: true, user_id: user.id
+            url, category: "music", download: true, user_id: user.id,
+            playlist_id: nil, new_playlist_name: nil
           )
         end
       end
@@ -185,7 +262,9 @@ RSpec.describe "YoutubeImports", type: :request do
           "https://www.youtube.com/playlist?list=PLtest123",
           category: "music",
           download: true,
-          user_id: user.id
+          user_id: user.id,
+          playlist_id: nil,
+          new_playlist_name: nil
         )
       end
 

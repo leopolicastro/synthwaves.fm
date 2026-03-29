@@ -17,7 +17,7 @@
     <turbo-frame id="youtube-search-results" data-youtube-search-target="frame"></turbo-frame>
   </div>
 
-  <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
+  <div class="bg-gray-800 rounded-lg border border-gray-700 p-6" data-controller="playlist-select">
     <%= form_with url: youtube_imports_path, method: :post, class: "space-y-4" do |f| %>
       <div>
         <%= f.label :youtube_url, "YouTube URL", class: "block text-sm font-medium text-gray-400 mb-1" %>
@@ -41,15 +41,33 @@
         <span class="block text-sm font-medium text-gray-400 mb-2">Download As</span>
         <div class="flex gap-4">
           <label class="inline-flex items-center gap-2 cursor-pointer">
-            <%= f.radio_button :media_type, "audio", checked: true, class: "text-neon-pink focus:ring-neon-pink" %>
+            <%= f.radio_button :media_type, "audio", checked: true, class: "text-neon-pink focus:ring-neon-pink", data: { action: "playlist-select#mediaTypeChanged" } %>
             <span class="text-sm text-white">Audio (Track)</span>
           </label>
           <label class="inline-flex items-center gap-2 cursor-pointer">
-            <%= f.radio_button :media_type, "video", class: "text-neon-pink focus:ring-neon-pink" %>
+            <%= f.radio_button :media_type, "video", class: "text-neon-pink focus:ring-neon-pink", data: { action: "playlist-select#mediaTypeChanged" } %>
             <span class="text-sm text-white">Video</span>
           </label>
         </div>
         <p class="mt-1 text-xs text-gray-400">Audio extracts an MP3 track. Video downloads the full video file (single videos only).</p>
+      </div>
+
+      <div data-playlist-select-target="section">
+        <%= f.label :playlist_id, "Add to Playlist", class: "block text-sm font-medium text-gray-400 mb-1" %>
+        <%= f.select :playlist_id,
+          options_for_select(
+            [["Don't add to playlist", ""]] +
+            @playlists.map { |p| [p.name, p.id] } +
+            [["Create new playlist", "new"]],
+            params[:playlist_id]
+          ),
+          {},
+          class: "block w-full rounded-lg border border-gray-600 bg-gray-900 text-white shadow-sm focus:outline-neon-cyan px-3 py-2",
+          data: { action: "playlist-select#changed" } %>
+        <div data-playlist-select-target="newNameField" class="hidden mt-2">
+          <%= f.label :new_playlist_name, "Playlist Name", class: "block text-sm font-medium text-gray-400 mb-1" %>
+          <%= f.text_field :new_playlist_name, placeholder: "Enter playlist name...", class: "block w-full rounded-lg border border-gray-600 bg-gray-900 text-white shadow-sm focus:outline-neon-cyan px-3 py-2" %>
+        </div>
       </div>
 
       <div class="pt-2">

@@ -102,5 +102,35 @@ RSpec.describe "PublicRadioStations", type: :request do
         expect(response.body).to include("Station Offline")
       end
     end
+
+    context "with M3U format" do
+      it "returns an M3U playlist with the stream URL" do
+        get "/radio/#{station.slug}.m3u"
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to include("audio/x-mpegurl")
+        expect(response.body).to include("#EXTM3U")
+        expect(response.body).to include(station.listen_url)
+        expect(response.body).to include(station.playlist.name)
+      end
+    end
+
+    context "with PLS format" do
+      it "returns a PLS playlist with the stream URL" do
+        get "/radio/#{station.slug}.pls"
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to include("audio/x-scpls")
+        expect(response.body).to include("[playlist]")
+        expect(response.body).to include(station.listen_url)
+        expect(response.body).to include(station.playlist.name)
+      end
+    end
+
+    context "with audio Accept header" do
+      it "redirects to the Icecast stream URL" do
+        get public_radio_station_path(slug: station.slug), headers: {"Accept" => "audio/mpeg"}
+        expect(response).to have_http_status(:found)
+        expect(response).to redirect_to(station.listen_url)
+      end
+    end
   end
 end

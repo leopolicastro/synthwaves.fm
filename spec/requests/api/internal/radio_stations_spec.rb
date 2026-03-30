@@ -61,6 +61,7 @@ RSpec.describe "API::Internal::RadioStations", type: :request do
     end
 
     it "queues the track and promotes the previous queued track to current" do
+      station.update!(playback_mode: "sequential")
       track1 = create(:track, artist: artist, album: album, user: user)
       track1.audio_file.attach(io: StringIO.new("audio"), filename: "t1.mp3", content_type: "audio/mpeg")
       create(:playlist_track, playlist: playlist, track: track1, position: 1)

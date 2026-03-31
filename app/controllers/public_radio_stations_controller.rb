@@ -11,6 +11,11 @@ class PublicRadioStationsController < ApplicationController
   def show
     @station = RadioStation.find_by_slug!(params[:slug])
 
+    if stream_client? && params[:format].blank?
+      redirect_to @station.listen_url, allow_other_host: true, status: :found
+      return
+    end
+
     respond_to do |format|
       format.html do
         if @station.active? || @station.idle?
@@ -20,11 +25,15 @@ class PublicRadioStationsController < ApplicationController
       end
       format.m3u { render plain: m3u_content, content_type: "audio/x-mpegurl" }
       format.pls { render plain: pls_content, content_type: "audio/x-scpls" }
-      format.any { redirect_to @station.listen_url, allow_other_host: true, status: :found }
     end
   end
 
   private
+
+  def stream_client?
+    accept = request.headers["Accept"]
+    accept.present? && !accept.include?("text/html")
+  end
 
   def m3u_content
     "#EXTM3U\n#EXTINF:-1,#{@station.playlist.name}\n#{@station.listen_url}\n"

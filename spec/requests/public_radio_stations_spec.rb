@@ -132,5 +132,13 @@ RSpec.describe "PublicRadioStations", type: :request do
         expect(response).to redirect_to(station.listen_url)
       end
     end
+
+    context "with wildcard Accept header (CLI audio players)" do
+      it "redirects to the Icecast stream URL" do
+        get public_radio_station_path(slug: station.slug), headers: {"Accept" => "*/*"}
+        expect(response).to have_http_status(:found)
+        expect(response).to redirect_to(station.listen_url)
+      end
+    end
   end
 end

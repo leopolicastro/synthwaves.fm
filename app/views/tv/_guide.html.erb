@@ -62,7 +62,10 @@
         Forward &rarr;
       </button>
     </div>
-    <div class="text-sm text-gray-400">
+    <div class="text-sm text-gray-400"
+         data-tv-guide-target="timeRange"
+         data-start-timestamp="<%= @window_start.to_i %>"
+         data-end-timestamp="<%= @window_end.to_i %>">
       <%= @window_start.strftime("%-I:%M %p") %> &ndash; <%= @window_end.strftime("%-I:%M %p %Z") %>
     </div>
   </div>
@@ -107,7 +110,9 @@
                 <% left = time_slot_left_px(slot, @window_start) %>
                 <div class="absolute top-0 h-full flex items-center border-l border-gray-700/60 pl-2"
                  style="left: <%= left %>px;">
-                  <span class="text-xs text-gray-400 whitespace-nowrap"><%= slot.strftime("%-I:%M %p") %></span>
+                  <span class="text-xs text-gray-400 whitespace-nowrap"
+                        data-tv-guide-target="timeSlot"
+                        data-timestamp="<%= slot.to_i %>"><%= slot.strftime("%-I:%M %p") %></span>
                 </div>
               <% end %>
             </div>

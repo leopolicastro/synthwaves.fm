@@ -44,17 +44,8 @@
       "file": "app/controllers/tracks_controller.rb",
       "line": 100,
       "note": "Redirects to signed Active Storage URL, not user input"
-    },
-    {
-      "warning_type": "Redirect",
-      "fingerprint": "05ce2a3cb99a22ad144f245d0444ae452737c6e4c523e4535912f3ec0e552336",
-      "check_name": "Redirect",
-      "message": "Possible unprotected redirect",
-      "file": "app/controllers/public_radio_stations_controller.rb",
-      "line": 23,
-      "note": "Redirects to station listen_url built from env vars (ICECAST_HOST/PROTOCOL/PORT), not user input"
     }
   ],
-  "updated": "2026-03-30",
+  "updated": "2026-03-21",
   "brakeman_version": "8.0.4"
 }

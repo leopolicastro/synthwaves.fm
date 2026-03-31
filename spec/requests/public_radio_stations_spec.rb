@@ -103,41 +103,12 @@ RSpec.describe "PublicRadioStations", type: :request do
       end
     end
 
-    context "with M3U format" do
-      it "returns an M3U playlist with the stream URL" do
-        get "/radio/#{station.slug}.m3u"
-        expect(response).to have_http_status(:ok)
-        expect(response.content_type).to include("audio/x-mpegurl")
-        expect(response.body).to include("#EXTM3U")
+    context "when station is active" do
+      it "shows the stream URL with a copy button" do
+        station.update!(status: :active)
+        get public_radio_station_path(slug: station.slug)
         expect(response.body).to include(station.listen_url)
-        expect(response.body).to include(station.playlist.name)
-      end
-    end
-
-    context "with PLS format" do
-      it "returns a PLS playlist with the stream URL" do
-        get "/radio/#{station.slug}.pls"
-        expect(response).to have_http_status(:ok)
-        expect(response.content_type).to include("audio/x-scpls")
-        expect(response.body).to include("[playlist]")
-        expect(response.body).to include(station.listen_url)
-        expect(response.body).to include(station.playlist.name)
-      end
-    end
-
-    context "with audio Accept header" do
-      it "redirects to the Icecast stream URL" do
-        get public_radio_station_path(slug: station.slug), headers: {"Accept" => "audio/mpeg"}
-        expect(response).to have_http_status(:found)
-        expect(response).to redirect_to(station.listen_url)
-      end
-    end
-
-    context "with wildcard Accept header (CLI audio players)" do
-      it "redirects to the Icecast stream URL" do
-        get public_radio_station_path(slug: station.slug), headers: {"Accept" => "*/*"}
-        expect(response).to have_http_status(:found)
-        expect(response).to redirect_to(station.listen_url)
+        expect(response.body).to include("Stream URL")
       end
     end
   end

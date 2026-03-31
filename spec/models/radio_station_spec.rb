@@ -113,6 +113,61 @@ RSpec.describe RadioStation, type: :model do
     end
   end
 
+  describe "#recently_played_tracks" do
+    let(:user) { create(:user) }
+    let(:artist) { create(:artist, user: user) }
+    let(:album) { create(:album, artist: artist, user: user) }
+    let(:playlist) { create(:playlist, user: user) }
+    let(:station) { create(:radio_station, playlist: playlist, user: user, status: "active", playback_mode: "sequential") }
+
+    def create_track_with_audio(position:)
+      track = create(:track, artist: artist, album: album, user: user)
+      track.audio_file.attach(io: StringIO.new("fake audio"), filename: "track.mp3", content_type: "audio/mpeg")
+      create(:playlist_track, playlist: playlist, track: track, position: position)
+      track
+    end
+
+    it "excludes the current and queued tracks that have not actually finished playing" do
+      tracks = 5.times.map { |i| create_track_with_audio(position: i + 1) }
+      service = RadioQueueService.new(station)
+      service.populate!
+
+      # Simulate Liquidsoap's next_track flow:
+      # Call 1: advance pops track 1, controller queues it
+      entry1 = service.advance!
+      station.update!(queued_track: entry1.track)
+
+      # Call 2: advance pops track 2, controller promotes queued->current
+      entry2 = service.advance!
+      station.update!(current_track: station.queued_track, queued_track: entry2.track)
+
+      # Call 3: advance pops track 3, controller promotes again
+      # Track 1 has now actually finished playing
+      entry3 = service.advance!
+      station.update!(current_track: station.queued_track, queued_track: entry3.track)
+
+      recently_played = station.recently_played_tracks
+
+      # Track 1 actually finished -- should appear
+      expect(recently_played.map(&:track)).to include(tracks[0])
+      # Track 2 is current_track (still playing) -- should NOT appear
+      expect(recently_played.map(&:track)).not_to include(tracks[1])
+      # Track 3 is queued_track (not started) -- should NOT appear
+      expect(recently_played.map(&:track)).not_to include(tracks[2])
+    end
+
+    it "returns empty when only two tracks have been advanced (none actually finished)" do
+      2.times { |i| create_track_with_audio(position: i + 1) }
+      service = RadioQueueService.new(station)
+      service.populate!
+
+      service.advance!
+      service.advance!
+
+      expect(station.recently_played_tracks).to be_empty
+    end
+  end
+
   describe "#listen_url" do
     it "constructs the full Icecast URL" do
       station = build(:radio_station, mount_point: "/chill-vibes.mp3")

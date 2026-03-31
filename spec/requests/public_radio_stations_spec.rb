@@ -87,8 +87,12 @@ RSpec.describe "PublicRadioStations", type: :request do
       end
 
       it "shows recently played tracks" do
+        # The 2 most recent played entries are current/queued tracks (skipped by offset)
+        create(:radio_queue_track, :played, radio_station: station, track: create(:track), played_at: 10.seconds.ago)
+        create(:radio_queue_track, :played, radio_station: station, track: create(:track), played_at: 30.seconds.ago)
+        # This one has actually finished playing
         played = create(:track, title: "Old Favorite")
-        create(:radio_queue_track, radio_station: station, track: played, position: 1, played_at: 1.minute.ago)
+        create(:radio_queue_track, :played, radio_station: station, track: played, played_at: 1.minute.ago)
 
         get public_radio_station_path(slug: station.slug)
         expect(response.body).to include("Old Favorite")

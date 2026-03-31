@@ -93,7 +93,7 @@ class RadioStation < ApplicationRecord
   end
 
   def recently_played_tracks(limit = 10)
-    radio_queue_tracks.recently_played(limit).includes(track: [:artist, {album: {cover_image_attachment: :blob}}])
+    radio_queue_tracks.played.offset(2).limit(limit).includes(track: [:artist, {album: {cover_image_attachment: :blob}}])
   end
 
   private

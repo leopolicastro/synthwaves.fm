@@ -11,7 +11,7 @@ default: &default
       threads: 2
       processes: 1
       polling_interval: 0.5
-    - queues: [default]
+    - queues: [default, solid_queue_recurring]
       threads: 3
       processes: 1
       polling_interval: 0.1

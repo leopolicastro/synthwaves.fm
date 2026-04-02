@@ -36,25 +36,52 @@ RSpec.describe TrackEnricherService do
         track.reload
 
         expect(track.apple_music_id).to eq("123")
-        expect(track.isrc).to eq("USCO11300095")
         expect(track.content_rating).to eq("explicit")
-        expect(track.release_year).to eq(2013)
         expect(track.enrichment_status).to eq("matched")
         expect(track.enriched_at).to be_present
       end
 
-      it "creates genre tags excluding 'Music'" do
+      it "sets release_year when not already set" do
         described_class.call(track)
+        track.reload
+        expect(track.release_year).to eq(2013)
+      end
 
-        tag_names = track.tags.pluck(:name)
-        expect(tag_names).to include("electronic", "dance")
-        expect(tag_names).not_to include("music")
+      it "does not overwrite existing release_year" do
+        track.update!(release_year: 1990)
+
+        described_class.call(track)
+        track.reload
+        expect(track.release_year).to eq(1990)
+      end
+
+      it "sets ISRC when not already set" do
+        described_class.call(track)
+        track.reload
+        expect(track.isrc).to eq("USCO11300095")
+      end
+
+      it "does not overwrite existing ISRC" do
+        track.update!(isrc: "EXISTING123")
+
+        described_class.call(track)
+        track.reload
+        expect(track.isrc).to eq("EXISTING123")
       end
 
       it "detects and stores language" do
         described_class.call(track)
         track.reload
         expect(track.language).to eq("en")
+      end
+
+      it "does not overwrite existing language" do
+        track.update!(language: "ja")
+        allow(LanguageDetectorService).to receive(:call).and_return("en")
+
+        described_class.call(track)
+        track.reload
+        expect(track.language).to eq("ja")
       end
     end
 

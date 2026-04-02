@@ -18,11 +18,9 @@ class MediaDownloadJob < ApplicationJob
   retry_on MediaDownloadService::RateLimitError,
     wait: :polynomially_longer,
     attempts: 5 do |job, error|
-      track = Track.find_by(id: job.arguments.first)
-      if track
-        track.update!(download_status: "failed",
+      Track.find_by(id: job.arguments.first)
+        &.update!(download_status: "failed",
           download_error: "Rate limit retries exhausted: #{error.message}".truncate(500))
-      end
     end
 
   def perform(track_id, url, user_id:)

@@ -3,9 +3,27 @@ class MediaDownloadJob < ApplicationJob
 
   queue_as :imports
 
+  PERMANENT_ERRORS = [
+    /Video unavailable/i,
+    /Private video/i,
+    /removed by the uploader/i,
+    /not available in your country/i,
+    /blocked it.*on copyright grounds/i,
+    /one or more of whom have blocked/i,
+    /Music Premium members/i,
+    /live stream recording is not available/i,
+    /has not made this video available/i
+  ].freeze
+
   retry_on MediaDownloadService::RateLimitError,
     wait: :polynomially_longer,
-    attempts: 5
+    attempts: 5 do |job, error|
+      track = Track.find_by(id: job.arguments.first)
+      if track
+        track.update!(download_status: "failed",
+          download_error: "Rate limit retries exhausted: #{error.message}".truncate(500))
+      end
+    end
 
   def perform(track_id, url, user_id:)
     track = Track.find(track_id)
@@ -49,8 +67,12 @@ class MediaDownloadJob < ApplicationJob
     raise
   rescue MediaDownloadService::Error => e
     Rails.logger.error("[MediaDownloadJob] #{e.class}: #{e.message}")
-    track&.update!(download_status: "failed", download_error: e.message.truncate(500))
-    broadcast_download_status(track, user_id, type: "track") if track
+    if track && permanent_error?(e.message)
+      delete_permanently_failed_track(track, e.message)
+    elsif track
+      track.update!(download_status: "failed", download_error: e.message.truncate(500))
+      broadcast_download_status(track, user_id, type: "track")
+    end
   rescue => e
     track&.update!(download_status: "failed", download_error: e.message.truncate(500))
     broadcast_download_status(track, user_id, type: "track") if track
@@ -60,6 +82,23 @@ class MediaDownloadJob < ApplicationJob
   end
 
   private
+
+  def permanent_error?(message)
+    PERMANENT_ERRORS.any? { |pattern| message.match?(pattern) }
+  end
+
+  def delete_permanently_failed_track(track, error_message)
+    album = track.album
+    artist = track.artist
+    Rails.logger.info(
+      "[YouTubeCleanup] Deleted track ##{track.id} \"#{track.title}\" " \
+      "by \"#{artist.name}\" (youtube: #{track.youtube_video_id}) -- " \
+      "reason: #{error_message.truncate(200)}"
+    )
+    track.destroy!
+    album.destroy! if album.tracks.none?
+    artist.destroy! if artist.tracks.none?
+  end
 
   def enrich_from_embedded_metadata(track, metadata)
     if metadata[:artist].present? && metadata[:artist] != track.artist.name

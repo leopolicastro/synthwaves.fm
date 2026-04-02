@@ -46,7 +46,7 @@ RSpec.describe MediaDownloadJob, type: :job do
       expect(statuses).to include("downloading")
     end
 
-    it "sets failed status on download error" do
+    it "sets failed status on transient download error" do
       allow(MediaDownloadService).to receive(:download_audio)
         .and_raise(MediaDownloadService::Error, "yt-dlp failed: something went wrong")
 
@@ -55,6 +55,86 @@ RSpec.describe MediaDownloadJob, type: :job do
 
       expect(track.download_status).to eq("failed")
       expect(track.download_error).to include("something went wrong")
+      expect(Track.exists?(track.id)).to be true
+    end
+
+    context "permanent YouTube errors" do
+      [
+        "ERROR: [youtube] abc123: Video unavailable. This video is not available",
+        "ERROR: [youtube] abc123: Private video. Sign in if you've been granted access",
+        "ERROR: [youtube] abc123: Video unavailable. This video contains content from WMG, who has blocked it on copyright grounds",
+        "ERROR: [youtube] abc123: The uploader has not made this video available in your country",
+        "ERROR: [youtube] abc123: Video unavailable. This video has been removed by the uploader",
+        "ERROR: [youtube] abc123: This video is only available to Music Premium members",
+        "ERROR: [youtube] abc123: This live stream recording is not available.",
+        "ERROR: [youtube] abc123: Video unavailable. The uploader has not made this video available.",
+        "ERROR: [youtube] abc123: Video unavailable. This video contains content from WMG and SME, one or more of whom have blocked it"
+      ].each do |error_message|
+        it "auto-deletes the track for: #{error_message.truncate(80)}" do
+          allow(MediaDownloadService).to receive(:download_audio)
+            .and_raise(MediaDownloadService::Error, error_message)
+
+          described_class.perform_now(track.id, url, user_id: user.id)
+
+          expect(Track.exists?(track.id)).to be false
+        end
+      end
+
+      it "logs the deletion" do
+        allow(MediaDownloadService).to receive(:download_audio)
+          .and_raise(MediaDownloadService::Error, "ERROR: Video unavailable. This video is not available")
+        allow(Rails.logger).to receive(:info).and_call_original
+        allow(Rails.logger).to receive(:error).and_call_original
+
+        described_class.perform_now(track.id, url, user_id: user.id)
+
+        expect(Rails.logger).to have_received(:info).with(/\[YouTubeCleanup\] Deleted track ##{track.id}/)
+      end
+
+      it "deletes the album if it becomes empty" do
+        allow(MediaDownloadService).to receive(:download_audio)
+          .and_raise(MediaDownloadService::Error, "ERROR: Video unavailable. This video is not available")
+
+        album = track.album
+        described_class.perform_now(track.id, url, user_id: user.id)
+
+        expect(Album.exists?(album.id)).to be false
+      end
+
+      it "keeps the album if it still has other tracks" do
+        allow(MediaDownloadService).to receive(:download_audio)
+          .and_raise(MediaDownloadService::Error, "ERROR: Video unavailable. This video is not available")
+
+        album = track.album
+        create(:track, album: album, artist: track.artist, user: track.user)
+
+        described_class.perform_now(track.id, url, user_id: user.id)
+
+        expect(Album.exists?(album.id)).to be true
+      end
+
+      it "deletes the artist if they have no remaining tracks" do
+        allow(MediaDownloadService).to receive(:download_audio)
+          .and_raise(MediaDownloadService::Error, "ERROR: Video unavailable. This video is not available")
+
+        artist = track.artist
+        described_class.perform_now(track.id, url, user_id: user.id)
+
+        expect(Artist.exists?(artist.id)).to be false
+      end
+
+      it "keeps the artist if they still have other tracks" do
+        allow(MediaDownloadService).to receive(:download_audio)
+          .and_raise(MediaDownloadService::Error, "ERROR: Video unavailable. This video is not available")
+
+        artist = track.artist
+        other_album = create(:album, artist: artist, user: track.user)
+        create(:track, album: other_album, artist: artist, user: track.user)
+
+        described_class.perform_now(track.id, url, user_id: user.id)
+
+        expect(Artist.exists?(artist.id)).to be true
+      end
     end
 
     it "retries on rate limit error and keeps downloading status" do
@@ -68,6 +148,22 @@ RSpec.describe MediaDownloadJob, type: :job do
       track.reload
       expect(track.download_status).to eq("downloading")
       expect(track.download_error).to eq("Rate limited, retrying...")
+    end
+
+    it "marks track as failed when rate limit retries are exhausted" do
+      allow(MediaDownloadService).to receive(:download_audio)
+        .and_raise(MediaDownloadService::RateLimitError, "yt-dlp rate limited: HTTP Error 429")
+
+      # retry_on tracks per-exception counts via exception_executions, not
+      # the global executions counter. Setting to 4 means the handler
+      # increments to 5, matching attempts: 5 and triggering the exhaustion block.
+      job = described_class.new(track.id, url, user_id: user.id)
+      job.exception_executions = {"[MediaDownloadService::RateLimitError]" => 4}
+      job.perform_now
+
+      track.reload
+      expect(track.download_status).to eq("failed")
+      expect(track.download_error).to include("Rate limit retries exhausted")
     end
 
     it "cleans up temp directory" do

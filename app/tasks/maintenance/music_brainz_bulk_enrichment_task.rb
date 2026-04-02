@@ -1,5 +1,5 @@
 module Maintenance
-  class MusicbrainzBulkEnrichmentTask < MaintenanceTasks::Task
+  class MusicBrainzBulkEnrichmentTask < MaintenanceTasks::Task
     def collection
       Track.music.where(musicbrainz_enrichment_status: [nil, "failed"])
     end

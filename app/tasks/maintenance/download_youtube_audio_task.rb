@@ -4,6 +4,7 @@ module Maintenance
       Track.where.not(youtube_video_id: [nil, ""])
         .left_joins(:audio_file_attachment)
         .where(active_storage_attachments: {id: nil})
+        .where("download_status IS NULL OR download_status != ?", "failed")
     end
 
     def count

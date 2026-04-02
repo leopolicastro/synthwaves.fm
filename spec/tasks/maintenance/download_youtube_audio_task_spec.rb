@@ -24,6 +24,11 @@ RSpec.describe Maintenance::DownloadYoutubeAudioTask do
       track = create(:track)
       expect(task.collection).not_to include(track)
     end
+
+    it "excludes YouTube tracks with failed download status" do
+      track = create(:track, :youtube, download_status: "failed", download_error: "Video unavailable")
+      expect(task.collection).not_to include(track)
+    end
   end
 
   describe "#count" do

@@ -45,15 +45,15 @@ class MediaDownloadJob < ApplicationJob
     broadcast_download_status(track, user_id, type: "track")
   rescue MediaDownloadService::RateLimitError
     track&.update!(download_status: "downloading", download_error: "Rate limited, retrying...")
-    broadcast_download_status(track, user_id, type: "track") if track
+    track&.then { |t| broadcast_download_status(t, user_id, type: "track") }
     raise
   rescue MediaDownloadService::Error => e
     Rails.logger.error("[MediaDownloadJob] #{e.class}: #{e.message}")
     track&.update!(download_status: "failed", download_error: e.message.truncate(500))
-    broadcast_download_status(track, user_id, type: "track") if track
+    track&.then { |t| broadcast_download_status(t, user_id, type: "track") }
   rescue => e
     track&.update!(download_status: "failed", download_error: e.message.truncate(500))
-    broadcast_download_status(track, user_id, type: "track") if track
+    track&.then { |t| broadcast_download_status(t, user_id, type: "track") }
     raise
   ensure
     FileUtils.rm_rf(temp_dir) if temp_dir

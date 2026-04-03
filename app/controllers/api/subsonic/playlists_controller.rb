@@ -113,13 +113,6 @@ class API::Subsonic::PlaylistsController < API::Subsonic::BaseController
   end
 
   def playlist_to_entry(playlist)
-    {
-      id: playlist.id.to_s,
-      name: playlist.name,
-      songCount: playlist.tracks.merge(Track.streamable).size,
-      duration: playlist.tracks.merge(Track.streamable).sum(:duration).to_i,
-      owner: current_user.email_address,
-      public: false
-    }
+    Subsonic::PlaylistSerializer.to_entry(playlist, owner: current_user.email_address)
   end
 end

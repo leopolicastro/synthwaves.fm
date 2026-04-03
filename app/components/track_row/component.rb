@@ -32,5 +32,16 @@ module TrackRow
     def show_subtitle?
       show_artist? || show_album?
     end
+
+    def subtitle_parts
+      parts = []
+      if show_artist?
+        parts << {text: track.artist.name, url: link_subtitle? ? helpers.artist_path(track.artist) : nil}
+      end
+      if show_album?
+        parts << {text: track.album.title, url: link_subtitle? ? helpers.album_path(track.album) : nil}
+      end
+      parts
+    end
   end
 end

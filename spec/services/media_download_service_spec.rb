@@ -13,7 +13,7 @@ RSpec.describe MediaDownloadService do
       FileUtils.touch(mp3_path)
 
       expect(Open3).to receive(:capture3).with(
-        "yt-dlp", "--dump-json", "--no-download",
+        "yt-dlp", "--dump-json", "--no-download", "--no-playlist",
         "https://youtube.com/watch?v=abc123"
       ).and_return(not_live_metadata)
 
@@ -31,7 +31,7 @@ RSpec.describe MediaDownloadService do
 
     it "raises Error when yt-dlp fails" do
       allow(Open3).to receive(:capture3).with(
-        "yt-dlp", "--dump-json", "--no-download", anything
+        "yt-dlp", "--dump-json", "--no-download", "--no-playlist", anything
       ).and_return(not_live_metadata)
 
       expect(Open3).to receive(:capture2e).with(
@@ -47,7 +47,7 @@ RSpec.describe MediaDownloadService do
 
     it "raises RateLimitError on HTTP 429" do
       allow(Open3).to receive(:capture3).with(
-        "yt-dlp", "--dump-json", "--no-download", anything
+        "yt-dlp", "--dump-json", "--no-download", "--no-playlist", anything
       ).and_return(not_live_metadata)
 
       expect(Open3).to receive(:capture2e).with(
@@ -64,7 +64,7 @@ RSpec.describe MediaDownloadService do
 
     it "raises RateLimitError on Sign in to confirm" do
       allow(Open3).to receive(:capture3).with(
-        "yt-dlp", "--dump-json", "--no-download", anything
+        "yt-dlp", "--dump-json", "--no-download", "--no-playlist", anything
       ).and_return(not_live_metadata)
 
       expect(Open3).to receive(:capture2e).with(
@@ -81,7 +81,7 @@ RSpec.describe MediaDownloadService do
 
     it "raises Error when no mp3 file is found after download" do
       allow(Open3).to receive(:capture3).with(
-        "yt-dlp", "--dump-json", "--no-download", anything
+        "yt-dlp", "--dump-json", "--no-download", "--no-playlist", anything
       ).and_return(not_live_metadata)
 
       expect(Open3).to receive(:capture2e).with(
@@ -99,7 +99,7 @@ RSpec.describe MediaDownloadService do
       live_metadata = ['{"is_live": true}', "", instance_double(Process::Status, success?: true)]
 
       expect(Open3).to receive(:capture3).with(
-        "yt-dlp", "--dump-json", "--no-download", anything
+        "yt-dlp", "--dump-json", "--no-download", "--no-playlist", anything
       ).and_return(live_metadata)
 
       expect {
@@ -114,7 +114,7 @@ RSpec.describe MediaDownloadService do
       FileUtils.touch(mp4_path)
 
       expect(Open3).to receive(:capture3).with(
-        "yt-dlp", "--dump-json", "--no-download",
+        "yt-dlp", "--dump-json", "--no-download", "--no-playlist",
         "https://youtube.com/watch?v=abc123"
       ).and_return(not_live_metadata)
 
@@ -133,7 +133,7 @@ RSpec.describe MediaDownloadService do
 
     it "raises Error when yt-dlp fails" do
       allow(Open3).to receive(:capture3).with(
-        "yt-dlp", "--dump-json", "--no-download", anything
+        "yt-dlp", "--dump-json", "--no-download", "--no-playlist", anything
       ).and_return(not_live_metadata)
 
       expect(Open3).to receive(:capture2e).with(
@@ -151,7 +151,7 @@ RSpec.describe MediaDownloadService do
       live_metadata = ['{"is_live": true}', "", instance_double(Process::Status, success?: true)]
 
       expect(Open3).to receive(:capture3).with(
-        "yt-dlp", "--dump-json", "--no-download", anything
+        "yt-dlp", "--dump-json", "--no-download", "--no-playlist", anything
       ).and_return(live_metadata)
 
       expect {
@@ -344,7 +344,7 @@ RSpec.describe MediaDownloadService do
       FileUtils.touch(mp3_path)
 
       expect(Open3).to receive(:capture3).with(
-        "yt-dlp", "--dump-json", "--no-download", anything
+        "yt-dlp", "--dump-json", "--no-download", "--no-playlist", anything
       ).and_return(["", "ERROR\n", instance_double(Process::Status, success?: false)])
 
       expect(Open3).to receive(:capture2e).with(
@@ -360,7 +360,7 @@ RSpec.describe MediaDownloadService do
       FileUtils.touch(mp3_path)
 
       expect(Open3).to receive(:capture3).with(
-        "yt-dlp", "--dump-json", "--no-download", anything
+        "yt-dlp", "--dump-json", "--no-download", "--no-playlist", anything
       ).and_return(["not json", "", instance_double(Process::Status, success?: true)])
 
       expect(Open3).to receive(:capture2e).with(

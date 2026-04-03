@@ -1,14 +1,13 @@
 class SearchService
-  def self.call(query:, types: [:artist, :album, :track], limit: 20,
-    genre: nil, year_from: nil, year_to: nil,
-    favorites_only: false, user: nil, category: "music", tags: nil)
-    new(query: query, types: types, limit: limit,
-      genre: genre, year_from: year_from, year_to: year_to,
-      favorites_only: favorites_only, user: user, category: category, tags: tags).call
+  DEFAULTS = {types: [:artist, :album, :track], limit: 20, category: "music"}.freeze
+
+  def self.call(**options)
+    new(**options).call
   end
 
-  def initialize(query:, types:, limit:, genre: nil, year_from: nil, year_to: nil,
-    favorites_only: false, user: nil, category: "music", tags: nil)
+  def initialize(query:, types: DEFAULTS[:types], limit: DEFAULTS[:limit],
+    genre: nil, year_from: nil, year_to: nil,
+    favorites_only: false, user: nil, category: DEFAULTS[:category], tags: nil)
     @query = query
     @types = types
     @limit = limit

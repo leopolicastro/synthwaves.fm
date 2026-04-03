@@ -1,12 +1,6 @@
 <%= link_to track_path(track), class: "group w-40 flex-shrink-0" do %>
   <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden hover:border-neon-purple/40 hover:shadow-lg transition-all">
-    <% if track.album.cover_image.attached? %>
-      <%= image_tag track.album.cover_image, class: "w-full aspect-square object-cover", loading: "lazy" %>
-    <% else %>
-      <div class="w-full aspect-square bg-gray-700 flex items-center justify-center">
-        <svg class="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
-      </div>
-    <% end %>
+    <%= cover_image_or_placeholder(track.album.cover_image, size: :card_sm, rounded: "") %>
     <div class="p-2">
       <div class="font-medium text-sm text-white group-hover:text-neon-cyan truncate"><%= track.title %></div>
       <div class="text-xs text-gray-400 truncate"><%= track.artist.name %></div>

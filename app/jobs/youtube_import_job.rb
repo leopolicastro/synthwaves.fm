@@ -29,13 +29,6 @@ class YoutubeImportJob < ApplicationJob
 
     return unless playlist
 
-    next_position = (playlist.playlist_tracks.maximum(:position) || 0) + 1
-
-    album.tracks.order(:track_number).each do |track|
-      unless playlist.playlist_tracks.exists?(track: track)
-        playlist.playlist_tracks.create!(track: track, position: next_position)
-        next_position += 1
-      end
-    end
+    playlist.add_tracks(album.tracks.order(:track_number))
   end
 end

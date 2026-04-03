@@ -22,39 +22,18 @@ class PlaylistTracksController < ApplicationController
 
   def add_multiple_tracks
     tracks = Current.user.tracks.where(id: params[:track_ids])
-    track_ids_ordered = params[:track_ids].map(&:to_i)
-    next_position = (@playlist.playlist_tracks.maximum(:position) || 0) + 1
-
-    track_ids_ordered.each do |track_id|
-      track = tracks.find { |t| t.id == track_id }
-      next unless track
-      unless @playlist.playlist_tracks.exists?(track: track)
-        @playlist.playlist_tracks.create!(track: track, position: next_position)
-        next_position += 1
-      end
-    end
+    ordered = params[:track_ids].map(&:to_i).filter_map { |id| tracks.find { |t| t.id == id } }
+    @playlist.add_tracks(ordered)
   end
 
   def add_single_track
     track = Current.user.tracks.find(params[:track_id])
-
-    unless @playlist.playlist_tracks.exists?(track: track)
-      next_position = (@playlist.playlist_tracks.maximum(:position) || 0) + 1
-      @playlist.playlist_tracks.create!(track: track, position: next_position)
-    end
+    @playlist.add_track(track)
   end
 
   def add_album_tracks
     album = Current.user.albums.find(params[:album_id])
-    tracks = album.tracks.order(:disc_number, :track_number)
-    next_position = (@playlist.playlist_tracks.maximum(:position) || 0) + 1
-
-    tracks.each do |track|
-      unless @playlist.playlist_tracks.exists?(track: track)
-        @playlist.playlist_tracks.create!(track: track, position: next_position)
-        next_position += 1
-      end
-    end
+    @playlist.add_tracks(album.tracks.order(:disc_number, :track_number))
   end
 
   def set_playlist

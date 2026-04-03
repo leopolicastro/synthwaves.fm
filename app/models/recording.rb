@@ -65,7 +65,7 @@ class Recording < ApplicationRecord
   end
 
   def filename
-    sanitize_filename(title) + ".mp4"
+    FilenameUtils.sanitize(title) + ".mp4"
   end
 
   def broadcast_status
@@ -89,9 +89,5 @@ class Recording < ApplicationRecord
   def max_duration
     return if starts_at.blank? || ends_at.blank?
     errors.add(:base, "Recording cannot exceed 4 hours") if (ends_at - starts_at) > 4.hours.to_i
-  end
-
-  def sanitize_filename(name)
-    name.gsub(/[^\w\s\-.]/, "").strip.gsub(/\s+/, " ")
   end
 end

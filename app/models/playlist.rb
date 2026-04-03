@@ -6,6 +6,26 @@ class Playlist < ApplicationRecord
 
   validates :name, presence: true
 
+  def add_track(track)
+    return nil if playlist_tracks.exists?(track: track)
+
+    next_position = (playlist_tracks.maximum(:position) || 0) + 1
+    playlist_tracks.create!(track: track, position: next_position)
+  end
+
+  def add_tracks(tracks)
+    next_position = (playlist_tracks.maximum(:position) || 0) + 1
+    added = 0
+
+    tracks.each do |track|
+      next if playlist_tracks.exists?(track: track)
+      playlist_tracks.create!(track: track, position: next_position)
+      next_position += 1
+      added += 1
+    end
+    added
+  end
+
   def random_cover_track
     tracks.joins(album: :cover_image_attachment).order("RANDOM()").first
   end

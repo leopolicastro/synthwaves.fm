@@ -53,11 +53,10 @@ class API::Import::TracksController < API::Import::BaseController
   end
 
   def create_track(metadata:, file_format:, file_size:, fallback_title:)
-    artist = current_user.artists.find_or_create_by!(name: metadata[:artist] || "Unknown Artist")
-    album = current_user.albums.find_or_create_by!(title: metadata[:album] || "Unknown Album", artist: artist) do |a|
-      a.year = metadata[:year]
-      a.genre = metadata[:genre]
-    end
+    artist, album = ArtistAlbumResolver.call(
+      user: current_user, artist_name: metadata[:artist],
+      album_title: metadata[:album], year: metadata[:year], genre: metadata[:genre]
+    )
 
     if metadata[:cover_art] && !album.cover_image.attached?
       CoverArtAttachJob.perform_later(album, Base64.strict_encode64(metadata[:cover_art][:data]), metadata[:cover_art][:mime_type])

@@ -50,42 +50,15 @@ class RadioStation < ApplicationRecord
   end
 
   def broadcast_status
-    Turbo::StreamsChannel.broadcast_replace_to(
-      "radio_stations_#{user_id}",
-      target: "radio_station_#{id}",
-      partial: "radio_stations/station",
-      locals: {station: self}
-    )
-    Turbo::StreamsChannel.broadcast_replace_to(
-      "radio_station_public_#{id}",
-      target: "public_status_#{id}",
-      partial: "radio_stations/status_badge",
-      locals: {station: self}
-    )
+    RadioStationBroadcaster.status(self)
   end
 
   def broadcast_now_playing
-    Turbo::StreamsChannel.broadcast_replace_to(
-      "radio_stations_#{user_id}",
-      target: "now_playing_#{id}",
-      partial: "radio_stations/now_playing",
-      locals: {station: self}
-    )
-    Turbo::StreamsChannel.broadcast_replace_to(
-      "radio_station_public_#{id}",
-      target: "now_playing_#{id}",
-      partial: "radio_stations/now_playing",
-      locals: {station: self}
-    )
+    RadioStationBroadcaster.now_playing(self)
   end
 
   def broadcast_queue
-    Turbo::StreamsChannel.broadcast_replace_to(
-      "radio_station_public_#{id}",
-      target: "station_queue_#{id}",
-      partial: "public_radio_stations/queue",
-      locals: {station: self, upcoming_tracks: upcoming_tracks, recently_played: recently_played_tracks}
-    )
+    RadioStationBroadcaster.queue(self)
   end
 
   def upcoming_tracks(limit = 3)

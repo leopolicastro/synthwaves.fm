@@ -39,17 +39,19 @@ class MusicBrainzEnricherService
   end
 
   def apply_match(match)
-    @track.update!(
-      musicbrainz_recording_id: match[:mbid],
-      musicbrainz_enrichment_status: "matched",
-      musicbrainz_enriched_at: Time.current
-    )
+    ActiveRecord::Base.transaction do
+      @track.update!(
+        musicbrainz_recording_id: match[:mbid],
+        musicbrainz_enrichment_status: "matched",
+        musicbrainz_enriched_at: Time.current
+      )
 
-    apply_release_year(match)
-    assign_genres(match[:tags])
-    fix_associations(match) if match[:confidence] >= REASSIGNMENT_THRESHOLD
-    update_album(match)
-    update_artist(match)
+      apply_release_year(match)
+      assign_genres(match[:tags])
+      fix_associations(match) if match[:confidence] >= REASSIGNMENT_THRESHOLD
+      update_album(match)
+      update_artist(match)
+    end
   end
 
   def apply_release_year(match)

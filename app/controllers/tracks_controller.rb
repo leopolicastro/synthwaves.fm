@@ -46,11 +46,10 @@ class TracksController < ApplicationController
     file_format = uploaded_file.original_filename[/\.\w+$/]&.delete(".")
     metadata = extract_metadata(uploaded_file, file_format)
 
-    artist = Current.user.artists.find_or_create_by!(name: metadata[:artist] || "Unknown Artist")
-    album = Current.user.albums.find_or_create_by!(title: metadata[:album] || "Unknown Album", artist: artist) do |a|
-      a.year = metadata[:year]
-      a.genre = metadata[:genre]
-    end
+    artist, album = ArtistAlbumResolver.call(
+      user: Current.user, artist_name: metadata[:artist],
+      album_title: metadata[:album], year: metadata[:year], genre: metadata[:genre]
+    )
 
     if metadata[:cover_art] && !album.cover_image.attached?
       album.cover_image.attach(

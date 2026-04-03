@@ -49,7 +49,7 @@ class Download < ApplicationRecord
       "SynthWaves Library Export"
     end
 
-    sanitize_filename(base) + ".zip"
+    FilenameUtils.sanitize(base) + ".zip"
   end
 
   def broadcast_status
@@ -77,8 +77,4 @@ class Download < ApplicationRecord
   end
 
   private
-
-  def sanitize_filename(name)
-    name.gsub(/[^\w\s\-.]/, "").strip.gsub(/\s+/, " ")
-  end
 end

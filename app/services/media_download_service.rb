@@ -91,13 +91,10 @@ class MediaDownloadService
   private
 
   def reject_live_stream!(url)
-    metadata_json, _stderr, status = Open3.capture3("yt-dlp", "--dump-json", "--no-download", url)
-    return unless status.success?
-
-    metadata = JSON.parse(metadata_json)
-    raise Error, "Cannot download a live stream" if metadata["is_live"] == true
-  rescue JSON::ParserError
-    # If we can't parse metadata, let the download attempt proceed
+    fetch_metadata(url)
+  rescue Error => e
+    raise if e.message.include?("live stream")
+    # If metadata fetch fails for other reasons, let the download attempt proceed
   end
 
   def run_yt_dlp(*args)

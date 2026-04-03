@@ -28,35 +28,16 @@ class MediaDownloadJob < ApplicationJob
     track = Track.find(track_id)
     return if track.audio_file.attached?
 
-    temp_dir = Rails.root.join("tmp/media_downloads/track_#{track_id}_#{SecureRandom.hex(4)}")
-    FileUtils.mkdir_p(temp_dir)
+    @temp_dir = Rails.root.join("tmp/media_downloads/track_#{track_id}_#{SecureRandom.hex(4)}")
+    FileUtils.mkdir_p(@temp_dir)
 
     track.update!(download_status: "downloading", download_error: nil)
     broadcast_download_status(track, user_id, type: "track")
 
-    file_path = MediaDownloadService.download_audio(url, output_dir: temp_dir.to_s)
-
-    track.audio_file.attach(
-      io: File.open(file_path),
-      filename: "#{track_id}.mp3",
-      content_type: "audio/mpeg"
-    )
-
-    metadata = begin
-      MetadataExtractor.call(file_path)
-    rescue WahWah::WahWahArgumentError
-      {}
-    end
-
-    track.update!(
-      download_status: "completed",
-      download_error: nil,
-      duration: metadata[:duration] || track.duration,
-      bitrate: metadata[:bitrate] || track.bitrate,
-      file_format: "mp3",
-      file_size: File.size(file_path)
-    )
-
+    file_path = MediaDownloadService.download_audio(url, output_dir: @temp_dir.to_s)
+    attach_audio(track, file_path)
+    metadata = extract_metadata(file_path)
+    apply_metadata(track, metadata, file_path)
     enrich_from_embedded_metadata(track, metadata) if track.youtube_video_id.present?
 
     broadcast_download_status(track, user_id, type: "track")
@@ -77,10 +58,35 @@ class MediaDownloadJob < ApplicationJob
     broadcast_download_status(track, user_id, type: "track") if track
     raise
   ensure
-    FileUtils.rm_rf(temp_dir) if temp_dir
+    FileUtils.rm_rf(@temp_dir) if @temp_dir
   end
 
   private
+
+  def attach_audio(track, file_path)
+    track.audio_file.attach(
+      io: File.open(file_path),
+      filename: "#{track.id}.mp3",
+      content_type: "audio/mpeg"
+    )
+  end
+
+  def extract_metadata(file_path)
+    MetadataExtractor.call(file_path)
+  rescue WahWah::WahWahArgumentError
+    {}
+  end
+
+  def apply_metadata(track, metadata, file_path)
+    track.update!(
+      download_status: "completed",
+      download_error: nil,
+      duration: metadata[:duration] || track.duration,
+      bitrate: metadata[:bitrate] || track.bitrate,
+      file_format: "mp3",
+      file_size: File.size(file_path)
+    )
+  end
 
   def permanent_error?(message)
     PERMANENT_ERRORS.any? { |pattern| message.match?(pattern) }

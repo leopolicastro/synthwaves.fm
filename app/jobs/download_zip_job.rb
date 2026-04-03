@@ -106,18 +106,14 @@ class DownloadZipJob < ApplicationJob
     case type
     when "Album"
       num = track.track_number ? format("%02d", track.track_number) : "00"
-      "#{num} - #{sanitize(track.title)}.#{ext}"
+      "#{num} - #{FilenameUtils.sanitize(track.title)}.#{ext}"
     when "Playlist"
-      "#{sanitize(track.artist.name)} - #{sanitize(track.title)}.#{ext}"
+      "#{FilenameUtils.sanitize(track.artist.name)} - #{FilenameUtils.sanitize(track.title)}.#{ext}"
     when "Library"
-      "#{sanitize(track.artist.name)}/#{sanitize(track.album.title)}/#{sanitize(track.title)}.#{ext}"
+      "#{FilenameUtils.sanitize(track.artist.name)}/#{FilenameUtils.sanitize(track.album.title)}/#{FilenameUtils.sanitize(track.title)}.#{ext}"
     else
-      "#{sanitize(track.artist.name)} - #{sanitize(track.title)}.#{ext}"
+      "#{FilenameUtils.sanitize(track.artist.name)} - #{FilenameUtils.sanitize(track.title)}.#{ext}"
     end
-  end
-
-  def sanitize(name)
-    name.to_s.gsub(/[^\w\s\-.]/, "").strip.gsub(/\s+/, " ")
   end
 
   def deduplicate_name(name, used_names)

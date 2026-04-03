@@ -155,6 +155,74 @@ RSpec.describe Playlist, type: :model do
     end
   end
 
+  describe "#add_track" do
+    let(:user) { create(:user) }
+    let(:playlist) { create(:playlist, user: user) }
+    let(:track) { create(:track) }
+
+    it "adds a track at the next position" do
+      pt = playlist.add_track(track)
+
+      expect(pt).to be_a(PlaylistTrack)
+      expect(pt.position).to eq(1)
+      expect(playlist.tracks).to include(track)
+    end
+
+    it "appends after existing tracks" do
+      existing = create(:track)
+      playlist.playlist_tracks.create!(track: existing, position: 5)
+
+      pt = playlist.add_track(track)
+
+      expect(pt.position).to eq(6)
+    end
+
+    it "skips duplicate tracks and returns nil" do
+      playlist.playlist_tracks.create!(track: track, position: 1)
+
+      expect(playlist.add_track(track)).to be_nil
+      expect(playlist.playlist_tracks.count).to eq(1)
+    end
+  end
+
+  describe "#add_tracks" do
+    let(:user) { create(:user) }
+    let(:playlist) { create(:playlist, user: user) }
+    let(:track1) { create(:track) }
+    let(:track2) { create(:track) }
+    let(:track3) { create(:track) }
+
+    it "adds multiple tracks in order" do
+      count = playlist.add_tracks([track1, track2, track3])
+
+      expect(count).to eq(3)
+      positions = playlist.playlist_tracks.order(:position).pluck(:track_id, :position)
+      expect(positions).to eq([[track1.id, 1], [track2.id, 2], [track3.id, 3]])
+    end
+
+    it "skips duplicates and counts only new additions" do
+      playlist.playlist_tracks.create!(track: track1, position: 1)
+
+      count = playlist.add_tracks([track1, track2])
+
+      expect(count).to eq(1)
+      expect(playlist.playlist_tracks.count).to eq(2)
+    end
+
+    it "appends after existing tracks" do
+      playlist.playlist_tracks.create!(track: track1, position: 3)
+
+      playlist.add_tracks([track2, track3])
+
+      positions = playlist.playlist_tracks.where(track: [track2, track3]).order(:position).pluck(:position)
+      expect(positions).to eq([4, 5])
+    end
+
+    it "returns 0 for empty input" do
+      expect(playlist.add_tracks([])).to eq(0)
+    end
+  end
+
   describe ".search" do
     let(:user) { create(:user) }
     let!(:chill) { create(:playlist, user: user, name: "Chill Vibes") }

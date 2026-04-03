@@ -55,5 +55,28 @@ module CollectionLayout
     def has_pagination? = pagy.present?
     def has_content_frame? = content_frame.present?
     def show_controls_row? = filters? || has_sort? || view_toggle?
+
+    def show_actions_bar?
+      !search? && (actions? || view_toggle?)
+    end
+
+    def outer_data
+      data = {}
+      if view_toggle?
+        data[:controller] = "view-toggle"
+        data[:view_toggle_page_key_value] = page_key
+      end
+      data
+    end
+
+    def grid_data
+      view_toggle? ? {view_toggle_target: "container"} : {}
+    end
+
+    def default_empty_message
+      msg = "No #{empty_label} found"
+      msg += " for \"#{query}\"" if query.present?
+      "#{msg}."
+    end
   end
 end

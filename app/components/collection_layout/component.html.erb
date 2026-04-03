@@ -1,13 +1,7 @@
-<% outer_data = {} %>
-<% if view_toggle? %>
-  <% outer_data[:controller] = "view-toggle" %>
-  <% outer_data[:view_toggle_page_key_value] = page_key %>
-<% end %>
-
 <%= tag.div(data: outer_data) do %>
   <%= header_content if header_content? %>
 
-  <% if !search? && (actions? || view_toggle?) %>
+  <% if show_actions_bar? %>
     <div class="flex justify-between items-center mb-4">
       <%= actions if actions? %>
       <%= render "shared/view_toggle" if view_toggle? %>
@@ -53,7 +47,7 @@
 
   <% grid_and_pagination = capture do %>
     <% if collection.any? %>
-      <%= tag.div(class: container_classes, data: view_toggle? ? { view_toggle_target: "container" } : {}) do %>
+      <%= tag.div(class: container_classes, data: grid_data) do %>
         <%= content %>
       <% end %>
       <% if has_pagination? %>
@@ -61,12 +55,10 @@
           <%== pagy.series_nav %>
         </div>
       <% end %>
+    <% elsif empty_state? %>
+      <%= empty_state %>
     <% else %>
-      <% if empty_state? %>
-        <%= empty_state %>
-      <% else %>
-        <p class="text-gray-400">No <%= empty_label %> found<%= " for \"#{query}\"" if query.present? %>.</p>
-      <% end %>
+      <p class="text-gray-400"><%= default_empty_message %></p>
     <% end %>
   <% end %>
 

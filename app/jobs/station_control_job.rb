@@ -41,19 +41,6 @@ class StationControlJob < ApplicationJob
   end
 
   def restart_liquidsoap
-    return unless Rails.env.production?
-
-    socket = UNIXSocket.new("/var/run/docker.sock")
-    request = "POST /containers/synthwaves_fm-liquidsoap/restart HTTP/1.0\r\nHost: localhost\r\n\r\n"
-    socket.write(request)
-    response = socket.read
-    socket.close
-
-    status = response[/HTTP\/\d\.\d (\d+)/, 1].to_i
-    unless status == 204
-      Rails.logger.warn("Failed to restart Liquidsoap container: HTTP #{status}")
-    end
-  rescue => e
-    Rails.logger.warn("Failed to restart Liquidsoap container: #{e.message}")
+    LiquidsoapContainerService.restart
   end
 end

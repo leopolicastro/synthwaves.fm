@@ -108,4 +108,10 @@
               </div>
             <% end %>
           </turbo-frame>
+
+          <% if @album.musicbrainz_release_id.present? %>
+            <turbo-frame id="album-tracks-merged" src="<%= missing_tracks_album_path(@album) %>" loading="lazy">
+              <p class="text-sm text-gray-500 mt-4">Checking MusicBrainz for missing tracks...</p>
+            </turbo-frame>
+          <% end %>
         </div>

@@ -18,10 +18,10 @@ class MusicBrainzMatcherService
     results = search_results
     return nil if results.empty?
 
-    best_match = results.map { |r| [r, score(r)] }.max_by(&:last)
-    return nil if best_match.last < CONFIDENCE_THRESHOLD
+    result, confidence = results.map { |r| [r, score(r)] }.max_by(&:last)
+    return nil if confidence < CONFIDENCE_THRESHOLD
 
-    best_match.first
+    result.merge(confidence: confidence)
   end
 
   private

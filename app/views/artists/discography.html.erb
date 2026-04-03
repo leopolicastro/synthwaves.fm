@@ -1,0 +1,11 @@
+<turbo-frame id="discography">
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+    <% @entries.each do |entry| %>
+      <% if entry[:type] == :owned %>
+        <%= render "artists/album_card", album: entry[:album] %>
+      <% else %>
+        <%= render "artists/missing_album_card", entry: entry, artist: @artist %>
+      <% end %>
+    <% end %>
+  </div>
+</turbo-frame>

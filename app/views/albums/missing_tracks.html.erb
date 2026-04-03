@@ -1,0 +1,20 @@
+<turbo-frame id="album-tracks-merged">
+  <% missing_entries = @entries.select { |e| e[:type] == :missing } %>
+  <% if missing_entries.any? %>
+    <div class="mt-6">
+      <div class="mb-4 flex items-center justify-between">
+        <p class="text-sm text-gray-400"><%= missing_entries.size %> missing <%= "track".pluralize(missing_entries.size) %> found on MusicBrainz</p>
+        <%= button_to "Download All Missing",
+              import_missing_tracks_album_path(@album),
+              class: "px-3 py-1.5 text-sm font-medium text-white bg-neon-purple hover:bg-neon-purple/80 rounded-lg transition-colors",
+              data: { turbo_confirm: "Download #{missing_entries.size} missing #{"track".pluralize(missing_entries.size)} from YouTube?", turbo_frame: "_top" } %>
+      </div>
+
+      <div class="bg-gray-800 rounded-lg border border-gray-700">
+        <% missing_entries.each do |entry| %>
+          <%= render "albums/missing_track_row", entry: entry, album: @album %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</turbo-frame>

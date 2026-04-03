@@ -1,0 +1,85 @@
+<% content_for :meta_title, "#{@album_data[:title]} by #{@artist.name} — synthwaves.fm" %>
+<% default_query = "#{@artist.name} #{@album_data[:title]} full album" %>
+
+<div class="w-full">
+  <div class="mb-6">
+    <%= render Button::Component.new(label: "<< #{@artist.name}", behavior: :navigation, link_url: artist_path(@artist), style: :link) %>
+  </div>
+
+  <div class="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-8">
+    <img src="<%= @cover_art_url %>"
+         alt="<%= @album_data[:title] %>"
+         class="w-32 h-32 sm:w-48 sm:h-48 rounded-lg object-cover shadow-lg flex-shrink-0"
+         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+    <div class="w-32 h-32 sm:w-48 sm:h-48 rounded-lg bg-gray-700 items-center justify-center shadow-lg hidden flex-shrink-0">
+      <svg class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
+    </div>
+
+    <div>
+      <h1 class="text-3xl font-bold font-display text-white"><%= @album_data[:title] %></h1>
+      <p class="text-lg text-gray-400"><%= link_to @artist.name, artist_path(@artist), class: "hover:underline" %></p>
+      <% if @album_data[:year] %>
+        <p class="text-gray-400"><%= @album_data[:year] %></p>
+      <% end %>
+      <% total_duration_ms = @album_data[:tracks].sum { |t| t[:duration_ms] || 0 } %>
+      <p class="text-sm text-gray-400 mt-2">
+        <%= pluralize(@album_data[:tracks].size, "track") %>
+        <% if total_duration_ms > 0 %>
+          &middot; <%= format_duration(total_duration_ms / 1000.0) %>
+        <% end %>
+      </p>
+      <p class="text-xs text-gray-500 mt-1">Not in your library</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <%# Tracklist from MusicBrainz %>
+    <div>
+      <h2 class="text-sm font-medium text-gray-400 mb-3">Tracklist</h2>
+      <% if @album_data[:tracks].any? %>
+        <div class="bg-gray-800 rounded-lg border border-gray-700">
+          <% @album_data[:tracks].each do |track| %>
+            <div class="flex items-center gap-3 px-4 py-3 border-b border-gray-700 last:border-b-0">
+              <span class="text-sm text-gray-500 w-6 text-right"><%= track[:position] %></span>
+              <span class="text-sm text-white flex-1 truncate"><%= track[:title] %></span>
+              <% if track[:duration_ms] %>
+                <span class="text-sm text-gray-400"><%= format_duration(track[:duration_ms] / 1000.0) %></span>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <%# YouTube playlist search %>
+    <div data-controller="youtube-search" data-youtube-search-url-value="<%= import_search_artist_path(@artist) %>">
+      <h2 class="text-sm font-medium text-gray-400 mb-3">Import from YouTube</h2>
+      <div class="bg-gray-800 rounded-lg border border-gray-700 p-4">
+        <form data-action="submit->youtube-search#submit" class="flex gap-2 mb-3">
+          <input type="text"
+            data-youtube-search-target="input"
+            value="<%= default_query %>"
+            placeholder="Search YouTube playlists..."
+            class="block w-full rounded-lg border border-gray-600 bg-gray-900 text-white shadow-sm focus:outline-neon-cyan px-3 py-2 text-sm">
+          <%= render Button::Component.new(label: "Search", type: "submit", size: :small) %>
+        </form>
+
+        <turbo-frame id="youtube-search-results" src="<%= import_search_artist_path(@artist, q: default_query) %>" data-youtube-search-target="frame">
+          <p class="text-gray-400 text-sm">Searching YouTube playlists...</p>
+        </turbo-frame>
+
+        <p class="mt-3 text-xs text-gray-500">
+          <a href="https://www.youtube.com/results?search_query=<%= ERB::Util.url_encode(default_query + " playlist") %>&sp=EgIQAw%253D%253D" target="_blank" rel="noopener" class="text-neon-cyan hover:underline">Search on YouTube directly</a>
+        </p>
+
+        <div class="mt-4 pt-4 border-t border-gray-700">
+          <p class="text-xs text-gray-400 mb-2">Or paste a YouTube playlist URL:</p>
+          <%= form_with url: import_album_artist_path(@artist), method: :post, class: "flex gap-2" do |f| %>
+            <%= f.text_field :youtube_url, placeholder: "https://youtube.com/playlist?list=...", class: "block w-full rounded-lg border border-gray-600 bg-gray-900 text-white shadow-sm focus:outline-neon-cyan px-3 py-2 text-sm" %>
+            <%= render Button::Component.new(label: "Import", type: "submit", size: :small) %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

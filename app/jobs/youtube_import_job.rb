@@ -1,9 +1,10 @@
 class YoutubeImportJob < ApplicationJob
   queue_as :imports
 
-  def perform(url, category: "music", download: false, user_id: nil, playlist_id: nil, new_playlist_name: nil)
+  def perform(url, category: "music", download: false, user_id: nil, playlist_id: nil, new_playlist_name: nil, artist_id: nil)
     user = User.find(user_id)
-    album = YoutubePlaylistImportService.call(url, category: category, api_key: user.youtube_api_key, user: user)
+    artist = artist_id ? user.artists.find_by(id: artist_id) : nil
+    album = YoutubePlaylistImportService.call(url, category: category, api_key: user.youtube_api_key, user: user, artist: artist)
 
     if download && album && user_id
       album.tracks.where.not(youtube_video_id: [nil, ""]).find_each do |track|

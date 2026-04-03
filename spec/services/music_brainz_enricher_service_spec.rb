@@ -12,6 +12,7 @@ RSpec.describe MusicBrainzEnricherService do
           artist_name: track.artist.name,
           artist_mbid: "artist-456",
           duration_ms: 373000,
+          confidence: 0.95,
           tags: ["synthpop", "electronic", "new wave"],
           releases: [{mbid: "rel-789", title: track.album.title, date: "1990-03-19", country: "GB"}]
         }
@@ -139,6 +140,71 @@ RSpec.describe MusicBrainzEnricherService do
         described_class.call(track)
         track.reload
         expect(track.musicbrainz_enrichment_status).to eq("failed")
+      end
+    end
+
+    context "when match confidence is high and artist differs" do
+      let(:wrong_artist) { create(:artist, user: track.user, name: "Wrong Artist") }
+      let(:wrong_album) { create(:album, artist: wrong_artist, user: track.user, title: "Wrong Album") }
+
+      let(:reassign_match) do
+        {
+          mbid: "abc-123",
+          title: "Enjoy the Silence",
+          artist_name: "Depeche Mode",
+          artist_mbid: "dm-mbid-456",
+          duration_ms: 373000,
+          confidence: 0.95,
+          tags: [],
+          releases: [{mbid: "rel-789", title: "Violator", date: "1990-03-19", country: "GB"}]
+        }
+      end
+
+      before do
+        track.update!(artist: wrong_artist, album: wrong_album)
+        allow(MusicBrainzMatcherService).to receive(:call).with(track).and_return(reassign_match)
+      end
+
+      it "reassigns track to the correct artist" do
+        described_class.call(track)
+        track.reload
+
+        expect(track.artist.name).to eq("Depeche Mode")
+        expect(track.artist.musicbrainz_artist_id).to eq("dm-mbid-456")
+      end
+
+      it "reassigns track to the correct album" do
+        described_class.call(track)
+        track.reload
+
+        expect(track.album.title).to eq("Violator")
+      end
+
+      it "cleans up empty artist and album" do
+        described_class.call(track)
+
+        expect(Artist.find_by(id: wrong_artist.id)).to be_nil
+        expect(Album.find_by(id: wrong_album.id)).to be_nil
+      end
+
+      it "does not reassign when confidence is below threshold" do
+        low_match = reassign_match.merge(confidence: 0.7)
+        allow(MusicBrainzMatcherService).to receive(:call).with(track).and_return(low_match)
+
+        described_class.call(track)
+        track.reload
+
+        expect(track.artist.name).to eq("Wrong Artist")
+      end
+
+      it "does not reassign when artist name matches" do
+        same_match = reassign_match.merge(artist_name: wrong_artist.name)
+        allow(MusicBrainzMatcherService).to receive(:call).with(track).and_return(same_match)
+
+        described_class.call(track)
+        track.reload
+
+        expect(track.artist).to eq(wrong_artist)
       end
     end
 

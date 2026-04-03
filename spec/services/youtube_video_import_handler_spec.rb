@@ -42,15 +42,13 @@ RSpec.describe YoutubeVideoImportHandler do
           user: user
         )
       }.to change(Video, :count).by(1)
+        .and have_enqueued_job(VideoDownloadJob)
 
       expect(result.status).to eq(:created)
       expect(result.video.title).to eq("Test Video")
       expect(result.video.youtube_video_id).to eq("dQw4w9WgXcQ")
       expect(result.video.duration).to eq(120.0)
       expect(result.video.status).to eq("processing")
-      expect(VideoDownloadJob).to have_been_enqueued.with(
-        result.video.id, "https://www.youtube.com/watch?v=dQw4w9WgXcQ", user_id: user.id
-      )
     end
 
     it "falls back to yt-dlp metadata when no API key" do

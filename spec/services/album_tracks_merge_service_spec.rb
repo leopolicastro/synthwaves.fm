@@ -14,53 +14,62 @@ RSpec.describe AlbumTracksMergeService do
   end
 
   describe ".call" do
-    it "marks owned and missing tracks" do
+    it "returns only missing tracks" do
       owned = create(:track, album: album, artist: artist, title: "Novocaine for the Soul", track_number: 1)
 
-      entries = described_class.call([owned], mb_tracks)
+      missing = described_class.call([owned], mb_tracks)
 
-      owned_entries = entries.select { |e| e[:type] == :owned }
-      missing_entries = entries.select { |e| e[:type] == :missing }
-
-      expect(owned_entries.length).to eq(1)
-      expect(missing_entries.length).to eq(3)
-      expect(missing_entries.map { |e| e[:title] }).to contain_exactly("Susan's House", "Rags to Rags", "Beautiful Freak")
+      expect(missing.length).to eq(3)
+      expect(missing.all? { |e| e[:type] == :missing }).to be true
+      expect(missing.map { |e| e[:title] }).to contain_exactly("Susan's House", "Rags to Rags", "Beautiful Freak")
     end
 
     it "matches by normalized title" do
-      owned = create(:track, album: album, artist: artist, title: "NOVOCAINE FOR THE SOUL!", track_number: 1)
+      owned = create(:track, album: album, artist: artist, title: "NOVOCAINE FOR THE SOUL!", track_number: 99)
 
-      entries = described_class.call([owned], mb_tracks)
-      missing_titles = entries.select { |e| e[:type] == :missing }.map { |e| e[:title] }
+      missing = described_class.call([owned], mb_tracks)
 
-      expect(missing_titles).not_to include("Novocaine for the Soul")
+      expect(missing.map { |e| e[:title] }).not_to include("Novocaine for the Soul")
     end
 
-    it "matches by track position as fallback" do
+    it "matches by track position" do
       owned = create(:track, album: album, artist: artist, title: "Totally Different Name", track_number: 2)
 
-      entries = described_class.call([owned], mb_tracks)
-      missing_positions = entries.select { |e| e[:type] == :missing }.map { |e| e[:position] }
+      missing = described_class.call([owned], mb_tracks)
 
-      expect(missing_positions).not_to include(2)
+      expect(missing.map { |e| e[:position] }).not_to include(2)
     end
 
-    it "sorts by position" do
-      owned = create(:track, album: album, artist: artist, title: "Beautiful Freak", track_number: 4)
+    it "sorts missing tracks by position" do
+      missing = described_class.call([], mb_tracks)
 
-      entries = described_class.call([owned], mb_tracks)
-      positions = entries.map { |e| e[:position] }
-
-      expect(positions).to eq([1, 2, 3, 4])
+      expect(missing.map { |e| e[:position] }).to eq([1, 2, 3, 4])
     end
 
-    it "returns only owned entries when mb_tracks is empty" do
+    it "returns empty when all tracks are owned" do
+      tracks = mb_tracks.map.with_index do |mb, i|
+        create(:track, album: album, artist: artist, title: mb[:title], track_number: mb[:position])
+      end
+
+      missing = described_class.call(tracks, mb_tracks)
+
+      expect(missing).to be_empty
+    end
+
+    it "returns empty when mb_tracks is empty" do
       owned = create(:track, album: album, artist: artist, title: "Test", track_number: 1)
 
-      entries = described_class.call([owned], [])
+      missing = described_class.call([owned], [])
 
-      expect(entries.length).to eq(1)
-      expect(entries.first[:type]).to eq(:owned)
+      expect(missing).to be_empty
+    end
+
+    it "handles partial word matching" do
+      owned = create(:track, album: album, artist: artist, title: "Eels - Novocaine for the Soul (Official)", track_number: 99)
+
+      missing = described_class.call([owned], mb_tracks)
+
+      expect(missing.map { |e| e[:title] }).not_to include("Novocaine for the Soul")
     end
   end
 end

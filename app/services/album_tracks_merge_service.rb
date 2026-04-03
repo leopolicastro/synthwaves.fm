@@ -10,34 +10,42 @@ class AlbumTracksMergeService
 
   def call
     matched_positions = Set.new
-    entries = []
+    matched_titles = Set.new
 
     @owned_tracks.each do |track|
       match = find_match(track)
-      matched_positions << match[:position] if match
-      entries << {type: :owned, track: track, position: track.track_number || 0}
+      if match
+        matched_positions << match[:position]
+        matched_titles << normalize(match[:title])
+      end
     end
 
-    @mb_tracks.each do |mb_track|
-      next if matched_positions.include?(mb_track[:position])
-
-      entries << {
+    @mb_tracks.select do |mb_track|
+      !matched_positions.include?(mb_track[:position]) &&
+        !matched_titles.include?(normalize(mb_track[:title]))
+    end.map do |mb_track|
+      {
         type: :missing,
         position: mb_track[:position],
         title: mb_track[:title],
         duration_ms: mb_track[:duration_ms]
       }
-    end
-
-    entries.sort_by { |e| e[:position] || 0 }
+    end.sort_by { |e| e[:position] || 0 }
   end
 
   private
 
   def find_match(track)
-    @mb_tracks.find do |mb|
-      match_by_title?(track, mb) || match_by_position?(track, mb)
-    end
+    by_position = @mb_tracks.find { |mb| match_by_position?(track, mb) }
+    return by_position if by_position
+
+    @mb_tracks.find { |mb| match_by_title?(track, mb) }
+  end
+
+  def match_by_position?(track, mb)
+    track.track_number.present? &&
+      mb[:position].present? &&
+      track.track_number == mb[:position]
   end
 
   def match_by_title?(track, mb)
@@ -52,12 +60,6 @@ class AlbumTracksMergeService
     overlap = (owned_words & mb_words).size
     smaller = [owned_words.size, mb_words.size].min
     smaller > 0 && overlap.to_f / smaller >= 0.7
-  end
-
-  def match_by_position?(track, mb)
-    track.track_number.present? &&
-      mb[:position].present? &&
-      track.track_number == mb[:position]
   end
 
   def normalize(text)

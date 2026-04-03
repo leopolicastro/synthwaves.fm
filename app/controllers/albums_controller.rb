@@ -121,21 +121,17 @@ class AlbumsController < ApplicationController
 
   def missing_tracks
     @album = Current.user.albums.includes(:artist, tracks: :artist).find(params[:id])
-    @sort = "disc_number"
-    @direction = "asc"
     tracks = @album.tracks.order(disc_number: :asc, track_number: :asc)
 
     if @album.musicbrainz_release_id.present?
       mb_data = MusicBrainzDiscographyService.fetch_release_tracks(@album.musicbrainz_release_id)
       @entries = AlbumTracksMergeService.call(tracks, mb_data[:tracks])
     else
-      @entries = tracks.map { |t| {type: :owned, track: t, position: t.track_number || 0} }
+      @entries = []
     end
-    @favorited_track_ids = Current.user.favorited_ids_for("Track")
   rescue MusicBrainzService::Error => e
     Rails.logger.error("Missing tracks fetch failed for album #{@album.id}: #{e.message}")
-    @entries = tracks.map { |t| {type: :owned, track: t, position: t.track_number || 0} }
-    @favorited_track_ids = Current.user.favorited_ids_for("Track")
+    @entries = []
   end
 
   def import_track

@@ -77,15 +77,8 @@ class PlaylistsController < ApplicationController
     return unless params[:track_ids].present?
 
     tracks = Track.where(id: params[:track_ids])
-    track_ids_ordered = params[:track_ids].map(&:to_i)
-    position = 1
-
-    track_ids_ordered.each do |track_id|
-      track = tracks.find { |t| t.id == track_id }
-      next unless track
-      @playlist.playlist_tracks.create!(track: track, position: position)
-      position += 1
-    end
+    ordered = params[:track_ids].map(&:to_i).filter_map { |id| tracks.find { |t| t.id == id } }
+    @playlist.add_tracks(ordered)
   end
 
   def playlist_params

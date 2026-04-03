@@ -55,10 +55,7 @@ class YoutubeImportsController < ApplicationController
 
     return unless playlist
 
-    unless playlist.playlist_tracks.exists?(track: track)
-      next_position = (playlist.playlist_tracks.maximum(:position) || 0) + 1
-      playlist.playlist_tracks.create!(track: track, position: next_position)
-    end
+    playlist.add_track(track)
   end
 
   def handle_video_import(url)

@@ -157,12 +157,8 @@ class AlbumsController < ApplicationController
 
   def create_playlist
     album = Current.user.albums.find(params[:id])
-    tracks = album.tracks.order(:disc_number, :track_number)
     playlist = Current.user.playlists.create!(name: album.title)
-
-    tracks.each_with_index do |track, index|
-      playlist.playlist_tracks.create!(track: track, position: index + 1)
-    end
+    playlist.add_tracks(album.tracks.order(:disc_number, :track_number))
 
     redirect_to playlist, notice: "Playlist created from #{album.title}"
   end

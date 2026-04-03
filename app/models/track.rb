@@ -93,24 +93,14 @@ class Track < ApplicationRecord
   end
 
   def add_to_search_index
-    self.class.connection.execute(
-      ActiveRecord::Base.sanitize_sql_array([
-        "INSERT INTO tracks_search (track_title, artist_name, album_title, track_id) VALUES (?, ?, ?, ?)",
-        title, artist.name, album.title, id
-      ])
-    )
+    TrackSearchIndexService.add(self)
   end
 
   def update_search_index
-    remove_from_search_index
-    add_to_search_index
+    TrackSearchIndexService.update(self)
   end
 
   def remove_from_search_index
-    self.class.connection.execute(
-      ActiveRecord::Base.sanitize_sql_array([
-        "DELETE FROM tracks_search WHERE track_id = ?", id.to_s
-      ])
-    )
+    TrackSearchIndexService.remove(self)
   end
 end

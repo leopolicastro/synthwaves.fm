@@ -1,0 +1,39 @@
+<turbo-frame id="album-tracks-merged">
+  <% missing_entries = @entries.select { |e| e[:type] == :missing } %>
+  <% if missing_entries.any? %>
+    <div class="mb-4 flex items-center justify-between">
+      <p class="text-sm text-gray-400"><%= missing_entries.size %> missing <%= "track".pluralize(missing_entries.size) %> found on MusicBrainz</p>
+      <%= button_to "Download All Missing",
+            import_missing_tracks_album_path(@album),
+            class: "px-3 py-1.5 text-sm font-medium text-white bg-neon-purple hover:bg-neon-purple/80 rounded-lg transition-colors",
+            data: { turbo_confirm: "Download #{missing_entries.size} missing #{"track".pluralize(missing_entries.size)} from YouTube?", turbo_frame: "_top" } %>
+    </div>
+  <% end %>
+
+  <div class="bg-gray-800 rounded-lg border border-gray-700">
+    <% @entries.each do |entry| %>
+      <% if entry[:type] == :owned %>
+        <%= render TrackRow::Component.new(
+              track: entry[:track],
+              number: entry[:track].track_number,
+              link_title: true,
+              link_subtitle: true,
+              show_album: false,
+              hide_artist_if: @album.artist
+            ) do |c| %>
+          <% c.with_trailing do %>
+            <% if entry[:track].audio_file.attached? %>
+              <%= link_to download_track_path(entry[:track]), class: "text-gray-400 hover:text-neon-cyan", title: "Download" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <% end %>
+            <% end %>
+            <%= render "favorites/button", favorable: entry[:track], favorited: @favorited_track_ids.include?(entry[:track].id) %>
+            <%= render "playlist_tracks/add_menu", track: entry[:track], playlists: current_user_playlists %>
+          <% end %>
+        <% end %>
+      <% else %>
+        <%= render "albums/missing_track_row", entry: entry, album: @album %>
+      <% end %>
+    <% end %>
+  </div>
+</turbo-frame>

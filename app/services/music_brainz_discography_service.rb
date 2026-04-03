@@ -9,6 +9,10 @@ class MusicBrainzDiscographyService
     new(nil).fetch_release_group_tracks(release_group_mbid)
   end
 
+  def self.fetch_release_tracks(release_mbid)
+    new(nil).fetch_release_tracks(release_mbid)
+  end
+
   def initialize(artist_mbid)
     @artist_mbid = artist_mbid
   end
@@ -16,6 +20,29 @@ class MusicBrainzDiscographyService
   def call
     Rails.cache.fetch(cache_key, expires_in: CACHE_TTL) do
       fetch_discography
+    end
+  end
+
+  def fetch_release_tracks(release_mbid)
+    Rails.cache.fetch("musicbrainz:release_tracks:#{release_mbid}", expires_in: CACHE_TTL) do
+      release_detail = mb_get("/release/#{release_mbid}", params: {inc: "recordings", fmt: "json"})
+
+      media = release_detail["media"] || []
+      tracks = media.flat_map do |medium|
+        (medium["tracks"] || []).map do |track|
+          recording = track["recording"] || {}
+          {
+            position: track["position"],
+            title: recording["title"] || track["title"],
+            duration_ms: recording["length"] || track["length"]
+          }
+        end
+      end
+
+      year = release_detail["date"]&.slice(0, 4)&.to_i
+      year = nil if year&.zero?
+
+      {title: release_detail["title"], year: year, tracks: tracks}
     end
   end
 

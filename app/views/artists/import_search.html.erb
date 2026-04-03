@@ -20,7 +20,7 @@
                 import_album_artist_path(@artist),
                 params: {youtube_url: "https://www.youtube.com/playlist?list=#{result[:playlist_id]}"},
                 class: "px-3 py-1.5 text-xs font-medium text-white bg-neon-purple hover:bg-neon-purple/80 rounded-lg transition-colors flex-shrink-0",
-                data: {turbo_confirm: "Import this playlist?"} %>
+                data: {turbo_confirm: "Import this playlist?", turbo_frame: "_top"} %>
         </li>
       <% end %>
     </ul>

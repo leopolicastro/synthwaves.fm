@@ -1,0 +1,15 @@
+<div class="flex items-center gap-3 px-4 py-3 border-b border-gray-700 last:border-b-0 opacity-50">
+  <span class="text-sm text-gray-500 w-8 text-right"><%= entry[:position] %></span>
+  <div class="flex-1 min-w-0">
+    <span class="text-sm text-gray-400 truncate block"><%= entry[:title] %></span>
+  </div>
+  <% if entry[:duration_ms] %>
+    <span class="text-sm text-gray-500 hidden sm:block"><%= format_duration(entry[:duration_ms] / 1000.0) %></span>
+  <% end %>
+  <%= button_to import_track_album_path(album),
+        params: { track_title: entry[:title] },
+        class: "px-2 py-1 text-xs font-medium text-neon-cyan hover:text-white transition-colors flex-shrink-0",
+        data: { turbo_confirm: "Search YouTube and download \"#{entry[:title]}\"?", turbo_frame: "_top" } do %>
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+  <% end %>
+</div>

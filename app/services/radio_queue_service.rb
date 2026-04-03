@@ -69,34 +69,35 @@ class RadioQueueService
 
   def pick_shuffle_batch(count)
     pool = streamable_tracks
-    total = pool.count
-    return [] if total == 0
+    return [] if pool.count == 0
 
     upcoming_ids = @station.radio_queue_tracks.upcoming.pluck(:track_id)
-    exclude_ids = upcoming_ids.dup
+    exclude_ids = build_shuffle_exclusions(pool.count, count, upcoming_ids)
+    candidates = pool.where.not(id: exclude_ids)
 
+    pick_random_with_fallback(candidates, pool, upcoming_ids, count)
+  end
+
+  def build_shuffle_exclusions(total, count, upcoming_ids)
+    exclude_ids = upcoming_ids.dup
     recently_played_limit = [total - count, 0].max
     if recently_played_limit > 0
       exclude_ids += @station.radio_queue_tracks.played.limit(recently_played_limit).pluck(:track_id)
     end
-    exclude_ids.uniq!
+    exclude_ids.uniq
+  end
 
-    candidates = pool.where.not(id: exclude_ids)
+  def pick_random_with_fallback(candidates, pool, upcoming_ids, count)
+    return candidates.reorder("RANDOM()").limit(count).to_a if candidates.count >= count
 
-    if candidates.count >= count
-      candidates.reorder("RANDOM()").limit(count).to_a
-    else
-      # Not enough fresh candidates — relax recently-played constraint but still avoid upcoming duplicates
-      first_batch = candidates.reorder("RANDOM()").to_a
-      remaining = count - first_batch.size
-      if remaining > 0
-        used_ids = (upcoming_ids + first_batch.map(&:id)).uniq
-        second_batch = pool.where.not(id: used_ids).reorder("RANDOM()").limit(remaining).to_a
-        first_batch + second_batch
-      else
-        first_batch
-      end
-    end
+    # Not enough fresh candidates -- relax recently-played constraint but still avoid upcoming duplicates
+    first_batch = candidates.reorder("RANDOM()").to_a
+    remaining = count - first_batch.size
+    return first_batch if remaining <= 0
+
+    used_ids = (upcoming_ids + first_batch.map(&:id)).uniq
+    second_batch = pool.where.not(id: used_ids).reorder("RANDOM()").limit(remaining).to_a
+    first_batch + second_batch
   end
 
   def pick_sequential_batch(count)

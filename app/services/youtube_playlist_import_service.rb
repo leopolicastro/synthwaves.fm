@@ -18,43 +18,54 @@ class YoutubePlaylistImportService
   end
 
   def call
-    playlist_info, items = fetch_playlist_data
+    @playlist_info, @items = fetch_playlist_data
+    return nil if @items.empty?
 
-    return nil if items.empty?
+    @artist = find_or_create_artist
+    @album = find_or_create_album
+    import_tracks
 
-    artist = @artist_override || @user.artists.find_or_create_by!(name: playlist_info[:channel_name] || "Unknown Artist") do |a|
+    @album
+  end
+
+  private
+
+  def find_or_create_artist
+    @artist_override || @user.artists.find_or_create_by!(name: @playlist_info[:channel_name] || "Unknown Artist") do |a|
       a.category = @category
     end
+  end
 
-    album = @user.albums.find_or_create_by!(title: playlist_info[:title], artist: artist)
+  def find_or_create_album
+    album = @user.albums.find_or_create_by!(title: @playlist_info[:title], artist: @artist)
     album.update!(youtube_playlist_url: @url) if album.youtube_playlist_url.blank?
 
-    if playlist_info[:thumbnail_url].present? && !album.cover_image.attached?
-      attach_thumbnail(album, playlist_info[:thumbnail_url])
-    end
-
-    items.each do |item|
-      enriched = YoutubeMetadataEnricher.call(title: item[:title], channel_name: playlist_info[:channel_name])
-
-      track_artist = if enriched[:source] == :parsed
-        @user.artists.find_or_create_by!(name: enriched[:artist]) { |a| a.category = @category }
-      else
-        artist
-      end
-
-      @user.tracks.find_or_create_by!(youtube_video_id: item[:video_id]) do |track|
-        track.title = enriched[:title]
-        track.artist = track_artist
-        track.album = album
-        track.track_number = item[:position] + 1
-        track.duration = item[:duration]
-      end
+    if @playlist_info[:thumbnail_url].present? && !album.cover_image.attached?
+      attach_thumbnail(album, @playlist_info[:thumbnail_url])
     end
 
     album
   end
 
-  private
+  def import_tracks
+    @items.each do |item|
+      enriched = YoutubeMetadataEnricher.call(title: item[:title], channel_name: @playlist_info[:channel_name])
+
+      track_artist = if enriched[:source] == :parsed
+        @user.artists.find_or_create_by!(name: enriched[:artist]) { |a| a.category = @category }
+      else
+        @artist
+      end
+
+      @user.tracks.find_or_create_by!(youtube_video_id: item[:video_id]) do |track|
+        track.title = enriched[:title]
+        track.artist = track_artist
+        track.album = @album
+        track.track_number = item[:position] + 1
+        track.duration = item[:duration]
+      end
+    end
+  end
 
   def fetch_playlist_data
     if @api_key.present?

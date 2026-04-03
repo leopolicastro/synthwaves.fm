@@ -22,8 +22,8 @@ class ListeningStatsService
       top_genres: top_genres,
       total_plays: total_plays,
       total_listening_time: total_listening_time,
-      current_streak: current_streak,
-      longest_streak: longest_streak,
+      current_streak: calculate_streak(:current),
+      longest_streak: calculate_streak(:longest),
       hourly_distribution: hourly_distribution,
       daily_distribution: daily_distribution
     }
@@ -74,14 +74,6 @@ class ListeningStatsService
       .to_f
   end
 
-  def current_streak
-    calculate_streak(:current)
-  end
-
-  def longest_streak
-    calculate_streak(:longest)
-  end
-
   def hourly_distribution
     result = Array.new(24, 0)
     base_scope
@@ -101,43 +93,49 @@ class ListeningStatsService
   end
 
   def calculate_streak(type)
-    dates = @user.play_histories
+    dates = listening_dates
+    return 0 if dates.empty?
+
+    (type == :current) ? current_streak(dates) : longest_streak(dates)
+  end
+
+  def listening_dates
+    @user.play_histories
       .select("DATE(played_at) AS play_date")
       .distinct
       .order("play_date DESC")
       .map { |r| r.play_date.to_date }
+  end
 
-    return 0 if dates.empty?
-
-    if type == :current
-      streak = 0
-      expected = Date.current
-      dates.each do |d|
-        if d == expected
-          streak += 1
-          expected -= 1.day
-        elsif d == expected - 1.day
-          # Allow for today not having plays yet
-          expected = d
-          streak += 1
-          expected -= 1.day
-        else
-          break
-        end
+  def current_streak(dates)
+    streak = 0
+    expected = Date.current
+    dates.each do |d|
+      if d == expected
+        streak += 1
+        expected -= 1.day
+      elsif d == expected - 1.day
+        expected = d
+        streak += 1
+        expected -= 1.day
+      else
+        break
       end
-      streak
-    else
-      max_streak = 1
-      current = 1
-      dates.each_cons(2) do |a, b|
-        if (a - b).to_i == 1
-          current += 1
-          max_streak = [max_streak, current].max
-        else
-          current = 1
-        end
-      end
-      max_streak
     end
+    streak
+  end
+
+  def longest_streak(dates)
+    max_streak = 1
+    current = 1
+    dates.each_cons(2) do |a, b|
+      if (a - b).to_i == 1
+        current += 1
+        max_streak = [max_streak, current].max
+      else
+        current = 1
+      end
+    end
+    max_streak
   end
 end

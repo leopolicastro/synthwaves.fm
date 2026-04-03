@@ -73,69 +73,14 @@ module SubsonicResponseFormatting
   end
 
   def track_to_child(track)
-    {
-      id: track.id.to_s,
-      parent: track.album_id.to_s,
-      isDir: false,
-      title: track.title,
-      album: track.album.title,
-      artist: track.artist.name,
-      track: track.track_number,
-      year: track.album.year,
-      genre: track.album.genre,
-      size: track.file_size,
-      contentType: audio_content_type(track.file_format),
-      suffix: track.file_format,
-      duration: track.duration&.to_i,
-      bitRate: track.bitrate,
-      albumId: track.album_id.to_s,
-      artistId: track.artist_id.to_s,
-      type: "music"
-    }.compact
+    Subsonic::TrackSerializer.to_child(track)
   end
 
   def album_to_entry(album)
-    streamable = album.tracks.merge(Track.streamable)
-    {
-      id: album.id.to_s,
-      name: album.title,
-      artist: album.artist.name,
-      artistId: album.artist_id.to_s,
-      songCount: streamable.size,
-      duration: streamable.sum(&:duration).to_i,
-      year: album.year,
-      genre: album.genre,
-      coverArt: album.id.to_s
-    }.compact
+    Subsonic::AlbumSerializer.to_entry(album)
   end
 
   def video_to_entry(video)
-    {
-      id: video.id.to_s,
-      title: video.title,
-      description: video.description,
-      duration: video.duration&.to_i,
-      width: video.width,
-      height: video.height,
-      size: video.file_size,
-      contentType: "video/mp4",
-      fileFormat: video.file_format,
-      folderId: video.folder_id&.to_s,
-      folderName: video.folder&.name,
-      episodeNumber: video.episode_number,
-      seasonNumber: video.season_number,
-      created: video.created_at.iso8601
-    }.compact
-  end
-
-  def audio_content_type(format)
-    {
-      "mp3" => "audio/mpeg",
-      "flac" => "audio/flac",
-      "ogg" => "audio/ogg",
-      "m4a" => "audio/mp4",
-      "aac" => "audio/mp4",
-      "opus" => "audio/opus"
-    }[format.to_s.downcase] || "audio/mpeg"
+    Subsonic::VideoSerializer.to_entry(video)
   end
 end

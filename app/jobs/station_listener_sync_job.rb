@@ -2,8 +2,6 @@ class StationListenerSyncJob < ApplicationJob
   ICECAST_STATUS_URL = "http://%{host}:%{port}/status-json.xsl"
 
   def perform
-    return unless Flipper.enabled?(:radio_stations)
-
     stations = RadioStation.where(status: %w[active idle])
     return if stations.none?
 

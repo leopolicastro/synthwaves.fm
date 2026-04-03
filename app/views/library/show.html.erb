@@ -7,11 +7,9 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
         Upload
       <% end %>
-      <% if Flipper.enabled?(:youtube_import, Current.user) %>
-        <%= link_to new_youtube_import_path, class: "inline-flex items-center gap-1.5 px-3 py-1.5 bg-neon-purple/30 text-white rounded-full text-sm font-medium hover:bg-neon-purple/50 transition-colors" do %>
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-          Import from YouTube
-        <% end %>
+      <%= link_to new_youtube_import_path, class: "inline-flex items-center gap-1.5 px-3 py-1.5 bg-neon-purple/30 text-white rounded-full text-sm font-medium hover:bg-neon-purple/50 transition-colors" do %>
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        Import from YouTube
       <% end %>
       <%= link_to new_playlist_path, class: "inline-flex items-center gap-1.5 px-3 py-1.5 bg-neon-purple/30 text-white rounded-full text-sm font-medium hover:bg-neon-purple/50 transition-colors" do %>
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -25,11 +23,9 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/></svg>
         Downloads
       <% end %>
-      <% if Flipper.enabled?(:youtube_radio, Current.user) %>
-        <%= link_to new_external_stream_path, class: "inline-flex items-center gap-1.5 px-3 py-1.5 bg-neon-purple/30 text-white rounded-full text-sm font-medium hover:bg-neon-purple/50 transition-colors" do %>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 14.828a4 4 0 010-5.656m5.656 0a4 4 0 010 5.656M12 12h.01"/></svg>
-          Add Radio Station
-        <% end %>
+      <%= link_to new_external_stream_path, class: "inline-flex items-center gap-1.5 px-3 py-1.5 bg-neon-purple/30 text-white rounded-full text-sm font-medium hover:bg-neon-purple/50 transition-colors" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 14.828a4 4 0 010-5.656m5.656 0a4 4 0 010 5.656M12 12h.01"/></svg>
+        Add Radio Station
       <% end %>
     </div>
   </div>

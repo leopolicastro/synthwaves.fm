@@ -82,8 +82,6 @@ class Track < ApplicationRecord
   private
 
   def queue_enrichment
-    return unless Flipper.enabled?(:musicbrainz_enrichment)
-
     MusicBrainzEnrichmentJob.perform_later(id)
   end
 

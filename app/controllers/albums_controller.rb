@@ -56,11 +56,6 @@ class AlbumsController < ApplicationController
   def refresh
     album = Current.user.albums.find(params[:id])
 
-    unless Flipper.enabled?(:youtube_import, Current.user)
-      redirect_to album, alert: "This feature is not available."
-      return
-    end
-
     unless album.youtube_playlist_url.present?
       redirect_to album, alert: "This album has no YouTube playlist URL to refresh from."
       return
@@ -81,11 +76,6 @@ class AlbumsController < ApplicationController
 
   def download_audio
     album = Current.user.albums.find(params[:id])
-
-    unless Flipper.enabled?(:youtube_import, Current.user)
-      redirect_to album, alert: "This feature is not available."
-      return
-    end
 
     tracks = album.tracks.where.not(youtube_video_id: [nil, ""]).reject { |t| t.audio_file.attached? }
 

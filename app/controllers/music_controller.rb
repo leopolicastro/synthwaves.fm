@@ -24,10 +24,7 @@ class MusicController < ApplicationController
   private
 
   def available_tabs
-    tabs = %w[artists albums tracks playlists]
-    tabs << "radio" if Flipper.enabled?(:youtube_radio, Current.user)
-    tabs << "internet_radio" if Flipper.enabled?(:internet_radio, Current.user)
-    tabs
+    %w[artists albums tracks playlists radio internet_radio]
   end
 
   def load_artists

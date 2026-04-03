@@ -176,10 +176,6 @@ RSpec.describe "Albums", type: :request do
   describe "POST /albums/:id/refresh" do
     let(:album) { create(:album, youtube_playlist_url: "https://www.youtube.com/playlist?list=PLtest123", artist: create(:artist, user: user)) }
 
-    before do
-      Flipper.enable(:youtube_import)
-    end
-
     it "refreshes episodes and reports new count" do
       create(:track, album: album, youtube_video_id: "vid1")
 
@@ -226,16 +222,6 @@ RSpec.describe "Albums", type: :request do
       expect(response).to redirect_to(album_path(album))
       follow_redirect!
       expect(response.body).to include("Refresh failed: API quota exceeded")
-    end
-
-    it "redirects with error when feature flag is disabled" do
-      Flipper.disable(:youtube_import)
-
-      post refresh_album_path(album)
-
-      expect(response).to redirect_to(album_path(album))
-      follow_redirect!
-      expect(response.body).to include("This feature is not available")
     end
   end
 
@@ -298,8 +284,6 @@ RSpec.describe "Albums", type: :request do
   end
 
   describe "POST /albums/:id/download_audio" do
-    before { Flipper.enable(:youtube_import) }
-
     it "enqueues MediaDownloadJob for YouTube tracks without audio" do
       album = create(:album, artist: create(:artist, user: user))
       yt_track = create(:track, album: album, youtube_video_id: "abc123")
@@ -341,17 +325,6 @@ RSpec.describe "Albums", type: :request do
       expect(response).to redirect_to(album_path(album))
       follow_redirect!
       expect(response.body).to include("No YouTube tracks to download")
-    end
-
-    it "requires the youtube_import feature flag" do
-      Flipper.disable(:youtube_import)
-      album = create(:album, artist: create(:artist, user: user))
-
-      post download_audio_album_path(album)
-
-      expect(response).to redirect_to(album_path(album))
-      follow_redirect!
-      expect(response.body).to include("not available")
     end
   end
 

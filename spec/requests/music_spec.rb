@@ -82,9 +82,8 @@ RSpec.describe "Music", type: :request do
       expect(response.body).not_to include("Secret Playlist")
     end
 
-    it "renders the radio tab when feature is enabled" do
+    it "renders the radio tab" do
       user = create(:user)
-      Flipper.enable(:youtube_radio, user)
       login_user(user)
       create(:external_stream, name: "Lofi Beats", user: user)
 
@@ -94,19 +93,8 @@ RSpec.describe "Music", type: :request do
       expect(response.body).to include("Lofi Beats")
     end
 
-    it "falls back to artists when radio feature is disabled" do
+    it "renders the internet radio tab" do
       user = create(:user)
-      login_user(user)
-
-      get music_path(tab: "radio")
-
-      expect(response).to have_http_status(:success)
-      expect(response.body).to include("Search artists...")
-    end
-
-    it "renders the internet radio tab when feature is enabled" do
-      user = create(:user)
-      Flipper.enable(:internet_radio, user)
       login_user(user)
       create(:internet_radio_station, name: "Jazz FM")
 
@@ -116,19 +104,8 @@ RSpec.describe "Music", type: :request do
       expect(response.body).to include("Jazz FM")
     end
 
-    it "falls back to artists when internet radio feature is disabled" do
+    it "shows radio tab link" do
       user = create(:user)
-      login_user(user)
-
-      get music_path(tab: "internet_radio")
-
-      expect(response).to have_http_status(:success)
-      expect(response.body).to include("Search artists...")
-    end
-
-    it "shows radio tab link when feature is enabled" do
-      user = create(:user)
-      Flipper.enable(:youtube_radio, user)
       login_user(user)
 
       get music_path
@@ -136,32 +113,13 @@ RSpec.describe "Music", type: :request do
       expect(response.body).to include(">Radio</a>")
     end
 
-    it "hides radio tab link when feature is disabled" do
+    it "shows internet radio tab link" do
       user = create(:user)
-      login_user(user)
-
-      get music_path
-
-      expect(response.body).not_to include(">Radio</a>")
-    end
-
-    it "shows internet radio tab link when feature is enabled" do
-      user = create(:user)
-      Flipper.enable(:internet_radio, user)
       login_user(user)
 
       get music_path
 
       expect(response.body).to include(">Internet Radio</a>")
-    end
-
-    it "hides internet radio tab link when feature is disabled" do
-      user = create(:user)
-      login_user(user)
-
-      get music_path
-
-      expect(response.body).not_to include(">Internet Radio</a>")
     end
 
     it "always shows the playlists tab link" do

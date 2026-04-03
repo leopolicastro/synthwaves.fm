@@ -5,7 +5,6 @@ RSpec.describe "InternetRadioStations", type: :request do
 
   before do
     login_user(user)
-    Flipper.enable(:internet_radio, user)
   end
 
   describe "GET /internet-radio" do
@@ -74,12 +73,6 @@ RSpec.describe "InternetRadioStations", type: :request do
       get internet_radio_stations_path, params: {favorites: "1"}
       expect(response.body).to include("My Fav Station")
       expect(response.body).not_to include("Other Station")
-    end
-
-    it "redirects when feature is disabled" do
-      Flipper.disable(:internet_radio, user)
-      get internet_radio_stations_path
-      expect(response).to redirect_to(root_path)
     end
   end
 

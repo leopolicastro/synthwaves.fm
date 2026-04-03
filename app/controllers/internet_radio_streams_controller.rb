@@ -1,8 +1,5 @@
 class InternetRadioStreamsController < ApplicationController
   include ActionController::Live
-  include FeatureFlagged
-
-  require_feature :internet_radio
 
   def show
     station = InternetRadioStation.find(params[:internet_radio_station_id])

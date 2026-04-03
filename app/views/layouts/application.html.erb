@@ -23,7 +23,7 @@
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
-    <% if authenticated? && Flipper.enabled?(:chromecast, Current.user) %>
+    <% if authenticated? %>
       <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1" async></script>
     <% end %>
     <meta name="turbo-refresh-method" content="morph">
@@ -36,9 +36,7 @@
     <% if authenticated? %>
       <%= turbo_stream_from "downloads_#{Current.user.id}" %>
       <%= turbo_stream_from "recordings_#{Current.user.id}" %>
-      <% if Flipper.enabled?(:radio_stations, Current.user) %>
-        <%= turbo_stream_from "radio_stations_#{Current.user.id}" %>
-      <% end %>
+      <%= turbo_stream_from "radio_stations_#{Current.user.id}" %>
       <div id="download-notifications" class="fixed top-20 right-4 z-50 space-y-2"></div>
     <% end %>
     <%= render 'navbar' unless turbo_native_app? %>

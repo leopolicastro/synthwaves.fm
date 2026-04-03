@@ -5,7 +5,6 @@ RSpec.describe "YoutubeImports", type: :request do
 
   before do
     login_user(user)
-    Flipper.enable(:youtube_import)
     user.update!(youtube_api_key: "test_key")
   end
 
@@ -79,14 +78,6 @@ RSpec.describe "YoutubeImports", type: :request do
       get search_youtube_imports_path, params: {q: "test"}
 
       expect(response).to redirect_to(new_session_path)
-    end
-
-    it "requires the youtube_import feature flag" do
-      Flipper.disable(:youtube_import)
-
-      get search_youtube_imports_path, params: {q: "test"}
-
-      expect(response).to redirect_to(root_path)
     end
   end
 

@@ -27,6 +27,8 @@ class AlbumsController < ApplicationController
 
     @total_tracks = scope.count
     @total_duration = @album.tracks.sum(:duration)
+    @display_year = @album.year || @album.tracks.where.not(release_year: nil).pick(:release_year)
+    @genre_tags = @album.tracks.joins(:tags).where(tags: {tag_type: "genre"}).distinct.pluck("tags.name").first(5)
     @all_tracks = @album.tracks
     @pagy, @tracks = pagy(:offset, scope)
     @favorited_track_ids = Current.user.favorited_ids_for("Track")

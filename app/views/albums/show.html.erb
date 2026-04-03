@@ -20,14 +20,12 @@
     <div>
       <h1 class="text-3xl font-bold font-display text-white"><%= @album.title %></h1>
       <p class="text-lg text-gray-400"><%= link_to @album.artist.name, artist_path(@album.artist), class: "hover:underline" %></p>
-      <% display_year = @album.year || @album.tracks.where.not(release_year: nil).pick(:release_year) %>
-      <% genre_tags = @album.tracks.joins(:tags).where(tags: { tag_type: "genre" }).distinct.pluck("tags.name").first(5) %>
-      <% if display_year %>
-        <p class="text-gray-400"><%= display_year %></p>
+      <% if @display_year %>
+        <p class="text-gray-400"><%= @display_year %></p>
       <% end %>
-      <% if genre_tags.any? %>
+      <% if @genre_tags.any? %>
         <div class="flex flex-wrap gap-1.5 mt-1">
-          <% genre_tags.each do |tag| %>
+          <% @genre_tags.each do |tag| %>
             <span class="px-2 py-0.5 text-xs rounded-full bg-gray-700 text-gray-300"><%= tag.titleize %></span>
           <% end %>
         </div>

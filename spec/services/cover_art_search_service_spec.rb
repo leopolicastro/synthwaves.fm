@@ -29,6 +29,10 @@ RSpec.describe CoverArtSearchService do
       it "fetches YouTube thumbnail and returns :youtube" do
         create(:track, album: album, youtube_video_id: "abc123")
 
+        stub_request(:get, "https://itunes.apple.com/search")
+          .with(query: hash_including(entity: "album"))
+          .to_return(status: 200, body: {results: []}.to_json, headers: {"Content-Type" => "application/json"})
+
         stub_request(:get, "https://img.youtube.com/vi/abc123/hqdefault.jpg")
           .to_return(
             status: 200,
@@ -45,12 +49,12 @@ RSpec.describe CoverArtSearchService do
       it "falls through when YouTube returns an error" do
         create(:track, album: album, youtube_video_id: "bad123")
 
-        stub_request(:get, "https://img.youtube.com/vi/bad123/hqdefault.jpg")
-          .to_return(status: 404)
-
         stub_request(:get, "https://itunes.apple.com/search")
           .with(query: hash_including(term: anything))
           .to_return(status: 200, body: {results: []}.to_json, headers: {"Content-Type" => "application/json"})
+
+        stub_request(:get, "https://img.youtube.com/vi/bad123/hqdefault.jpg")
+          .to_return(status: 404)
 
         result = described_class.call(album)
 
@@ -104,7 +108,7 @@ RSpec.describe CoverArtSearchService do
     end
 
     context "waterfall order" do
-      it "tries audio first, skips YouTube and iTunes when audio succeeds" do
+      it "tries audio first, skips Cover Art Archive, iTunes, and YouTube when audio succeeds" do
         track = create(:track, album: album, youtube_video_id: "vid1")
         track.audio_file.attach(
           io: File.open(Rails.root.join("spec/fixtures/files/test.mp3")),

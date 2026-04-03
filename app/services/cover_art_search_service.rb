@@ -8,7 +8,7 @@ class CoverArtSearchService
   end
 
   def call
-    try_audio_metadata || try_youtube_thumbnail || try_cover_art_archive || try_itunes_search || :not_found
+    try_audio_metadata || try_cover_art_archive || try_itunes_search || try_youtube_thumbnail || :not_found
   end
 
   private

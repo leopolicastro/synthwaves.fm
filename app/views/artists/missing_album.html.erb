@@ -67,6 +67,10 @@
         <turbo-frame id="youtube-search-results" src="<%= import_search_artist_path(@artist, q: default_query) %>" data-youtube-search-target="frame">
           <p class="text-gray-400 text-sm">Searching YouTube playlists...</p>
         </turbo-frame>
+
+        <p class="mt-3 text-xs text-gray-500">
+          <a href="https://www.youtube.com/results?search_query=<%= ERB::Util.url_encode(default_query + " playlist") %>&sp=EgIQAw%253D%253D" target="_blank" rel="noopener" class="text-neon-cyan hover:underline">Search on YouTube directly</a>
+        </p>
       </div>
     </div>
   </div>

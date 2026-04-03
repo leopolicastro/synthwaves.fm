@@ -33,6 +33,16 @@
     </div>
 
     <div>
+      <%= f.label :cover_image, "Cover Image", class: "block text-sm font-medium text-gray-400 mb-1" %>
+      <% if @album.cover_image.attached? %>
+        <div class="mb-2">
+          <%= image_tag @album.cover_image, class: "w-24 h-24 rounded-lg object-cover" %>
+        </div>
+      <% end %>
+      <%= f.file_field :cover_image, accept: "image/*", class: "w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-700 file:text-white hover:file:bg-gray-600 file:cursor-pointer" %>
+    </div>
+
+    <div>
       <%= f.submit "Save", class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink cursor-pointer" %>
       <%= render Button::Component.new(label: "Cancel", behavior: :navigation, link_url: album_path(@album), style: :ghost) %>
     </div>

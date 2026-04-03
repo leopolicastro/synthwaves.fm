@@ -223,6 +223,6 @@ class AlbumsController < ApplicationController
   private
 
   def album_params
-    params.require(:album).permit(:title, :year, :genre, :artist_id, :youtube_playlist_url)
+    params.require(:album).permit(:title, :year, :genre, :artist_id, :youtube_playlist_url, :cover_image)
   end
 end

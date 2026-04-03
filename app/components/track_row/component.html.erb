@@ -39,22 +39,13 @@
       </div>
       <% if show_subtitle? %>
         <div class="text-sm text-gray-400">
-          <% parts = [] %>
-          <% if show_artist? %>
-            <% if link_subtitle? %>
-              <% parts << render(Button::Component.new(label: track.artist.name, behavior: :navigation, link_url: artist_path(track.artist), style: :inline_link, turbo_frame: "_top")) %>
-            <% else %>
-              <% parts << track.artist.name %>
-            <% end %>
-          <% end %>
-          <% if show_album? %>
-            <% if link_subtitle? %>
-              <% parts << render(Button::Component.new(label: track.album.title, behavior: :navigation, link_url: album_path(track.album), style: :inline_link, turbo_frame: "_top")) %>
-            <% else %>
-              <% parts << track.album.title %>
-            <% end %>
-          <% end %>
-          <%= safe_join(parts, " &middot; ".html_safe) %>
+          <%= safe_join(subtitle_parts.map { |part|
+            if part[:url]
+              render(Button::Component.new(label: part[:text], behavior: :navigation, link_url: part[:url], style: :inline_link, turbo_frame: "_top"))
+            else
+              part[:text]
+            end
+          }, " &middot; ".html_safe) %>
         </div>
       <% end %>
     </div>

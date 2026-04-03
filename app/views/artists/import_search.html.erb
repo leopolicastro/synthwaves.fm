@@ -1,0 +1,28 @@
+<turbo-frame id="youtube-search-results">
+  <% if @error.present? %>
+    <p class="text-red-400 text-sm mt-2"><%= @error %></p>
+  <% elsif @query.present? && @results.empty? %>
+    <p class="text-gray-400 text-sm mt-2">No playlists found for "<%= @query %>".</p>
+  <% elsif @results.any? %>
+    <ul class="space-y-2">
+      <% @results.each do |result| %>
+        <li class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 transition-colors">
+          <% if result[:thumbnail_url].present? %>
+            <img src="<%= result[:thumbnail_url] %>" alt="" class="w-20 h-auto rounded flex-shrink-0" loading="lazy">
+          <% else %>
+            <div class="w-20 h-12 bg-gray-700 rounded flex-shrink-0"></div>
+          <% end %>
+          <a href="https://www.youtube.com/playlist?list=<%= result[:playlist_id] %>" target="_blank" rel="noopener" class="flex-1 min-w-0 hover:underline">
+            <p class="text-white text-sm font-medium truncate"><%= result[:title] %></p>
+            <p class="text-gray-400 text-xs truncate"><%= result[:channel_name] %></p>
+          </a>
+          <%= button_to "Import",
+                import_album_artist_path(@artist),
+                params: {youtube_url: "https://www.youtube.com/playlist?list=#{result[:playlist_id]}"},
+                class: "px-3 py-1.5 text-xs font-medium text-white bg-neon-purple hover:bg-neon-purple/80 rounded-lg transition-colors flex-shrink-0",
+                data: {turbo_confirm: "Import this playlist?"} %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</turbo-frame>

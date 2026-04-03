@@ -84,6 +84,26 @@ class YoutubeAPIService
     results
   end
 
+  def search_playlists(query, max_results: 5)
+    return [] if query.blank?
+
+    response = get("search", {
+      part: "snippet",
+      type: "playlist",
+      q: query,
+      maxResults: max_results
+    })
+
+    (response["items"] || []).map do |item|
+      {
+        playlist_id: item.dig("id", "playlistId"),
+        title: CGI.unescapeHTML(item.dig("snippet", "title").to_s),
+        channel_name: item.dig("snippet", "channelTitle"),
+        thumbnail_url: best_thumbnail(item.dig("snippet", "thumbnails"))
+      }
+    end
+  end
+
   def search_videos(query, max_results: 5)
     return [] if query.blank?
 

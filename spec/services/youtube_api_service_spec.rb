@@ -108,6 +108,42 @@ RSpec.describe YoutubeAPIService do
     end
   end
 
+  describe "#search_playlists" do
+    it "returns playlist results for a valid query" do
+      stub_request(:get, "https://www.googleapis.com/youtube/v3/search")
+        .with(query: {part: "snippet", type: "playlist", q: "Depeche Mode Violator", maxResults: "5", key: api_key})
+        .to_return(
+          status: 200,
+          headers: {"Content-Type" => "application/json"},
+          body: {
+            items: [
+              {
+                id: {playlistId: "PLabc123"},
+                snippet: {
+                  title: "Depeche Mode - Violator (Full Album)",
+                  channelTitle: "Music Channel",
+                  thumbnails: {high: {url: "https://i.ytimg.com/vi/abc/hqdefault.jpg"}}
+                }
+              }
+            ]
+          }.to_json
+        )
+
+      results = service.search_playlists("Depeche Mode Violator")
+
+      expect(results.length).to eq(1)
+      expect(results[0][:playlist_id]).to eq("PLabc123")
+      expect(results[0][:title]).to eq("Depeche Mode - Violator (Full Album)")
+      expect(results[0][:channel_name]).to eq("Music Channel")
+    end
+
+    it "returns empty array for blank query" do
+      results = service.search_playlists("")
+      expect(results).to eq([])
+      expect(WebMock).not_to have_requested(:get, /googleapis/)
+    end
+  end
+
   describe "#search_videos" do
     it "returns results for a valid query" do
       stub_request(:get, "https://www.googleapis.com/youtube/v3/search")

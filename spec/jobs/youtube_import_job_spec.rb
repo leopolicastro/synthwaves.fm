@@ -13,7 +13,7 @@ RSpec.describe YoutubeImportJob, type: :job do
     )
 
     expect(YoutubePlaylistImportService).to have_received(:call)
-      .with("https://www.youtube.com/playlist?list=PLtest123", category: "podcast", api_key: "test_api_key", user: user)
+      .with("https://www.youtube.com/playlist?list=PLtest123", category: "podcast", api_key: "test_api_key", user: user, artist: nil)
   end
 
   describe "playlist association" do

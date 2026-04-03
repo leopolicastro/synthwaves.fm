@@ -34,7 +34,7 @@ class YoutubeImportsController < ApplicationController
       flash.now[:alert] = "Please enter a valid YouTube URL."
       render :new, status: :unprocessable_content
     end
-  rescue YoutubeVideoImportService::Error, YoutubeAPIService::Error, MediaDownloadService::Error => e
+  rescue YoutubeVideoImportHandler::Error, YoutubeVideoImportService::Error, YoutubeAPIService::Error, MediaDownloadService::Error => e
     flash.now[:alert] = e.message
     render :new, status: :unprocessable_content
   end
@@ -62,43 +62,12 @@ class YoutubeImportsController < ApplicationController
   end
 
   def handle_video_import(url)
-    if YoutubeUrlParser.playlist_url?(url)
-      flash.now[:alert] = "Video download is not supported for playlists. Please use a single video URL."
-      render :new, status: :unprocessable_content
-      return
-    end
+    result = YoutubeVideoImportHandler.call(url: url, user: Current.user)
 
-    unless YoutubeUrlParser.video_url?(url)
-      flash.now[:alert] = "Please enter a valid YouTube URL."
-      render :new, status: :unprocessable_content
-      return
-    end
-
-    video_id = YoutubeUrlParser.extract_video_id(url)
-    existing = Video.find_by(youtube_video_id: video_id)
-    if existing
-      redirect_to video_path(existing), notice: "This video has already been imported."
-      return
-    end
-
-    details = if Current.user.youtube_api_key.present?
-      api = YoutubeAPIService.new(api_key: Current.user.youtube_api_key)
-      api.fetch_video_details([video_id]).first.tap do |d|
-        raise YoutubeAPIService::Error, "Video not found" if d.nil?
-      end
+    if result.status == :existing
+      redirect_to video_path(result.video), notice: "This video has already been imported."
     else
-      MediaDownloadService.fetch_metadata(url)
+      redirect_to video_path(result.video), notice: "Video import started! It will be ready once the download completes."
     end
-
-    video = Video.create!(
-      title: details[:title],
-      user: Current.user,
-      duration: details[:duration],
-      youtube_video_id: video_id,
-      status: "processing"
-    )
-
-    VideoDownloadJob.perform_later(video.id, url, user_id: Current.user.id)
-    redirect_to video_path(video), notice: "Video import started! It will be ready once the download completes."
   end
 end

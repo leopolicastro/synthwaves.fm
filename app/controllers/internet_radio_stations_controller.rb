@@ -1,8 +1,4 @@
 class InternetRadioStationsController < ApplicationController
-  include FeatureFlagged
-
-  require_feature :internet_radio
-
   def index
     @categories = InternetRadioCategory.with_stations.order(:name)
     scope = InternetRadioStation.active.includes(:internet_radio_category)

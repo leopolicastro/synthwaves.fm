@@ -4,31 +4,37 @@ RSpec.describe AppleMusicMatcherService do
   let(:track) { create(:track, title: "Get Lucky", duration: 369.0, track_number: 8) }
 
   before do
-    allow(Flipper).to receive(:enabled?).and_call_original
-    allow(Flipper).to receive(:enabled?).with(:apple_music_musickit).and_return(false)
+    allow(AppleMusicTokenService).to receive(:token).and_return("test-token")
   end
 
   describe ".call" do
     it "returns the best matching result above threshold" do
-      stub_request(:get, "https://itunes.apple.com/search")
-        .with(query: hash_including(entity: "song"))
+      stub_request(:get, "https://api.music.apple.com/v1/catalog/us/search")
+        .with(query: hash_including(types: "songs"))
         .to_return(
           status: 200,
           headers: {"Content-Type" => "application/json"},
           body: {
-            resultCount: 1,
-            results: [{
-              trackId: 123,
-              trackName: "Get Lucky",
-              artistName: track.artist.name,
-              collectionName: "Random Access Memories",
-              primaryGenreName: "Electronic",
-              trackExplicitness: "notExplicit",
-              releaseDate: "2013-05-17T07:00:00Z",
-              trackTimeMillis: 369000,
-              discNumber: 1,
-              trackNumber: 8
-            }]
+            results: {
+              songs: {
+                data: [{
+                  id: "123",
+                  attributes: {
+                    name: "Get Lucky",
+                    artistName: track.artist.name,
+                    albumName: "Random Access Memories",
+                    genreNames: ["Electronic"],
+                    isrc: nil,
+                    contentRating: nil,
+                    releaseDate: "2013-05-17",
+                    durationInMillis: 369000,
+                    discNumber: 1,
+                    trackNumber: 8,
+                    composerName: nil
+                  }
+                }]
+              }
+            }
           }.to_json
         )
 
@@ -40,25 +46,32 @@ RSpec.describe AppleMusicMatcherService do
     end
 
     it "returns nil when no results match above threshold" do
-      stub_request(:get, "https://itunes.apple.com/search")
-        .with(query: hash_including(entity: "song"))
+      stub_request(:get, "https://api.music.apple.com/v1/catalog/us/search")
+        .with(query: hash_including(types: "songs"))
         .to_return(
           status: 200,
           headers: {"Content-Type" => "application/json"},
           body: {
-            resultCount: 1,
-            results: [{
-              trackId: 999,
-              trackName: "Completely Different Song",
-              artistName: "Different Artist",
-              collectionName: "Different Album",
-              primaryGenreName: "Pop",
-              trackExplicitness: "notExplicit",
-              releaseDate: "2020-01-01T07:00:00Z",
-              trackTimeMillis: 200000,
-              discNumber: 1,
-              trackNumber: 1
-            }]
+            results: {
+              songs: {
+                data: [{
+                  id: "999",
+                  attributes: {
+                    name: "Completely Different Song",
+                    artistName: "Different Artist",
+                    albumName: "Different Album",
+                    genreNames: ["Pop"],
+                    isrc: nil,
+                    contentRating: nil,
+                    releaseDate: "2020-01-01",
+                    durationInMillis: 200000,
+                    discNumber: 1,
+                    trackNumber: 1,
+                    composerName: nil
+                  }
+                }]
+              }
+            }
           }.to_json
         )
 
@@ -67,12 +80,12 @@ RSpec.describe AppleMusicMatcherService do
     end
 
     it "returns nil when search returns no results" do
-      stub_request(:get, "https://itunes.apple.com/search")
-        .with(query: hash_including(entity: "song"))
+      stub_request(:get, "https://api.music.apple.com/v1/catalog/us/search")
+        .with(query: hash_including(types: "songs"))
         .to_return(
           status: 200,
           headers: {"Content-Type" => "application/json"},
-          body: {resultCount: 0, results: []}.to_json
+          body: {results: {}}.to_json
         )
 
       result = described_class.call(track)

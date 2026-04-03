@@ -25,7 +25,7 @@ bundle exec brakeman     # Security scan
 - **SQLite** for all databases (primary, cache, queue, cable)
 - **Solid Queue/Cache/Cable** for background jobs, caching, and WebSockets
 - **Pagy** for pagination
-- **Flipper** for feature flags
+- **Flipper** for the `:open_registration` feature flag (sole remaining flag)
 
 ### Key Gems
 
@@ -158,7 +158,7 @@ When adding a new job, assign it to the appropriate queue via `queue_as` in the 
 
 ## Radio Stations (Icecast + Liquidsoap)
 
-Playlist-based radio stations that stream continuously via Icecast. Gated behind the `:radio_stations` Flipper feature flag.
+Playlist-based radio stations that stream continuously via Icecast.
 
 ### How It Works
 

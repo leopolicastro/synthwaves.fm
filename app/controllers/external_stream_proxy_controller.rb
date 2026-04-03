@@ -1,8 +1,5 @@
 class ExternalStreamProxyController < ApplicationController
   include ActionController::Live
-  include FeatureFlagged
-
-  require_feature :youtube_radio
 
   def show
     station = ExternalStream.find(params[:external_stream_id])

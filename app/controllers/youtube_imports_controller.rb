@@ -1,8 +1,4 @@
 class YoutubeImportsController < ApplicationController
-  include FeatureFlagged
-
-  require_feature :youtube_import
-
   def new
     @playlists = Current.user.playlists.order(:name)
   end

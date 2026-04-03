@@ -17,9 +17,7 @@ class LibraryController < ApplicationController
       .order(created_at: :desc)
       .limit(10)
 
-    if Flipper.enabled?(:youtube_radio, Current.user)
-      @external_streams = Current.user.external_streams.order(created_at: :desc).limit(10)
-    end
+    @external_streams = Current.user.external_streams.order(created_at: :desc).limit(10)
 
     @recently_added_albums = Current.user.albums.music
       .joins(:tracks)

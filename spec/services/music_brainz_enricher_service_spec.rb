@@ -147,21 +147,9 @@ RSpec.describe MusicBrainzEnricherService do
         allow(MusicBrainzMatcherService).to receive(:call).with(track).and_return(nil)
       end
 
-      it "queues Apple Music enrichment when flag is enabled" do
-        allow(Flipper).to receive(:enabled?).and_call_original
-        allow(Flipper).to receive(:enabled?).with(:apple_music_enrichment).and_return(true)
-
+      it "queues Apple Music enrichment after enriching" do
         expect(AppleMusicEnrichmentJob).to receive(:set).with(wait: 5.seconds).and_return(AppleMusicEnrichmentJob)
         expect(AppleMusicEnrichmentJob).to receive(:perform_later).with(track.id)
-
-        described_class.call(track)
-      end
-
-      it "does not queue Apple Music when flag is disabled" do
-        allow(Flipper).to receive(:enabled?).and_call_original
-        allow(Flipper).to receive(:enabled?).with(:apple_music_enrichment).and_return(false)
-
-        expect(AppleMusicEnrichmentJob).not_to receive(:set)
 
         described_class.call(track)
       end

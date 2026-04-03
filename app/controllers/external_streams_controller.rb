@@ -1,8 +1,4 @@
 class ExternalStreamsController < ApplicationController
-  include FeatureFlagged
-
-  require_feature :youtube_radio
-
   def index
     @external_streams = Current.user.external_streams.order(created_at: :desc)
   end

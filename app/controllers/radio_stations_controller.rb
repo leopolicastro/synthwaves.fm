@@ -1,8 +1,4 @@
 class RadioStationsController < ApplicationController
-  include FeatureFlagged
-
-  require_feature :radio_stations
-
   before_action :set_station, only: [:show, :edit, :update, :destroy, :start, :stop, :skip]
 
   def index

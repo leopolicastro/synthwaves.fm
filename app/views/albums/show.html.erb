@@ -20,13 +20,21 @@
     <div>
       <h1 class="text-3xl font-bold font-display text-white"><%= @album.title %></h1>
       <p class="text-lg text-gray-400"><%= link_to @album.artist.name, artist_path(@album.artist), class: "hover:underline" %></p>
-      <% if @album.year %>
-        <p class="text-gray-400"><%= @album.year %></p>
+      <% display_year = @album.year || @album.tracks.where.not(release_year: nil).pick(:release_year) %>
+      <% genre_tags = @album.tracks.joins(:tags).where(tags: { tag_type: "genre" }).distinct.pluck("tags.name").first(5) %>
+      <% if display_year %>
+        <p class="text-gray-400"><%= display_year %></p>
       <% end %>
-      <% if @album.genre %>
+      <% if genre_tags.any? %>
+        <div class="flex flex-wrap gap-1.5 mt-1">
+          <% genre_tags.each do |tag| %>
+            <span class="px-2 py-0.5 text-xs rounded-full bg-gray-700 text-gray-300"><%= tag.titleize %></span>
+          <% end %>
+        </div>
+      <% elsif @album.genre.present? %>
         <p class="text-gray-400"><%= @album.genre %></p>
       <% end %>
-      <p class="text-sm text-gray-400 mt-2"><%= pluralize(@total_tracks, "track") %> · <%= format_duration(@total_duration) %></p>
+      <p class="text-sm text-gray-400 mt-2"><%= pluralize(@total_tracks, "track") %> &middot; <%= format_duration(@total_duration) %></p>
       <div class="mt-3 flex flex-wrap items-center gap-2">
         <%= render Button::Component.new(size: :small, data: { action: "play-all#playAll" }, extra_classes: "gap-1") do %>
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.84A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.27l9.344-5.891a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
@@ -56,14 +64,12 @@
           <%= render "albums/merge_menu", album: @album %>
         <% end %>
       </div>
-      <% if Flipper.enabled?(:youtube_import, Current.user) %>
-        <%= form_with model: @album, class: "mt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-2" do |f| %>
-          <%= f.text_field :youtube_playlist_url,
-                placeholder: "YouTube playlist URL",
-                class: "text-sm rounded-lg border border-gray-600 bg-gray-700 text-white px-3 py-2 flex-1 min-w-0 focus:outline-neon-cyan" %>
-          <%= f.submit "Save",
-                class: "px-3 py-1 text-sm font-medium text-white bg-neon-pink hover:shadow-neon-pink rounded-md cursor-pointer" %>
-        <% end %>
+      <%= form_with model: @album, class: "mt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-2" do |f| %>
+        <%= f.text_field :youtube_playlist_url,
+              placeholder: "YouTube playlist URL",
+              class: "text-sm rounded-lg border border-gray-600 bg-gray-700 text-white px-3 py-2 flex-1 min-w-0 focus:outline-neon-cyan" %>
+        <%= f.submit "Save",
+              class: "px-3 py-1 text-sm font-medium text-white bg-neon-pink hover:shadow-neon-pink rounded-md cursor-pointer" %>
       <% end %>
     </div>
   </div>

@@ -5,7 +5,6 @@ RSpec.describe "ExternalStreamProxy", type: :request do
 
   before do
     login_user(user)
-    Flipper.enable(:youtube_radio)
   end
 
   describe "GET /external_streams/:id/stream" do

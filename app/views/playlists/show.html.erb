@@ -32,26 +32,24 @@
     </div>
   </div>
 
-  <% if Flipper.enabled?(:radio_stations, Current.user) %>
-    <% if @playlist.radio_station %>
-      <div class="mb-6 bg-gray-800 rounded-lg border border-gray-700 p-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <svg class="w-5 h-5 text-neon-pink" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 14.828a4 4 0 010-5.656m5.656 0a4 4 0 010 5.656M12 12h.01"/></svg>
-          <div>
-            <span class="text-white font-medium">Radio Station</span>
-            <%= render "radio_stations/status_badge", station: @playlist.radio_station %>
-          </div>
+  <% if @playlist.radio_station %>
+    <div class="mb-6 bg-gray-800 rounded-lg border border-gray-700 p-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <svg class="w-5 h-5 text-neon-pink" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 14.828a4 4 0 010-5.656m5.656 0a4 4 0 010 5.656M12 12h.01"/></svg>
+        <div>
+          <span class="text-white font-medium">Radio Station</span>
+          <%= render "radio_stations/status_badge", station: @playlist.radio_station %>
         </div>
-        <%= link_to "Manage", radio_station_path(@playlist.radio_station), class: "px-3 py-1.5 bg-gray-700 text-gray-300 rounded-lg text-sm hover:bg-gray-600" %>
       </div>
-    <% else %>
-      <div class="mb-6">
-        <%= button_to radio_stations_path(playlist_id: @playlist.id), class: "inline-flex items-center gap-2 px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 text-sm" do %>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 14.828a4 4 0 010-5.656m5.656 0a4 4 0 010 5.656M12 12h.01"/></svg>
-          Create Radio Station
-        <% end %>
-      </div>
-    <% end %>
+      <%= link_to "Manage", radio_station_path(@playlist.radio_station), class: "px-3 py-1.5 bg-gray-700 text-gray-300 rounded-lg text-sm hover:bg-gray-600" %>
+    </div>
+  <% else %>
+    <div class="mb-6">
+      <%= button_to radio_stations_path(playlist_id: @playlist.id), class: "inline-flex items-center gap-2 px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 text-sm" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 14.828a4 4 0 010-5.656m5.656 0a4 4 0 010 5.656M12 12h.01"/></svg>
+        Create Radio Station
+      <% end %>
+    </div>
   <% end %>
 
   <turbo-frame id="playlist-tracks" data-turbo-action="advance">

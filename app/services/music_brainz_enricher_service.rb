@@ -109,8 +109,6 @@ class MusicBrainzEnricherService
   end
 
   def queue_apple_music_enrichment
-    return unless Flipper.enabled?(:apple_music_enrichment)
-
     AppleMusicEnrichmentJob.set(wait: 5.seconds).perform_later(@track.id)
   end
 

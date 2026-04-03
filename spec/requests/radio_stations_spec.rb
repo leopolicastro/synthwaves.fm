@@ -6,7 +6,6 @@ RSpec.describe "RadioStations", type: :request do
 
   before do
     login_user(user)
-    Flipper.enable(:radio_stations)
   end
 
   describe "GET /radio_stations" do
@@ -19,12 +18,6 @@ RSpec.describe "RadioStations", type: :request do
       create(:radio_station, playlist: playlist, user: user)
       get radio_stations_path
       expect(response.body).to include(playlist.name)
-    end
-
-    it "redirects when feature flag is disabled" do
-      Flipper.disable(:radio_stations)
-      get radio_stations_path
-      expect(response).to redirect_to(root_path)
     end
   end
 

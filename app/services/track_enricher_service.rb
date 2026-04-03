@@ -32,48 +32,26 @@ class TrackEnricherService
   end
 
   def apply_match(match)
-    release_year = parse_release_year(match[:release_date])
-
-    @track.update!(
+    attrs = {
       apple_music_id: match[:apple_music_id],
-      isrc: match[:isrc],
       content_rating: match[:content_rating],
-      release_year: release_year,
       enrichment_status: "matched",
       enriched_at: Time.current
-    )
+    }
 
-    assign_genres(match[:genre_names])
+    attrs[:isrc] = match[:isrc] if @track.isrc.blank? && match[:isrc].present?
+    attrs[:release_year] = parse_release_year(match[:release_date]) if @track.release_year.nil?
+
+    @track.update!(attrs)
+
     detect_language
-    update_artist_storefront
-  end
-
-  def assign_genres(genre_names)
-    return if genre_names.blank?
-
-    genre_names.each do |name|
-      normalized = name.strip.downcase
-      next if normalized == "music"
-
-      tag = Tag.find_or_create_by!(name: normalized, tag_type: "genre")
-      Tagging.find_or_create_by!(
-        tag: tag,
-        taggable: @track,
-        user: @track.user
-      )
-    end
   end
 
   def detect_language
+    return if @track.language.present?
+
     language = LanguageDetectorService.call(@track)
     @track.update!(language: language) if language.present?
-  end
-
-  def update_artist_storefront
-    # The Apple Music service defaults to "us" storefront, so we don't
-    # set it here — it would be misleading. The storefront is only useful
-    # when we can determine the artist's primary market, which requires
-    # checking multiple storefronts. For now, leave it nil.
   end
 
   def parse_release_year(release_date)

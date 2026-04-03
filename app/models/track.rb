@@ -73,7 +73,7 @@ class Track < ApplicationRecord
 
   after_create_commit :convert_audio_if_needed
   after_create_commit :add_to_search_index
-  after_create_commit :queue_apple_music_enrichment
+  after_create_commit :queue_enrichment
   after_update_commit :update_search_index, if: -> {
     saved_change_to_title? || saved_change_to_album_id? || saved_change_to_artist_id?
   }
@@ -81,10 +81,10 @@ class Track < ApplicationRecord
 
   private
 
-  def queue_apple_music_enrichment
-    return unless Flipper.enabled?(:apple_music_enrichment)
+  def queue_enrichment
+    return unless Flipper.enabled?(:musicbrainz_enrichment)
 
-    AppleMusicEnrichmentJob.perform_later(id)
+    MusicBrainzEnrichmentJob.perform_later(id)
   end
 
   def convert_audio_if_needed

@@ -8,7 +8,7 @@ class CoverArtSearchService
   end
 
   def call
-    try_audio_metadata || try_youtube_thumbnail || try_itunes_search || :not_found
+    try_audio_metadata || try_youtube_thumbnail || try_cover_art_archive || try_itunes_search || :not_found
   end
 
   private
@@ -54,6 +54,30 @@ class CoverArtSearchService
       content_type: content_type
     )
     :youtube
+  rescue HTTP::Error
+    nil
+  end
+
+  def try_cover_art_archive
+    return nil unless @album.musicbrainz_release_id.present?
+
+    url = "https://coverartarchive.org/release/#{@album.musicbrainz_release_id}/front-500"
+    response = HTTP.get(url)
+    return nil unless response.status.success?
+
+    content_type = response.content_type&.mime_type || "image/jpeg"
+    extension = case content_type
+    when "image/png" then "png"
+    when "image/webp" then "webp"
+    else "jpg"
+    end
+
+    @album.cover_image.attach(
+      io: StringIO.new(response.body.to_s),
+      filename: "cover.#{extension}",
+      content_type: content_type
+    )
+    :cover_art_archive
   rescue HTTP::Error
     nil
   end

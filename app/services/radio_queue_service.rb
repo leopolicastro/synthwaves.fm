@@ -88,16 +88,42 @@ class RadioQueueService
   end
 
   def pick_random_with_fallback(candidates, pool, upcoming_ids, count)
-    return candidates.reorder("RANDOM()").limit(count).to_a if candidates.count >= count
+    favorited_ids = @station.user.favorited_ids_for("Track")
+    weight = @station.favorites_weight
 
-    # Not enough fresh candidates -- relax recently-played constraint but still avoid upcoming duplicates
-    first_batch = candidates.reorder("RANDOM()").to_a
-    remaining = count - first_batch.size
-    return first_batch if remaining <= 0
+    if candidates.count >= count
+      selected_ids = weighted_sample(candidates.pluck(:id), count, favorited_ids, weight)
+      load_tracks_in_order(selected_ids)
+    else
+      # Not enough fresh candidates -- relax recently-played constraint but still avoid upcoming duplicates
+      first_ids = weighted_sample(candidates.pluck(:id), candidates.count, favorited_ids, weight)
+      remaining = count - first_ids.size
+      if remaining > 0
+        used_ids = (upcoming_ids + first_ids).uniq
+        second_ids = weighted_sample(pool.where.not(id: used_ids).pluck(:id), remaining, favorited_ids, weight)
+        load_tracks_in_order(first_ids + second_ids)
+      else
+        load_tracks_in_order(first_ids)
+      end
+    end
+  end
 
-    used_ids = (upcoming_ids + first_batch.map(&:id)).uniq
-    second_batch = pool.where.not(id: used_ids).reorder("RANDOM()").limit(remaining).to_a
-    first_batch + second_batch
+  # Weighted random sampling without replacement (Efraimidis-Spirakis algorithm).
+  # Each item gets a key: rand^(1/weight). Higher weights push keys closer to 1.0,
+  # making those items more likely to land at the top when sorted descending.
+  # Lighter items can still win with a lucky roll -- no one is starved.
+  def weighted_sample(candidate_ids, count, favorited_ids, weight)
+    return [] if candidate_ids.empty?
+    count = [count, candidate_ids.size].min
+
+    candidate_ids
+      .sort_by { |id| -(rand**(1.0 / (favorited_ids.include?(id) ? weight : 1.0))) }
+      .first(count)
+  end
+
+  def load_tracks_in_order(ids)
+    return [] if ids.empty?
+    Track.where(id: ids).index_by(&:id).values_at(*ids)
   end
 
   def pick_sequential_batch(count)

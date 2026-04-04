@@ -53,6 +53,17 @@
             class: "w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-white focus:outline-neon-cyan" %>
       </div>
 
+      <div>
+        <%= f.label :favorites_weight, "Favorites boost", class: "block text-sm font-medium text-gray-400 mb-1" %>
+        <p class="text-xs text-gray-500 mb-2">How much more likely favorited tracks are to play in shuffle mode. 1x = no boost, 5x = strong boost.</p>
+        <div class="flex items-center gap-3">
+          <%= f.range_field :favorites_weight, in: 1.0..5.0, step: 0.5,
+              class: "flex-1 accent-neon-pink",
+              oninput: "this.nextElementSibling.textContent = this.value + 'x'" %>
+          <span class="text-white text-sm font-mono w-10 text-right"><%= @station.favorites_weight %>x</span>
+        </div>
+      </div>
+
       <div class="pt-2 flex gap-3">
         <%= f.submit "Save", class: "px-4 py-2 bg-neon-pink text-white rounded-lg hover:shadow-neon-pink cursor-pointer" %>
         <%= link_to "Cancel", radio_station_path(@station), class: "px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600" %>

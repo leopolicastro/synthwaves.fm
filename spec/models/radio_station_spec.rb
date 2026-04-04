@@ -29,6 +29,8 @@ RSpec.describe RadioStation, type: :model do
       expect(station).to be_valid
     end
 
+    it { is_expected.to validate_numericality_of(:favorites_weight).is_greater_than_or_equal_to(1.0).is_less_than_or_equal_to(5.0) }
+
     it "validates crossfade_duration range" do
       station = build(:radio_station, crossfade_duration: 15)
       expect(station).not_to be_valid

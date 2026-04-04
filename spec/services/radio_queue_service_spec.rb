@@ -62,6 +62,61 @@ RSpec.describe RadioQueueService do
       end
     end
 
+    context "shuffle mode with favorites weighting" do
+      it "selects favorited tracks more often than non-favorited" do
+        # Need more tracks than WINDOW_SIZE so the algorithm actually has to choose
+        favorited_tracks = 5.times.map { |i| create_track_with_audio(position: i + 1) }
+        non_favorited_tracks = 25.times.map { |i| create_track_with_audio(position: i + 6) }
+        favorited_tracks.each { |t| create(:favorite, user: user, favorable: t) }
+        station.update!(favorites_weight: 5.0)
+
+        counts = Hash.new(0)
+        50.times do
+          service.populate!
+          station.radio_queue_tracks.upcoming.each { |e| counts[e.track_id] += 1 }
+        end
+
+        avg_favorited = favorited_tracks.sum { |t| counts[t.id] }.to_f / favorited_tracks.size
+        avg_non_favorited = non_favorited_tracks.sum { |t| counts[t.id] }.to_f / non_favorited_tracks.size
+
+        expect(avg_favorited).to be > avg_non_favorited
+      end
+
+      it "still includes non-favorited tracks" do
+        favorited = create_track_with_audio(position: 1)
+        non_favorited_tracks = 25.times.map { |i| create_track_with_audio(position: i + 2) }
+        create(:favorite, user: user, favorable: favorited)
+        station.update!(favorites_weight: 5.0)
+
+        all_selected = Set.new
+        50.times do
+          service.populate!
+          station.radio_queue_tracks.upcoming.pluck(:track_id).each { |id| all_selected << id }
+        end
+
+        # At least some non-favorited tracks should appear across 50 runs
+        non_fav_selected = all_selected & non_favorited_tracks.map(&:id).to_set
+        expect(non_fav_selected).not_to be_empty
+      end
+
+      it "behaves like standard shuffle when favorites_weight is 1.0" do
+        5.times { |i| create_track_with_audio(position: i + 1) }
+        station.update!(favorites_weight: 1.0)
+
+        service.populate!
+
+        expect(station.radio_queue_tracks.upcoming.count).to eq(5)
+      end
+
+      it "works when no tracks are favorited" do
+        5.times { |i| create_track_with_audio(position: i + 1) }
+
+        service.populate!
+
+        expect(station.radio_queue_tracks.upcoming.count).to eq(5)
+      end
+    end
+
     context "sequential mode" do
       before { station.update!(playback_mode: "sequential") }
 
@@ -190,6 +245,28 @@ RSpec.describe RadioQueueService do
       service.populate!
 
       expect { service.clear! }.to change { station.radio_queue_tracks.count }.to(0)
+    end
+  end
+
+  describe "#weighted_sample" do
+    it "returns empty array for empty candidates" do
+      result = service.send(:weighted_sample, [], 5, Set.new, 3.0)
+      expect(result).to eq([])
+    end
+
+    it "returns all candidates when count exceeds pool size" do
+      result = service.send(:weighted_sample, [1, 2, 3], 10, Set.new, 3.0)
+      expect(result.sort).to eq([1, 2, 3])
+    end
+
+    it "returns exactly count items" do
+      result = service.send(:weighted_sample, [1, 2, 3, 4, 5], 3, Set.new, 2.0)
+      expect(result.size).to eq(3)
+    end
+
+    it "returns unique items (no replacement)" do
+      result = service.send(:weighted_sample, [1, 2, 3, 4, 5], 4, Set.new([1, 2]), 5.0)
+      expect(result.uniq.size).to eq(result.size)
     end
   end
 

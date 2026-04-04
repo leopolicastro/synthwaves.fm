@@ -88,6 +88,8 @@
       <dd class="text-white"><%= @station.bitrate %> kbps</dd>
       <dt class="text-gray-400">Crossfade</dt>
       <dd class="text-white"><%= @station.crossfade? ? "#{@station.crossfade_duration}s" : "Off" %></dd>
+      <dt class="text-gray-400">Favorites Boost</dt>
+      <dd class="text-white"><%= @station.favorites_weight %>x</dd>
       <dt class="text-gray-400">Listeners</dt>
       <dd class="text-white"><%= @station.listener_count %></dd>
       <% if @station.started_at %>

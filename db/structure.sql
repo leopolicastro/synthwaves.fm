@@ -246,7 +246,7 @@ CREATE INDEX "index_radio_queue_tracks_on_radio_station_id" ON "radio_queue_trac
 CREATE INDEX "index_radio_queue_tracks_on_track_id" ON "radio_queue_tracks" ("track_id") /*application='SynthWaves'*/;
 CREATE UNIQUE INDEX "index_radio_queue_tracks_on_radio_station_id_and_position" ON "radio_queue_tracks" ("radio_station_id", "position") /*application='SynthWaves'*/;
 CREATE INDEX "index_radio_queue_tracks_on_radio_station_id_and_played_at" ON "radio_queue_tracks" ("radio_station_id", "played_at") /*application='SynthWaves'*/;
-CREATE TABLE IF NOT EXISTS "radio_stations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "playlist_id" integer NOT NULL, "user_id" integer NOT NULL, "status" varchar DEFAULT 'stopped' NOT NULL, "mount_point" varchar NOT NULL, "playback_mode" varchar DEFAULT 'shuffle' NOT NULL, "bitrate" integer DEFAULT 192 NOT NULL, "crossfade" boolean DEFAULT TRUE NOT NULL, "crossfade_duration" float DEFAULT 3.0 NOT NULL, "current_track_id" integer, "listener_count" integer DEFAULT 0, "error_message" text, "started_at" datetime(6), "last_track_at" datetime(6), "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "queued_track_id" integer, CONSTRAINT "fk_rails_a5b9b61969"
+CREATE TABLE IF NOT EXISTS "radio_stations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "playlist_id" integer NOT NULL, "user_id" integer NOT NULL, "status" varchar DEFAULT 'stopped' NOT NULL, "mount_point" varchar NOT NULL, "playback_mode" varchar DEFAULT 'shuffle' NOT NULL, "bitrate" integer DEFAULT 192 NOT NULL, "crossfade" boolean DEFAULT TRUE NOT NULL, "crossfade_duration" float DEFAULT 3.0 NOT NULL, "current_track_id" integer, "listener_count" integer DEFAULT 0, "error_message" text, "started_at" datetime(6), "last_track_at" datetime(6), "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "queued_track_id" integer, "favorites_weight" float DEFAULT 2.0 NOT NULL /*application='SynthWaves'*/, CONSTRAINT "fk_rails_a5b9b61969"
 FOREIGN KEY ("playlist_id")
   REFERENCES "playlists" ("id")
 , CONSTRAINT "fk_rails_0b9af78719"
@@ -270,6 +270,7 @@ CREATE INDEX "index_tracks_on_musicbrainz_enrichment_status" ON "tracks" ("music
 CREATE INDEX "index_albums_on_musicbrainz_release_id" ON "albums" ("musicbrainz_release_id") /*application='SynthWaves'*/;
 CREATE INDEX "index_artists_on_musicbrainz_artist_id" ON "artists" ("musicbrainz_artist_id") /*application='SynthWaves'*/;
 INSERT INTO "schema_migrations" (version) VALUES
+('20260404002732'),
 ('20260402210631'),
 ('20260329203941'),
 ('20260329190333'),

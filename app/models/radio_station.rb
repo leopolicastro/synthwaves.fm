@@ -15,6 +15,7 @@ class RadioStation < ApplicationRecord
   validates :playback_mode, inclusion: {in: PLAYBACK_MODES}
   validates :bitrate, inclusion: {in: BITRATES}
   validates :crossfade_duration, numericality: {greater_than_or_equal_to: 0, less_than_or_equal_to: 10}
+  validates :favorites_weight, numericality: {greater_than_or_equal_to: 1.0, less_than_or_equal_to: 5.0}
   validates :mount_point, presence: true, uniqueness: true, format: {with: /\A\/[a-z0-9-]+\.mp3\z/}
   validates :playlist_id, uniqueness: true
 

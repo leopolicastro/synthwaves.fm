@@ -19,7 +19,7 @@ class API::V1::TaggingsController < API::V1::BaseController
 
     render json: {
       id: tagging.id,
-      tag: {id: tag.id, name: tag.name, tag_type: tag.tag_type},
+      tag: API::V1::TagSerializer.to_full(tag),
       taggable_type: tagging.taggable_type,
       taggable_id: tagging.taggable_id
     }, status: :created

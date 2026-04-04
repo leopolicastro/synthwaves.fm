@@ -18,13 +18,15 @@ class API::V1::SearchController < API::V1::BaseController
       year_from: params[:year_from]&.to_i,
       year_to: params[:year_to]&.to_i,
       favorites_only: params[:favorites_only] == "1",
+      category: params[:category].presence,
+      tags: params[:tags]&.split(",")&.map(&:strip),
       user: current_user
     )
 
     render json: {
-      artists: results[:artists].map { |a| {id: a.id, name: a.name, category: a.category} },
-      albums: results[:albums].map { |a| {id: a.id, title: a.title, year: a.year, genre: a.genre, artist: {id: a.artist_id, name: a.artist.name}} },
-      tracks: results[:tracks].map { |t| {id: t.id, title: t.title, duration: t.duration, artist: {id: t.artist_id, name: t.artist.name}, album: {id: t.album_id, title: t.album.title}} }
+      artists: results[:artists].map { |a| API::V1::ArtistSerializer.to_summary(a) },
+      albums: results[:albums].map { |a| API::V1::AlbumSerializer.to_search_result(a) },
+      tracks: results[:tracks].map { |t| API::V1::TrackSerializer.to_embedded(t) }
     }
   end
 end

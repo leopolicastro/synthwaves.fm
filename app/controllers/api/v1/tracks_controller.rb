@@ -6,18 +6,21 @@ class API::V1::TracksController < API::V1::BaseController
     scope = scope.search(params[:q]) if params[:q].present?
     scope = scope.where(album_id: params[:album_id]) if params[:album_id].present?
     scope = scope.where(artist_id: params[:artist_id]) if params[:artist_id].present?
+    scope = scope.by_genre(params[:genre]) if params[:genre].present?
+    scope = scope.by_language(params[:language]) if params[:language].present?
+    scope = scope.by_decade(params[:decade]) if params[:decade].present?
     scope = scope.order(sort_column(Track) => sort_direction)
 
     pagy, tracks = pagy(:offset, scope, limit: per_page)
 
     render json: {
-      tracks: tracks.map { |t| track_json(t) },
+      tracks: tracks.map { |t| API::V1::TrackSerializer.to_full(t) },
       pagination: pagination_meta(pagy)
     }
   end
 
   def show
-    render json: track_json(@track)
+    render json: API::V1::TrackSerializer.to_full(@track)
   end
 
   def create
@@ -34,7 +37,7 @@ class API::V1::TracksController < API::V1::BaseController
 
   def update
     if @track.update(track_update_params)
-      render json: track_json(@track)
+      render json: API::V1::TrackSerializer.to_full(@track)
     else
       render_validation_errors(@track)
     end
@@ -98,7 +101,7 @@ class API::V1::TracksController < API::V1::BaseController
     end
 
     if track.save
-      render json: track_json(track), status: :created
+      render json: API::V1::TrackSerializer.to_full(track), status: :created
     else
       render_validation_errors(track)
     end
@@ -135,7 +138,7 @@ class API::V1::TracksController < API::V1::BaseController
     end
 
     if track.save
-      render json: track_json(track), status: :created
+      render json: API::V1::TrackSerializer.to_full(track), status: :created
     else
       render_validation_errors(track)
     end
@@ -145,7 +148,7 @@ class API::V1::TracksController < API::V1::BaseController
     track = current_user.tracks.build(track_create_params)
 
     if track.save
-      render json: track_json(track), status: :created
+      render json: API::V1::TrackSerializer.to_full(track), status: :created
     else
       render_validation_errors(track)
     end
@@ -160,7 +163,8 @@ class API::V1::TracksController < API::V1::BaseController
 
   def track_update_params
     params.require(:track).permit(
-      :title, :artist_id, :album_id, :track_number, :disc_number, :lyrics
+      :title, :artist_id, :album_id, :track_number, :disc_number,
+      :lyrics, :language, :release_year, :content_rating
     )
   end
 
@@ -168,23 +172,5 @@ class API::V1::TracksController < API::V1::BaseController
     MetadataExtractor.call(uploaded_file.tempfile.path)
   rescue WahWah::WahWahArgumentError
     {}
-  end
-
-  def track_json(track)
-    {
-      id: track.id,
-      title: track.title,
-      track_number: track.track_number,
-      disc_number: track.disc_number,
-      duration: track.duration,
-      bitrate: track.bitrate,
-      file_format: track.file_format,
-      file_size: track.file_size,
-      lyrics: track.lyrics,
-      has_audio: track.audio_file.attached?,
-      artist: {id: track.artist_id, name: track.artist.name},
-      album: {id: track.album_id, title: track.album.title},
-      created_at: track.created_at
-    }
   end
 end

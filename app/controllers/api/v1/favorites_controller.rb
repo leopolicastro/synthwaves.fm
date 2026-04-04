@@ -8,7 +8,7 @@ class API::V1::FavoritesController < API::V1::BaseController
     pagy, favorites = pagy(:offset, scope, limit: per_page)
 
     render json: {
-      favorites: favorites.map { |f| favorite_json(f) },
+      favorites: favorites.map { |f| API::V1::FavoriteSerializer.to_full(f) },
       pagination: pagination_meta(pagy)
     }
   end
@@ -23,9 +23,9 @@ class API::V1::FavoritesController < API::V1::BaseController
 
     if favorite.new_record?
       favorite.save!
-      render json: favorite_json(favorite), status: :created
+      render json: API::V1::FavoriteSerializer.to_full(favorite), status: :created
     else
-      render json: favorite_json(favorite), status: :ok
+      render json: API::V1::FavoriteSerializer.to_full(favorite), status: :ok
     end
   rescue ActiveRecord::RecordNotFound
     render_not_found
@@ -51,27 +51,6 @@ class API::V1::FavoritesController < API::V1::BaseController
     when "Track" then current_user.tracks.find(params[:favorable_id])
     when "Album" then current_user.albums.find(params[:favorable_id])
     when "Artist" then current_user.artists.find(params[:favorable_id])
-    end
-  end
-
-  def favorite_json(favorite)
-    {
-      id: favorite.id,
-      favorable_type: favorite.favorable_type,
-      favorable_id: favorite.favorable_id,
-      favorable: favorable_summary(favorite.favorable),
-      created_at: favorite.created_at
-    }
-  end
-
-  def favorable_summary(favorable)
-    case favorable
-    when Track
-      {id: favorable.id, title: favorable.title, artist: {name: favorable.artist.name}}
-    when Album
-      {id: favorable.id, title: favorable.title, artist: {name: favorable.artist.name}}
-    when Artist
-      {id: favorable.id, name: favorable.name}
     end
   end
 end

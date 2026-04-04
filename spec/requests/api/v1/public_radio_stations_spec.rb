@@ -92,6 +92,25 @@ RSpec.describe "API::V1::PublicRadioStations", type: :request do
       expect(json["current_track"]).to be_nil
     end
 
+    it "includes image_url when station has an image" do
+      station = create(:radio_station, status: "active")
+      station.image.attach(io: StringIO.new("fake"), filename: "logo.png", content_type: "image/png")
+
+      get "/api/v1/radio/#{station.slug}"
+
+      json = JSON.parse(response.body)
+      expect(json["image_url"]).to be_present
+    end
+
+    it "returns null image_url when no image attached" do
+      station = create(:radio_station, status: "active")
+
+      get "/api/v1/radio/#{station.slug}"
+
+      json = JSON.parse(response.body)
+      expect(json["image_url"]).to be_nil
+    end
+
     it "returns not found for unknown slug" do
       get "/api/v1/radio/nonexistent"
 

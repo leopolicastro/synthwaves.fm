@@ -125,6 +125,8 @@ Rails.application.routes.draw do
       resources :favorites, only: [:index, :create, :destroy]
       resources :play_histories, only: [:index, :create]
 
+      resources :radio, controller: "public_radio_stations", only: [:index, :show], param: :slug
+
       resources :radio_stations, only: [:index, :show, :create, :update, :destroy] do
         resource :control, controller: "radio_station_controls", only: [:create]
       end

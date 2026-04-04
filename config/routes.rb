@@ -108,6 +108,31 @@ Rails.application.routes.draw do
     namespace :v1 do
       post "auth/token", to: "auth#create"
       get "native/credentials", to: "native#credentials"
+
+      resource :me, controller: "profile", only: [:show, :update]
+
+      resources :artists, only: [:index, :show, :create, :update, :destroy]
+      resources :albums, only: [:index, :show, :create, :update, :destroy]
+      resources :tracks, only: [:index, :show, :create, :update, :destroy] do
+        get :stream, on: :member
+      end
+
+      resources :playlists, only: [:index, :show, :create, :update, :destroy] do
+        resources :tracks, controller: "playlist_tracks", only: [:create, :destroy], as: :playlist_tracks
+        resource :track_order, controller: "playlist_track_orders", only: [:update]
+      end
+
+      resources :favorites, only: [:index, :create, :destroy]
+      resources :play_histories, only: [:index, :create]
+
+      resources :radio_stations, only: [:index, :show, :create, :update, :destroy] do
+        resource :control, controller: "radio_station_controls", only: [:create]
+      end
+
+      resources :tags, only: [:index]
+      resources :taggings, only: [:create, :destroy]
+
+      get :search, to: "search#index"
     end
     namespace :internal do
       resources :radio_stations, only: [] do

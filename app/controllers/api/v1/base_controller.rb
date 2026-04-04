@@ -1,4 +1,7 @@
 class API::V1::BaseController < ActionController::API
+  include Pagy::Method
+  include Orderable
+
   before_action :authenticate_with_jwt!
 
   private
@@ -26,5 +29,21 @@ class API::V1::BaseController < ActionController::API
 
   def render_error(message, status: :unprocessable_content)
     render json: {error: message}, status: status
+  end
+
+  def render_not_found
+    render json: {error: "Not found"}, status: :not_found
+  end
+
+  def render_validation_errors(record)
+    render json: {errors: record.errors.full_messages}, status: :unprocessable_content
+  end
+
+  def pagination_meta(pagy)
+    {page: pagy.page, per_page: pagy.limit, total_pages: pagy.pages, total_count: pagy.count}
+  end
+
+  def per_page
+    [(params[:per_page] || 24).to_i, 100].min
   end
 end

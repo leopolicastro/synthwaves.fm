@@ -10,7 +10,7 @@ class API::V1::ArtistsController < API::V1::BaseController
     pagy, artists = pagy(:offset, scope, limit: per_page)
 
     render json: {
-      artists: artists.map { |a| artist_json(a) },
+      artists: API::V1::ArtistSerializer.render_as_hash(artists, view: :full),
       pagination: pagination_meta(pagy)
     }
   end
@@ -18,8 +18,8 @@ class API::V1::ArtistsController < API::V1::BaseController
   def show
     albums = @artist.albums.includes(cover_image_attachment: :blob).order(year: :desc, title: :asc)
 
-    render json: artist_json(@artist).merge(
-      albums: albums.map { |a| album_summary_json(a) }
+    render json: API::V1::ArtistSerializer.render_as_hash(@artist, view: :full).merge(
+      albums: API::V1::AlbumSerializer.render_as_hash(albums, view: :summary)
     )
   end
 
@@ -27,7 +27,7 @@ class API::V1::ArtistsController < API::V1::BaseController
     artist = current_user.artists.build(artist_params)
 
     if artist.save
-      render json: artist_json(artist), status: :created
+      render json: API::V1::ArtistSerializer.render_as_hash(artist, view: :full), status: :created
     else
       render_validation_errors(artist)
     end
@@ -35,7 +35,7 @@ class API::V1::ArtistsController < API::V1::BaseController
 
   def update
     if @artist.update(artist_params)
-      render json: artist_json(@artist)
+      render json: API::V1::ArtistSerializer.render_as_hash(@artist, view: :full)
     else
       render_validation_errors(@artist)
     end
@@ -56,28 +56,5 @@ class API::V1::ArtistsController < API::V1::BaseController
 
   def artist_params
     params.require(:artist).permit(:name, :category)
-  end
-
-  def artist_json(artist)
-    {
-      id: artist.id,
-      name: artist.name,
-      category: artist.category,
-      image_url: artist.image_url,
-      albums_count: artist.albums.size,
-      tracks_count: artist.tracks.size,
-      created_at: artist.created_at
-    }
-  end
-
-  def album_summary_json(album)
-    {
-      id: album.id,
-      title: album.title,
-      year: album.year,
-      genre: album.genre,
-      tracks_count: album.tracks.size,
-      cover_image_url: album.cover_image.attached? ? url_for(album.cover_image) : nil
-    }
   end
 end

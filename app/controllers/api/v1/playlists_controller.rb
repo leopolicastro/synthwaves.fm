@@ -9,7 +9,7 @@ class API::V1::PlaylistsController < API::V1::BaseController
     pagy, playlists = pagy(:offset, scope, limit: per_page)
 
     render json: {
-      playlists: playlists.map { |p| playlist_json(p) },
+      playlists: API::V1::PlaylistSerializer.render_as_hash(playlists, view: :full),
       pagination: pagination_meta(pagy)
     }
   end
@@ -18,9 +18,9 @@ class API::V1::PlaylistsController < API::V1::BaseController
     scope = @playlist.playlist_tracks.includes(track: [:artist, :album]).order(:position)
     pagy, playlist_tracks = pagy(:offset, scope, limit: [(params[:per_page] || 50).to_i, 100].min)
 
-    render json: playlist_json(@playlist).merge(
+    render json: API::V1::PlaylistSerializer.render_as_hash(@playlist, view: :full).merge(
       total_duration: @playlist.tracks.sum(:duration),
-      tracks: playlist_tracks.map { |pt| playlist_track_json(pt) },
+      tracks: API::V1::PlaylistTrackSerializer.render_as_hash(playlist_tracks),
       pagination: pagination_meta(pagy)
     )
   end
@@ -30,7 +30,7 @@ class API::V1::PlaylistsController < API::V1::BaseController
 
     if playlist.save
       add_tracks_if_present(playlist)
-      render json: playlist_json(playlist), status: :created
+      render json: API::V1::PlaylistSerializer.render_as_hash(playlist, view: :full), status: :created
     else
       render_validation_errors(playlist)
     end
@@ -38,7 +38,7 @@ class API::V1::PlaylistsController < API::V1::BaseController
 
   def update
     if @playlist.update(playlist_params)
-      render json: playlist_json(@playlist)
+      render json: API::V1::PlaylistSerializer.render_as_hash(@playlist, view: :full)
     else
       render_validation_errors(@playlist)
     end
@@ -67,29 +67,5 @@ class API::V1::PlaylistsController < API::V1::BaseController
     tracks = current_user.tracks.where(id: params[:track_ids])
     ordered = params[:track_ids].map(&:to_i).filter_map { |id| tracks.find { |t| t.id == id } }
     playlist.add_tracks(ordered)
-  end
-
-  def playlist_json(playlist)
-    {
-      id: playlist.id,
-      name: playlist.name,
-      tracks_count: playlist.playlist_tracks_count,
-      created_at: playlist.created_at,
-      updated_at: playlist.updated_at
-    }
-  end
-
-  def playlist_track_json(pt)
-    {
-      position: pt.position,
-      playlist_track_id: pt.id,
-      track: {
-        id: pt.track.id,
-        title: pt.track.title,
-        duration: pt.track.duration,
-        artist: {id: pt.track.artist_id, name: pt.track.artist.name},
-        album: {id: pt.track.album_id, title: pt.track.album.title}
-      }
-    }
   end
 end

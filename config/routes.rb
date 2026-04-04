@@ -132,6 +132,9 @@ Rails.application.routes.draw do
       resources :tags, only: [:index]
       resources :taggings, only: [:create, :destroy]
 
+      resource :track_metadata, controller: "track_metadata", only: [:show]
+      resource :stats, only: [:show]
+
       get :search, to: "search#index"
     end
     namespace :internal do

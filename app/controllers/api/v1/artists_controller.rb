@@ -10,7 +10,7 @@ class API::V1::ArtistsController < API::V1::BaseController
     pagy, artists = pagy(:offset, scope, limit: per_page)
 
     render json: {
-      artists: artists.map { |a| API::V1::ArtistSerializer.to_full(a) },
+      artists: API::V1::ArtistSerializer.render_as_hash(artists, view: :full),
       pagination: pagination_meta(pagy)
     }
   end
@@ -18,8 +18,8 @@ class API::V1::ArtistsController < API::V1::BaseController
   def show
     albums = @artist.albums.includes(cover_image_attachment: :blob).order(year: :desc, title: :asc)
 
-    render json: API::V1::ArtistSerializer.to_full(@artist).merge(
-      albums: albums.map { |a| API::V1::AlbumSerializer.to_summary(a) }
+    render json: API::V1::ArtistSerializer.render_as_hash(@artist, view: :full).merge(
+      albums: API::V1::AlbumSerializer.render_as_hash(albums, view: :summary)
     )
   end
 
@@ -27,7 +27,7 @@ class API::V1::ArtistsController < API::V1::BaseController
     artist = current_user.artists.build(artist_params)
 
     if artist.save
-      render json: API::V1::ArtistSerializer.to_full(artist), status: :created
+      render json: API::V1::ArtistSerializer.render_as_hash(artist, view: :full), status: :created
     else
       render_validation_errors(artist)
     end
@@ -35,7 +35,7 @@ class API::V1::ArtistsController < API::V1::BaseController
 
   def update
     if @artist.update(artist_params)
-      render json: API::V1::ArtistSerializer.to_full(@artist)
+      render json: API::V1::ArtistSerializer.render_as_hash(@artist, view: :full)
     else
       render_validation_errors(@artist)
     end

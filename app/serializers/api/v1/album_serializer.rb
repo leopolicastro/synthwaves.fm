@@ -1,53 +1,36 @@
 module API
   module V1
-    class AlbumSerializer
-      def self.to_full(album)
-        {
-          id: album.id,
-          title: album.title,
-          year: album.year,
-          genre: album.genre,
-          artist: ArtistSerializer.to_ref(album.artist),
-          tracks_count: album.tracks.size,
-          cover_image_url: cover_image_url(album),
-          created_at: album.created_at
-        }
+    class AlbumSerializer < Blueprinter::Base
+      identifier :id
+
+      view :ref do
+        field :title
       end
 
-      def self.to_summary(album)
-        {
-          id: album.id,
-          title: album.title,
-          year: album.year,
-          genre: album.genre,
-          tracks_count: album.tracks.size,
-          cover_image_url: cover_image_url(album)
-        }
+      view :search_result do
+        include_view :ref
+        fields :year, :genre
+        association :artist, blueprint: ArtistSerializer, view: :ref
       end
 
-      def self.to_ref(album)
-        {
-          id: album.id,
-          title: album.title
-        }
+      view :summary do
+        include_view :ref
+        fields :year, :genre
+        field :tracks_count do |album|
+          album.tracks.size
+        end
+        field :cover_image_url do |album|
+          if album.cover_image.attached?
+            Rails.application.routes.url_helpers.url_for(album.cover_image)
+          end
+        end
       end
 
-      def self.to_search_result(album)
-        {
-          id: album.id,
-          title: album.title,
-          year: album.year,
-          genre: album.genre,
-          artist: ArtistSerializer.to_ref(album.artist)
-        }
+      view :full do
+        include_view :summary
+        association :artist, blueprint: ArtistSerializer, view: :ref
+        field :created_at
       end
-
-      def self.cover_image_url(album)
-        return nil unless album.cover_image.attached?
-        Rails.application.routes.url_helpers.url_for(album.cover_image)
-      end
-
-      private_class_method :cover_image_url
     end
   end
 end

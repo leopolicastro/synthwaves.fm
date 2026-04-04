@@ -7,12 +7,12 @@ class API::V1::RadioStationsController < API::V1::BaseController
       .order(created_at: :desc)
 
     render json: {
-      radio_stations: stations.map { |s| API::V1::RadioStationSerializer.to_full(s) }
+      radio_stations: API::V1::RadioStationSerializer.render_as_hash(stations)
     }
   end
 
   def show
-    render json: API::V1::RadioStationSerializer.to_full(@station)
+    render json: API::V1::RadioStationSerializer.render_as_hash(@station)
   end
 
   def create
@@ -20,7 +20,7 @@ class API::V1::RadioStationsController < API::V1::BaseController
     station = current_user.radio_stations.build(playlist: playlist)
 
     if station.save
-      render json: API::V1::RadioStationSerializer.to_full(station), status: :created
+      render json: API::V1::RadioStationSerializer.render_as_hash(station), status: :created
     else
       render_validation_errors(station)
     end
@@ -33,7 +33,7 @@ class API::V1::RadioStationsController < API::V1::BaseController
       if @station.saved_change_to_playback_mode? && !@station.stopped?
         RadioQueueService.new(@station).populate!
       end
-      render json: API::V1::RadioStationSerializer.to_full(@station)
+      render json: API::V1::RadioStationSerializer.render_as_hash(@station)
     else
       render_validation_errors(@station)
     end

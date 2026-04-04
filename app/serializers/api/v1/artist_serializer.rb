@@ -1,31 +1,27 @@
 module API
   module V1
-    class ArtistSerializer
-      def self.to_full(artist)
-        {
-          id: artist.id,
-          name: artist.name,
-          category: artist.category,
-          image_url: artist.image_url,
-          albums_count: artist.albums.size,
-          tracks_count: artist.tracks.size,
-          created_at: artist.created_at
-        }
+    class ArtistSerializer < Blueprinter::Base
+      identifier :id
+
+      view :ref do
+        field :name
       end
 
-      def self.to_summary(artist)
-        {
-          id: artist.id,
-          name: artist.name,
-          category: artist.category
-        }
+      view :summary do
+        include_view :ref
+        field :category
       end
 
-      def self.to_ref(artist)
-        {
-          id: artist.id,
-          name: artist.name
-        }
+      view :full do
+        include_view :summary
+        field :image_url
+        field :albums_count do |artist|
+          artist.albums.size
+        end
+        field :tracks_count do |artist|
+          artist.tracks.size
+        end
+        field :created_at
       end
     end
   end

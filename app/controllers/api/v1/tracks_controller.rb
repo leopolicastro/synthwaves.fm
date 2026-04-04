@@ -14,13 +14,13 @@ class API::V1::TracksController < API::V1::BaseController
     pagy, tracks = pagy(:offset, scope, limit: per_page)
 
     render json: {
-      tracks: tracks.map { |t| API::V1::TrackSerializer.to_full(t) },
+      tracks: API::V1::TrackSerializer.render_as_hash(tracks, view: :full),
       pagination: pagination_meta(pagy)
     }
   end
 
   def show
-    render json: API::V1::TrackSerializer.to_full(@track)
+    render json: API::V1::TrackSerializer.render_as_hash(@track, view: :full)
   end
 
   def create
@@ -37,7 +37,7 @@ class API::V1::TracksController < API::V1::BaseController
 
   def update
     if @track.update(track_update_params)
-      render json: API::V1::TrackSerializer.to_full(@track)
+      render json: API::V1::TrackSerializer.render_as_hash(@track, view: :full)
     else
       render_validation_errors(@track)
     end
@@ -101,7 +101,7 @@ class API::V1::TracksController < API::V1::BaseController
     end
 
     if track.save
-      render json: API::V1::TrackSerializer.to_full(track), status: :created
+      render json: API::V1::TrackSerializer.render_as_hash(track, view: :full), status: :created
     else
       render_validation_errors(track)
     end
@@ -138,7 +138,7 @@ class API::V1::TracksController < API::V1::BaseController
     end
 
     if track.save
-      render json: API::V1::TrackSerializer.to_full(track), status: :created
+      render json: API::V1::TrackSerializer.render_as_hash(track, view: :full), status: :created
     else
       render_validation_errors(track)
     end
@@ -148,7 +148,7 @@ class API::V1::TracksController < API::V1::BaseController
     track = current_user.tracks.build(track_create_params)
 
     if track.save
-      render json: API::V1::TrackSerializer.to_full(track), status: :created
+      render json: API::V1::TrackSerializer.render_as_hash(track, view: :full), status: :created
     else
       render_validation_errors(track)
     end

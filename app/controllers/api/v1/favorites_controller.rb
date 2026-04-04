@@ -8,7 +8,7 @@ class API::V1::FavoritesController < API::V1::BaseController
     pagy, favorites = pagy(:offset, scope, limit: per_page)
 
     render json: {
-      favorites: favorites.map { |f| API::V1::FavoriteSerializer.to_full(f) },
+      favorites: API::V1::FavoriteSerializer.render_as_hash(favorites),
       pagination: pagination_meta(pagy)
     }
   end
@@ -23,9 +23,9 @@ class API::V1::FavoritesController < API::V1::BaseController
 
     if favorite.new_record?
       favorite.save!
-      render json: API::V1::FavoriteSerializer.to_full(favorite), status: :created
+      render json: API::V1::FavoriteSerializer.render_as_hash(favorite), status: :created
     else
-      render json: API::V1::FavoriteSerializer.to_full(favorite), status: :ok
+      render json: API::V1::FavoriteSerializer.render_as_hash(favorite), status: :ok
     end
   rescue ActiveRecord::RecordNotFound
     render_not_found

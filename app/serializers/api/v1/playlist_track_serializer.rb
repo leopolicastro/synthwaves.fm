@@ -1,13 +1,11 @@
 module API
   module V1
-    class PlaylistTrackSerializer
-      def self.to_full(playlist_track)
-        {
-          position: playlist_track.position,
-          playlist_track_id: playlist_track.id,
-          track: TrackSerializer.to_embedded(playlist_track.track)
-        }
+    class PlaylistTrackSerializer < Blueprinter::Base
+      field :position
+      field :playlist_track_id do |pt|
+        pt.id
       end
+      association :track, blueprint: TrackSerializer, view: :embedded
     end
   end
 end

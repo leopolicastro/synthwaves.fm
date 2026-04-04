@@ -1,13 +1,9 @@
 module API
   module V1
-    class TagSerializer
-      def self.to_full(tag)
-        {
-          id: tag.id,
-          name: tag.name,
-          tag_type: tag.tag_type
-        }
-      end
+    class TagSerializer < Blueprinter::Base
+      identifier :id
+
+      fields :name, :tag_type
     end
   end
 end

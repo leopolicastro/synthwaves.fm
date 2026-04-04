@@ -24,9 +24,9 @@ class API::V1::SearchController < API::V1::BaseController
     )
 
     render json: {
-      artists: results[:artists].map { |a| API::V1::ArtistSerializer.to_summary(a) },
-      albums: results[:albums].map { |a| API::V1::AlbumSerializer.to_search_result(a) },
-      tracks: results[:tracks].map { |t| API::V1::TrackSerializer.to_embedded(t) }
+      artists: API::V1::ArtistSerializer.render_as_hash(results[:artists], view: :summary),
+      albums: API::V1::AlbumSerializer.render_as_hash(results[:albums], view: :search_result),
+      tracks: API::V1::TrackSerializer.render_as_hash(results[:tracks], view: :embedded)
     }
   end
 end

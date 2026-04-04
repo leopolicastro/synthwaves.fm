@@ -6,7 +6,7 @@ class API::V1::TagsController < API::V1::BaseController
     scope = scope.order(:name)
 
     render json: {
-      tags: scope.map { |t| API::V1::TagSerializer.to_full(t) }
+      tags: API::V1::TagSerializer.render_as_hash(scope)
     }
   end
 end

@@ -1,52 +1,37 @@
 module API
   module V1
-    class TrackSerializer
-      def self.to_full(track)
-        {
-          id: track.id,
-          title: track.title,
-          track_number: track.track_number,
-          disc_number: track.disc_number,
-          duration: track.duration,
-          bitrate: track.bitrate,
-          file_format: track.file_format,
-          file_size: track.file_size,
-          lyrics: track.lyrics,
-          has_audio: track.audio_file.attached?,
-          artist: ArtistSerializer.to_ref(track.artist),
-          album: AlbumSerializer.to_ref(track.album),
-          created_at: track.created_at
-        }
+    class TrackSerializer < Blueprinter::Base
+      identifier :id
+
+      view :minimal do
+        field :title
+        association :artist, blueprint: ArtistSerializer, view: :ref do |track|
+          {name: track.artist.name}
+        end
       end
 
-      def self.to_summary(track)
-        {
-          id: track.id,
-          title: track.title,
-          track_number: track.track_number,
-          disc_number: track.disc_number,
-          duration: track.duration,
-          file_format: track.file_format,
-          has_audio: track.audio_file.attached?
-        }
+      view :embedded do
+        field :title
+        field :duration
+        association :artist, blueprint: ArtistSerializer, view: :ref
+        association :album, blueprint: AlbumSerializer, view: :ref
       end
 
-      def self.to_embedded(track)
-        {
-          id: track.id,
-          title: track.title,
-          duration: track.duration,
-          artist: ArtistSerializer.to_ref(track.artist),
-          album: AlbumSerializer.to_ref(track.album)
-        }
+      view :summary do
+        fields :title, :track_number, :disc_number, :duration, :file_format
+        field :has_audio do |track|
+          track.audio_file.attached?
+        end
       end
 
-      def self.to_minimal(track)
-        {
-          id: track.id,
-          title: track.title,
-          artist: {name: track.artist.name}
-        }
+      view :full do
+        fields :title, :track_number, :disc_number, :duration,
+          :bitrate, :file_format, :file_size, :lyrics, :created_at
+        field :has_audio do |track|
+          track.audio_file.attached?
+        end
+        association :artist, blueprint: ArtistSerializer, view: :ref
+        association :album, blueprint: AlbumSerializer, view: :ref
       end
     end
   end

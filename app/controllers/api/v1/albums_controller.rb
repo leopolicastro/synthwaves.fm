@@ -10,7 +10,7 @@ class API::V1::AlbumsController < API::V1::BaseController
     pagy, albums = pagy(:offset, scope, limit: per_page)
 
     render json: {
-      albums: albums.map { |a| API::V1::AlbumSerializer.to_full(a) },
+      albums: API::V1::AlbumSerializer.render_as_hash(albums, view: :full),
       pagination: pagination_meta(pagy)
     }
   end
@@ -18,9 +18,9 @@ class API::V1::AlbumsController < API::V1::BaseController
   def show
     tracks = @album.tracks.order(disc_number: :asc, track_number: :asc)
 
-    render json: API::V1::AlbumSerializer.to_full(@album).merge(
+    render json: API::V1::AlbumSerializer.render_as_hash(@album, view: :full).merge(
       total_duration: tracks.sum(:duration),
-      tracks: tracks.map { |t| API::V1::TrackSerializer.to_summary(t) }
+      tracks: API::V1::TrackSerializer.render_as_hash(tracks, view: :summary)
     )
   end
 
@@ -29,7 +29,7 @@ class API::V1::AlbumsController < API::V1::BaseController
 
     if album.save
       attach_cover_image(album)
-      render json: API::V1::AlbumSerializer.to_full(album), status: :created
+      render json: API::V1::AlbumSerializer.render_as_hash(album, view: :full), status: :created
     else
       render_validation_errors(album)
     end
@@ -38,7 +38,7 @@ class API::V1::AlbumsController < API::V1::BaseController
   def update
     if @album.update(album_params)
       attach_cover_image(@album)
-      render json: API::V1::AlbumSerializer.to_full(@album)
+      render json: API::V1::AlbumSerializer.render_as_hash(@album, view: :full)
     else
       render_validation_errors(@album)
     end

@@ -1,21 +1,18 @@
 module API
   module V1
-    class PlaylistSerializer
-      def self.to_full(playlist)
-        {
-          id: playlist.id,
-          name: playlist.name,
-          tracks_count: playlist.playlist_tracks_count,
-          created_at: playlist.created_at,
-          updated_at: playlist.updated_at
-        }
+    class PlaylistSerializer < Blueprinter::Base
+      identifier :id
+
+      view :ref do
+        field :name
       end
 
-      def self.to_ref(playlist)
-        {
-          id: playlist.id,
-          name: playlist.name
-        }
+      view :full do
+        include_view :ref
+        field :tracks_count do |playlist|
+          playlist.playlist_tracks_count
+        end
+        fields :created_at, :updated_at
       end
     end
   end

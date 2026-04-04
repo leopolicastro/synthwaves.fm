@@ -4,7 +4,7 @@ class API::V1::PlayHistoriesController < API::V1::BaseController
     pagy, histories = pagy(:offset, scope, limit: per_page)
 
     render json: {
-      play_histories: histories.map { |h| API::V1::PlayHistorySerializer.to_full(h) },
+      play_histories: API::V1::PlayHistorySerializer.render_as_hash(histories),
       pagination: pagination_meta(pagy)
     }
   end
@@ -13,7 +13,7 @@ class API::V1::PlayHistoriesController < API::V1::BaseController
     track = current_user.tracks.find(params[:track_id])
     history = current_user.play_histories.create!(track: track, played_at: Time.current)
 
-    render json: API::V1::PlayHistorySerializer.to_full(history), status: :created
+    render json: API::V1::PlayHistorySerializer.render_as_hash(history), status: :created
   rescue ActiveRecord::RecordNotFound
     render_error("Track not found", status: :not_found)
   end

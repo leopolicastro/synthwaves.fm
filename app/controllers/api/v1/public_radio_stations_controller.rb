@@ -1,5 +1,4 @@
 class API::V1::PublicRadioStationsController < API::V1::BaseController
-
   def index
     stations = RadioStation
       .includes(:playlist, :image_attachment, current_track: [:artist, {album: {cover_image_attachment: :blob}}])

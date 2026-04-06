@@ -1,5 +1,4 @@
 class PublicRadioStationsController < ApplicationController
-  allow_unauthenticated_access only: %i[index show]
   layout "landing"
 
   def index

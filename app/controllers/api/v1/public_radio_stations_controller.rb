@@ -1,5 +1,4 @@
 class API::V1::PublicRadioStationsController < API::V1::BaseController
-  skip_before_action :authenticate_with_jwt!
 
   def index
     stations = RadioStation

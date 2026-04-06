@@ -1,5 +1,4 @@
 class PublicTvGuideController < ApplicationController
-  allow_unauthenticated_access only: %i[index]
   layout "landing"
 
   def index
